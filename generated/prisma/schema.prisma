@@ -15,16 +15,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
+enum Role {
+  ADMIN
+  MIDWIFE
 }
 
 // Necessary for Next auth
@@ -61,9 +54,10 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  password      String?
+  role          Role      @default(MIDWIFE)
   accounts      Account[]
   sessions      Session[]
-  posts         Post[]
 }
 
 model VerificationToken {

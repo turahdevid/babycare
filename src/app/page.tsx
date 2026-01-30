@@ -1,7 +1,264 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useId } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+
+type ToastKind = "success" | "error" | "loading";
+
+interface ToastState {
+  id: string;
+  kind: ToastKind;
+  message: string;
+}
+
+function IconMail({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="m6.2 7.4 5.1 4.2c.4.3 1 .3 1.4 0l5.1-4.2"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function IconLock({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M7 11V8a5 5 0 0 1 10 0v3"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M6.8 11h10.4c1 0 1.8.8 1.8 1.8v6.4c0 1-.8 1.8-1.8 1.8H6.8c-1 0-1.8-.8-1.8-1.8v-6.4c0-1 .8-1.8 1.8-1.8Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M12 14.8v2.4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function IconEye({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M2.5 12s3.4-6.5 9.5-6.5S21.5 12 21.5 12s-3.4 6.5-9.5 6.5S2.5 12 2.5 12Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M12 14.6a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function IconEyeOff({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4.2 6.1 19.8 17.9"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M9.2 8.3A8.8 8.8 0 0 1 12 7.5c6.1 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3.2 4.1"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M6 9.6C3.8 11.6 2.5 14 2.5 14s3.4 6.5 9.5 6.5c1.1 0 2.2-.2 3.2-.6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M10.2 10.6a2.6 2.6 0 0 0 3.3 3.3"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function IconCheck({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20 6 9.3 16.6 4 11.4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function IconWarning({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 3.5 21 19.5H3L12 3.5Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M12 9v5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M12 17.2h.01"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.6"
+      />
+    </svg>
+  );
+}
+
+function IconSpinner({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      height="22"
+      viewBox="0 0 24 24"
+      width="22"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 3a9 9 0 1 0 9 9"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function Toast({ toast, visible }: { toast: ToastState; visible: boolean }) {
+  const toneClassName =
+    toast.kind === "success"
+      ? "from-emerald-100/60 via-sky-100/50 to-violet-100/40 text-emerald-800"
+      : toast.kind === "error"
+        ? "from-rose-100/60 via-pink-100/50 to-violet-100/40 text-rose-800"
+        : "from-sky-100/60 via-white/40 to-violet-100/40 text-slate-800";
+
+  const icon =
+    toast.kind === "success" ? (
+      <IconCheck className="h-5 w-5" />
+    ) : toast.kind === "error" ? (
+      <IconWarning className="h-5 w-5" />
+    ) : (
+      <IconSpinner className="h-5 w-5 animate-spin" />
+    );
+
+  return (
+    <div
+      aria-atomic="true"
+      aria-live={toast.kind === "error" ? "assertive" : "polite"}
+      className={`pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex max-w-[1024px] justify-center px-6 pt-6 transition-all duration-300 ${
+        visible ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
+      }`}
+      role={toast.kind === "error" ? "alert" : "status"}
+    >
+      <div
+        className={`flex w-full max-w-md items-center gap-3 rounded-[18px] border border-white/55 bg-gradient-to-r ${toneClassName} bg-white/30 px-4 py-3 shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl`}
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/55 bg-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+          <span className="text-slate-800/80">{icon}</span>
+        </div>
+        <p className="text-sm font-medium tracking-tight text-slate-800/90">
+          {toast.message}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function BabycareLogo({ className }: { className?: string }) {
   return (
@@ -217,13 +474,126 @@ export default function Home() {
   const emailId = useId();
   const passwordId = useId();
   const rememberId = useId();
+  const passwordHintId = useId();
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const [toast, setToast] = useState<ToastState | null>(null);
+  const [toastVisible, setToastVisible] = useState<boolean>(false);
+  const toastAutoTimerRef = useRef<number | null>(null);
+  const toastExitTimerRef = useRef<number | null>(null);
+  const redirectTimerRef = useRef<number | null>(null);
+
+  const clearToastTimers = useCallback(() => {
+    if (toastAutoTimerRef.current) {
+      window.clearTimeout(toastAutoTimerRef.current);
+      toastAutoTimerRef.current = null;
+    }
+
+    if (toastExitTimerRef.current) {
+      window.clearTimeout(toastExitTimerRef.current);
+      toastExitTimerRef.current = null;
+    }
+
+    if (redirectTimerRef.current) {
+      window.clearTimeout(redirectTimerRef.current);
+      redirectTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      clearToastTimers();
+    };
+  }, [clearToastTimers]);
+
+  const dismissToast = useCallback(() => {
+    clearToastTimers();
+    setToastVisible(false);
+
+    toastExitTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastExitTimerRef.current = null;
+    }, 260);
+  }, [clearToastTimers]);
+
+  const showToast = useCallback(
+    (kind: ToastKind, message: string, autoDismissMs?: number) => {
+      clearToastTimers();
+
+      const nextToast: ToastState = {
+        id: `${Date.now()}`,
+        kind,
+        message,
+      };
+
+      setToast(nextToast);
+      setToastVisible(false);
+
+      window.requestAnimationFrame(() => {
+        setToastVisible(true);
+      });
+
+      if (typeof autoDismissMs === "number") {
+        toastAutoTimerRef.current = window.setTimeout(() => {
+          dismissToast();
+        }, autoDismissMs);
+      }
+    },
+    [clearToastTimers, dismissToast],
+  );
+
+  const onEmailChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  }, []);
+
+  const onPasswordChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setPassword(event.target.value);
+    },
+    [],
+  );
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    showToast("loading", "Memverifikasi akun...");
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: email.trim(),
+      password,
+      callbackUrl: "/dashboard",
+    });
+
+    setIsSubmitting(false);
+
+    if (result?.ok) {
+      showToast("success", "Login berhasil", 2400);
+
+      const nextUrl = typeof result.url === "string" ? result.url : "/dashboard";
+      redirectTimerRef.current = window.setTimeout(() => {
+        router.push(nextUrl);
+        redirectTimerRef.current = null;
+      }, 420);
+
+      return;
+    }
+
+    showToast("error", "Email atau password tidak valid", 2800);
   };
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-12 text-slate-900">
+      {toast ? <Toast toast={toast} visible={toastVisible} /> : null}
+
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-24 -top-24 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-sky-200/70 via-pink-200/60 to-violet-200/70 blur-3xl" />
         <div className="absolute -bottom-28 -right-28 h-[560px] w-[560px] rounded-full bg-gradient-to-tr from-amber-100/70 via-pink-200/50 to-sky-200/60 blur-3xl" />
@@ -269,16 +639,23 @@ export default function Home() {
                   >
                     Email
                   </label>
-                  <input
-                    autoComplete="email"
-                    className="w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-3 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-14px_30px_rgba(15,23,42,0.08)] outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-sky-200/60"
-                    id={emailId}
-                    inputMode="email"
-                    name="email"
-                    placeholder="you@example.com"
-                    required
-                    type="email"
-                  />
+                  <div className="relative">
+                    <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sky-700/55">
+                      <IconMail className="h-5 w-5" />
+                    </div>
+                    <input
+                      autoComplete="email"
+                      className="w-full rounded-2xl border border-white/60 bg-white/45 py-3 pl-11 pr-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-14px_30px_rgba(15,23,42,0.08)] outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-sky-200/60"
+                      id={emailId}
+                      inputMode="email"
+                      name="email"
+                      onChange={onEmailChange}
+                      placeholder="you@example.com"
+                      required
+                      type="email"
+                      value={email}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -296,15 +673,40 @@ export default function Home() {
                       Forgot password?
                     </Link>
                   </div>
-                  <input
-                    autoComplete="current-password"
-                    className="w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-3 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-14px_30px_rgba(15,23,42,0.08)] outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                    id={passwordId}
-                    name="password"
-                    placeholder="••••••••"
-                    required
-                    type="password"
-                  />
+                  <div className="relative">
+                    <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-violet-700/55">
+                      <IconLock className="h-5 w-5" />
+                    </div>
+                    <input
+                      autoComplete="current-password"
+                      aria-describedby={passwordHintId}
+                      className="w-full rounded-2xl border border-white/60 bg-white/45 py-3 pl-11 pr-12 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-14px_30px_rgba(15,23,42,0.08)] outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                      id={passwordId}
+                      name="password"
+                      onChange={onPasswordChange}
+                      placeholder="••••••••"
+                      required
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                    />
+                    <button
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-2xl border border-white/55 bg-white/25 p-2 text-slate-700/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] transition hover:bg-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                      onClick={() => {
+                        setShowPassword((current) => !current);
+                      }}
+                      type="button"
+                    >
+                      {showPassword ? (
+                        <IconEyeOff className="h-5 w-5" />
+                      ) : (
+                        <IconEye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-600/70" id={passwordHintId}>
+                    Minimal 8 karakter, kombinasi huruf &amp; angka
+                  </p>
                 </div>
 
                 <div className="flex items-center justify-between gap-3">
@@ -323,9 +725,15 @@ export default function Home() {
                 <div className="pt-1">
                   <button
                     className="group relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(120deg,#93C5FD,#FBCFE8,#C4B5FD)] bg-[length:200%_200%] px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_40px_rgba(59,130,246,0.18)] transition hover:bg-[position:100%_0%] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                    disabled={isSubmitting}
                     type="submit"
                   >
-                    <span className="relative z-10">Login</span>
+                    <span className="relative z-10 inline-flex items-center justify-center gap-2">
+                      {isSubmitting ? (
+                        <IconSpinner className="h-5 w-5 animate-spin" />
+                      ) : null}
+                      <span>{isSubmitting ? "Memverifikasi" : "Login"}</span>
+                    </span>
                     <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                       <span className="absolute -left-1/2 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-white/35 blur-xl bc-ripple" />
                     </span>
