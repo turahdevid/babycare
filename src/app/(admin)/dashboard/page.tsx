@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
+import { UserMenu } from "~/app/_components/user-menu";
+
 type ReservationItem = {
   id: string;
   time: string;
@@ -347,14 +349,17 @@ export default function DashboardPage() {
 
       <div className="bc-dash-enter relative mx-auto w-full max-w-[1024px]">
         <header className="mb-8">
-          <div className="rounded-[22px] border border-white/55 bg-white/30 px-6 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur-2xl">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-              Dashboard
-            </h1>
+          <div className="relative z-50 rounded-[22px] border border-white/55 bg-white/30 px-6 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur-2xl">
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+                Dashboard
+              </h1>
+              <UserMenu />
+            </div>
           </div>
         </header>
 
-        <section className="grid gap-6 md:grid-cols-2">
+        <section className="relative z-10 grid gap-6 md:grid-cols-2">
           <GlassCard className="md:col-span-2">
             <div className="flex items-start justify-between gap-6">
               <div className="space-y-2">
