@@ -160,6 +160,96 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.CustomerScalarFieldEnum = {
+  id: 'id',
+  motherName: 'motherName',
+  motherPhone: 'motherPhone',
+  motherEmail: 'motherEmail',
+  address: 'address',
+  notes: 'notes',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BabyScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  name: 'name',
+  gender: 'gender',
+  birthDate: 'birthDate',
+  notes: 'notes',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TreatmentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  durationMinutes: 'durationMinutes',
+  basePrice: 'basePrice',
+  isActive: 'isActive',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  babyId: 'babyId',
+  midwifeId: 'midwifeId',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  status: 'status',
+  channel: 'channel',
+  serviceType: 'serviceType',
+  notes: 'notes',
+  cancelledAt: 'cancelledAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationTreatmentScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  treatmentId: 'treatmentId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  durationMinutes: 'durationMinutes',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationAuditLogScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  action: 'action',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  actorId: 'actorId',
+  message: 'message',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  status: 'status',
+  userId: 'userId',
+  reservationId: 'reservationId',
+  title: 'title',
+  body: 'body',
+  readAt: 'readAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -202,16 +292,120 @@ exports.Prisma.VerificationTokenOrderByRelevanceFieldEnum = {
   identifier: 'identifier',
   token: 'token'
 };
+
+exports.Prisma.CustomerOrderByRelevanceFieldEnum = {
+  id: 'id',
+  motherName: 'motherName',
+  motherPhone: 'motherPhone',
+  motherEmail: 'motherEmail',
+  address: 'address',
+  notes: 'notes'
+};
+
+exports.Prisma.BabyOrderByRelevanceFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  name: 'name',
+  notes: 'notes'
+};
+
+exports.Prisma.TreatmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.ReservationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  babyId: 'babyId',
+  midwifeId: 'midwifeId',
+  notes: 'notes'
+};
+
+exports.Prisma.ReservationTreatmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  treatmentId: 'treatmentId',
+  notes: 'notes'
+};
+
+exports.Prisma.ReservationAuditLogOrderByRelevanceFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  actorId: 'actorId',
+  message: 'message'
+};
+
+exports.Prisma.NotificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  reservationId: 'reservationId',
+  title: 'title',
+  body: 'body'
+};
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',
   MIDWIFE: 'MIDWIFE'
+};
+
+exports.BabyGender = exports.$Enums.BabyGender = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE'
+};
+
+exports.ReservationStatus = exports.$Enums.ReservationStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  NO_SHOW: 'NO_SHOW'
+};
+
+exports.ReservationChannel = exports.$Enums.ReservationChannel = {
+  ADMIN: 'ADMIN',
+  CUSTOMER: 'CUSTOMER'
+};
+
+exports.ServiceType = exports.$Enums.ServiceType = {
+  OUTLET: 'OUTLET',
+  HOMECARE: 'HOMECARE'
+};
+
+exports.ReservationAuditAction = exports.$Enums.ReservationAuditAction = {
+  CREATE: 'CREATE',
+  UPDATE_STATUS: 'UPDATE_STATUS',
+  ASSIGN_MIDWIFE: 'ASSIGN_MIDWIFE',
+  UPDATE_SCHEDULE: 'UPDATE_SCHEDULE',
+  CANCEL: 'CANCEL',
+  COMPLETE: 'COMPLETE'
+};
+
+exports.NotificationType = exports.$Enums.NotificationType = {
+  RESERVATION_CREATED: 'RESERVATION_CREATED',
+  RESERVATION_STATUS_CHANGED: 'RESERVATION_STATUS_CHANGED',
+  MIDWIFE_ASSIGNED: 'MIDWIFE_ASSIGNED'
+};
+
+exports.NotificationStatus = exports.$Enums.NotificationStatus = {
+  UNREAD: 'UNREAD',
+  READ: 'READ',
+  ARCHIVED: 'ARCHIVED'
 };
 
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  Customer: 'Customer',
+  Baby: 'Baby',
+  Treatment: 'Treatment',
+  Reservation: 'Reservation',
+  ReservationTreatment: 'ReservationTreatment',
+  ReservationAuditLog: 'ReservationAuditLog',
+  Notification: 'Notification'
 };
 
 /**

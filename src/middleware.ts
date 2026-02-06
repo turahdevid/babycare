@@ -15,7 +15,16 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
-  if (pathname.startsWith("/dashboard") && !isLoggedIn) {
+  const requiresAuth =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/reservation") ||
+    pathname.startsWith("/customer") ||
+    pathname.startsWith("/treatment") ||
+    pathname.startsWith("/report") ||
+    pathname.startsWith("/user") ||
+    pathname.startsWith("/account");
+
+  if (requiresAuth && !isLoggedIn) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
@@ -23,5 +32,14 @@ export default function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*"],
+  matcher: [
+    "/",
+    "/dashboard/:path*",
+    "/reservation/:path*",
+    "/customer/:path*",
+    "/treatment/:path*",
+    "/report",
+    "/user/:path*",
+    "/account/:path*",
+  ],
 };

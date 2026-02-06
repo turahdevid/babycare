@@ -49,15 +49,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role      @default(MIDWIFE)
-  accounts      Account[]
-  sessions      Session[]
+  id                   String                @id @default(cuid())
+  name                 String?
+  email                String?               @unique
+  emailVerified        DateTime?
+  image                String?
+  password             String?
+  role                 Role                  @default(MIDWIFE)
+  accounts             Account[]
+  sessions             Session[]
+  midwifeReservations  Reservation[]         @relation("ReservationMidwife")
+  reservationAuditLogs ReservationAuditLog[] @relation("ReservationAuditActor")
+  notifications        Notification[]
 }
 
 model VerificationToken {
@@ -66,4 +69,183 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum BabyGender {
+  MALE
+  FEMALE
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum ReservationChannel {
+  ADMIN
+  CUSTOMER
+}
+
+enum ReservationAuditAction {
+  CREATE
+  UPDATE_STATUS
+  ASSIGN_MIDWIFE
+  UPDATE_SCHEDULE
+  CANCEL
+  COMPLETE
+}
+
+enum NotificationType {
+  RESERVATION_CREATED
+  RESERVATION_STATUS_CHANGED
+  MIDWIFE_ASSIGNED
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model Customer {
+  id           String        @id @default(cuid())
+  motherName   String
+  motherPhone  String
+  motherEmail  String?       @db.VarChar(255)
+  address      String?       @db.Text
+  notes        String?       @db.Text
+  deletedAt    DateTime?
+  babies       Baby[]
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([motherPhone])
+  @@index([motherEmail])
+  @@index([deletedAt])
+  @@index([createdAt])
+}
+
+model Baby {
+  id           String        @id @default(cuid())
+  customerId   String
+  name         String
+  gender       BabyGender?
+  birthDate    DateTime?
+  notes        String?       @db.Text
+  deletedAt    DateTime?
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([customerId])
+  @@index([name])
+  @@index([deletedAt])
+}
+
+model Treatment {
+  id               String                 @id @default(cuid())
+  name             String
+  description      String?                @db.Text
+  durationMinutes  Int
+  basePrice        Decimal                @db.Decimal(10, 2)
+  isActive         Boolean                @default(true)
+  deletedAt        DateTime?
+  reservationItems ReservationTreatment[]
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@index([isActive])
+  @@index([name])
+  @@index([deletedAt])
+}
+
+model Reservation {
+  id            String                 @id @default(cuid())
+  customerId    String
+  babyId        String?
+  midwifeId     String?
+  startAt       DateTime
+  endAt         DateTime
+  status        ReservationStatus      @default(PENDING)
+  channel       ReservationChannel     @default(ADMIN)
+  notes         String?                @db.Text
+  cancelledAt   DateTime?
+  completedAt   DateTime?
+  customer      Customer               @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  baby          Baby?                  @relation(fields: [babyId], references: [id], onDelete: SetNull)
+  midwife       User?                  @relation("ReservationMidwife", fields: [midwifeId], references: [id], onDelete: SetNull)
+  items         ReservationTreatment[]
+  auditLogs     ReservationAuditLog[]
+  notifications Notification[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@unique([midwifeId, startAt])
+  @@index([startAt])
+  @@index([status])
+  @@index([status, startAt])
+  @@index([midwifeId, startAt])
+  @@index([customerId, startAt])
+  @@index([babyId, startAt])
+}
+
+model ReservationTreatment {
+  id              String      @id @default(cuid())
+  reservationId   String
+  treatmentId     String
+  quantity        Int         @default(1)
+  unitPrice       Decimal     @db.Decimal(10, 2)
+  durationMinutes Int
+  notes           String?     @db.Text
+  reservation     Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  treatment       Treatment   @relation(fields: [treatmentId], references: [id], onDelete: Restrict)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([reservationId, treatmentId])
+  @@index([reservationId])
+  @@index([treatmentId])
+}
+
+model ReservationAuditLog {
+  id            String                 @id @default(cuid())
+  reservationId String
+  action        ReservationAuditAction
+  fromStatus    ReservationStatus?
+  toStatus      ReservationStatus?
+  actorId       String?
+  message       String?                @db.Text
+  reservation   Reservation            @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  actor         User?                  @relation("ReservationAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@index([reservationId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+}
+
+model Notification {
+  id            String             @id @default(cuid())
+  type          NotificationType
+  status        NotificationStatus @default(UNREAD)
+  userId        String?
+  reservationId String?
+  title         String
+  body          String             @db.Text
+  readAt        DateTime?
+  user          User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  reservation   Reservation?       @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@index([userId, status, createdAt])
+  @@index([reservationId])
+  @@index([type, createdAt])
 }

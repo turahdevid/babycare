@@ -243,7 +243,7 @@ export function UserMenu() {
               "flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-slate-800",
               "transition hover:bg-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70",
             )}
-            href="/dashboard/account"
+            href="/account"
             role="menuitem"
           >
             <IconUser className="h-5 w-5 text-sky-700/70" />
@@ -255,7 +255,7 @@ export function UserMenu() {
               "flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium text-slate-800",
               "transition hover:bg-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70",
             )}
-            href="/dashboard/account/password"
+            href="/account/password"
             role="menuitem"
           >
             <IconKey className="h-5 w-5 text-violet-700/70" />

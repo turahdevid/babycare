@@ -132,6 +132,96 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.CustomerScalarFieldEnum = {
+  id: 'id',
+  motherName: 'motherName',
+  motherPhone: 'motherPhone',
+  motherEmail: 'motherEmail',
+  address: 'address',
+  notes: 'notes',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BabyScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  name: 'name',
+  gender: 'gender',
+  birthDate: 'birthDate',
+  notes: 'notes',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TreatmentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  durationMinutes: 'durationMinutes',
+  basePrice: 'basePrice',
+  isActive: 'isActive',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  babyId: 'babyId',
+  midwifeId: 'midwifeId',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  status: 'status',
+  channel: 'channel',
+  serviceType: 'serviceType',
+  notes: 'notes',
+  cancelledAt: 'cancelledAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationTreatmentScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  treatmentId: 'treatmentId',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  durationMinutes: 'durationMinutes',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationAuditLogScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  action: 'action',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  actorId: 'actorId',
+  message: 'message',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  status: 'status',
+  userId: 'userId',
+  reservationId: 'reservationId',
+  title: 'title',
+  body: 'body',
+  readAt: 'readAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -174,16 +264,120 @@ exports.Prisma.VerificationTokenOrderByRelevanceFieldEnum = {
   identifier: 'identifier',
   token: 'token'
 };
+
+exports.Prisma.CustomerOrderByRelevanceFieldEnum = {
+  id: 'id',
+  motherName: 'motherName',
+  motherPhone: 'motherPhone',
+  motherEmail: 'motherEmail',
+  address: 'address',
+  notes: 'notes'
+};
+
+exports.Prisma.BabyOrderByRelevanceFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  name: 'name',
+  notes: 'notes'
+};
+
+exports.Prisma.TreatmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.ReservationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  babyId: 'babyId',
+  midwifeId: 'midwifeId',
+  notes: 'notes'
+};
+
+exports.Prisma.ReservationTreatmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  treatmentId: 'treatmentId',
+  notes: 'notes'
+};
+
+exports.Prisma.ReservationAuditLogOrderByRelevanceFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  actorId: 'actorId',
+  message: 'message'
+};
+
+exports.Prisma.NotificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  reservationId: 'reservationId',
+  title: 'title',
+  body: 'body'
+};
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',
   MIDWIFE: 'MIDWIFE'
+};
+
+exports.BabyGender = exports.$Enums.BabyGender = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE'
+};
+
+exports.ReservationStatus = exports.$Enums.ReservationStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  NO_SHOW: 'NO_SHOW'
+};
+
+exports.ReservationChannel = exports.$Enums.ReservationChannel = {
+  ADMIN: 'ADMIN',
+  CUSTOMER: 'CUSTOMER'
+};
+
+exports.ServiceType = exports.$Enums.ServiceType = {
+  OUTLET: 'OUTLET',
+  HOMECARE: 'HOMECARE'
+};
+
+exports.ReservationAuditAction = exports.$Enums.ReservationAuditAction = {
+  CREATE: 'CREATE',
+  UPDATE_STATUS: 'UPDATE_STATUS',
+  ASSIGN_MIDWIFE: 'ASSIGN_MIDWIFE',
+  UPDATE_SCHEDULE: 'UPDATE_SCHEDULE',
+  CANCEL: 'CANCEL',
+  COMPLETE: 'COMPLETE'
+};
+
+exports.NotificationType = exports.$Enums.NotificationType = {
+  RESERVATION_CREATED: 'RESERVATION_CREATED',
+  RESERVATION_STATUS_CHANGED: 'RESERVATION_STATUS_CHANGED',
+  MIDWIFE_ASSIGNED: 'MIDWIFE_ASSIGNED'
+};
+
+exports.NotificationStatus = exports.$Enums.NotificationStatus = {
+  UNREAD: 'UNREAD',
+  READ: 'READ',
+  ARCHIVED: 'ARCHIVED'
 };
 
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  Customer: 'Customer',
+  Baby: 'Baby',
+  Treatment: 'Treatment',
+  Reservation: 'Reservation',
+  ReservationTreatment: 'ReservationTreatment',
+  ReservationAuditLog: 'ReservationAuditLog',
+  Notification: 'Notification'
 };
 /**
  * Create the Client
@@ -232,13 +426,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below\n  // Further reading:\n  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema\n  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string\n  url      = env(\"DATABASE_URL\")\n}\n\nenum Role {\n  ADMIN\n  MIDWIFE\n}\n\n// Necessary for Next auth\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? @db.Text\n  access_token             String? // @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? // @db.Text\n  session_state            String?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refresh_token_expires_in Int?\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id            String    @id @default(cuid())\n  name          String?\n  email         String?   @unique\n  emailVerified DateTime?\n  image         String?\n  password      String?\n  role          Role      @default(MIDWIFE)\n  accounts      Account[]\n  sessions      Session[]\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n",
-  "inlineSchemaHash": "2d7764983a62ed5ad5141b8d762ab5538abb41d4be3255f67f0e55904a6e2b61",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below\n  // Further reading:\n  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema\n  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string\n  url      = env(\"DATABASE_URL\")\n}\n\nenum Role {\n  ADMIN\n  MIDWIFE\n}\n\n// Necessary for Next auth\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? @db.Text\n  access_token             String? // @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? // @db.Text\n  session_state            String?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refresh_token_expires_in Int?\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id                   String                @id @default(cuid())\n  name                 String?\n  email                String?               @unique\n  emailVerified        DateTime?\n  image                String?\n  password             String?\n  role                 Role                  @default(MIDWIFE)\n  accounts             Account[]\n  sessions             Session[]\n  midwifeReservations  Reservation[]         @relation(\"ReservationMidwife\")\n  reservationAuditLogs ReservationAuditLog[] @relation(\"ReservationAuditActor\")\n  notifications        Notification[]\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n\nenum BabyGender {\n  MALE\n  FEMALE\n}\n\nenum ReservationStatus {\n  PENDING\n  CONFIRMED\n  IN_PROGRESS\n  COMPLETED\n  CANCELLED\n  NO_SHOW\n}\n\nenum ReservationChannel {\n  ADMIN\n  CUSTOMER\n}\n\nenum ServiceType {\n  OUTLET\n  HOMECARE\n}\n\nenum ReservationAuditAction {\n  CREATE\n  UPDATE_STATUS\n  ASSIGN_MIDWIFE\n  UPDATE_SCHEDULE\n  CANCEL\n  COMPLETE\n}\n\nenum NotificationType {\n  RESERVATION_CREATED\n  RESERVATION_STATUS_CHANGED\n  MIDWIFE_ASSIGNED\n}\n\nenum NotificationStatus {\n  UNREAD\n  READ\n  ARCHIVED\n}\n\nmodel Customer {\n  id           String        @id @default(cuid())\n  motherName   String\n  motherPhone  String\n  motherEmail  String?       @db.VarChar(255)\n  address      String?       @db.Text\n  notes        String?       @db.Text\n  deletedAt    DateTime?\n  babies       Baby[]\n  reservations Reservation[]\n  createdAt    DateTime      @default(now())\n  updatedAt    DateTime      @updatedAt\n\n  @@index([motherPhone])\n  @@index([motherEmail])\n  @@index([deletedAt])\n  @@index([createdAt])\n}\n\nmodel Baby {\n  id           String        @id @default(cuid())\n  customerId   String\n  name         String\n  gender       BabyGender?\n  birthDate    DateTime?\n  notes        String?       @db.Text\n  deletedAt    DateTime?\n  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)\n  reservations Reservation[]\n  createdAt    DateTime      @default(now())\n  updatedAt    DateTime      @updatedAt\n\n  @@index([customerId])\n  @@index([name])\n  @@index([deletedAt])\n}\n\nmodel Treatment {\n  id               String                 @id @default(cuid())\n  name             String\n  description      String?                @db.Text\n  durationMinutes  Int\n  basePrice        Decimal                @db.Decimal(10, 2)\n  isActive         Boolean                @default(true)\n  deletedAt        DateTime?\n  reservationItems ReservationTreatment[]\n  createdAt        DateTime               @default(now())\n  updatedAt        DateTime               @updatedAt\n\n  @@index([isActive])\n  @@index([name])\n  @@index([deletedAt])\n}\n\nmodel Reservation {\n  id            String                 @id @default(cuid())\n  customerId    String\n  babyId        String?\n  midwifeId     String?\n  startAt       DateTime\n  endAt         DateTime\n  status        ReservationStatus      @default(PENDING)\n  channel       ReservationChannel     @default(ADMIN)\n  serviceType   ServiceType            @default(OUTLET)\n  notes         String?                @db.Text\n  cancelledAt   DateTime?\n  completedAt   DateTime?\n  customer      Customer               @relation(fields: [customerId], references: [id], onDelete: Restrict)\n  baby          Baby?                  @relation(fields: [babyId], references: [id], onDelete: SetNull)\n  midwife       User?                  @relation(\"ReservationMidwife\", fields: [midwifeId], references: [id], onDelete: SetNull)\n  items         ReservationTreatment[]\n  auditLogs     ReservationAuditLog[]\n  notifications Notification[]\n  createdAt     DateTime               @default(now())\n  updatedAt     DateTime               @updatedAt\n\n  @@unique([midwifeId, startAt])\n  @@index([startAt])\n  @@index([status])\n  @@index([status, startAt])\n  @@index([midwifeId, startAt])\n  @@index([customerId, startAt])\n  @@index([babyId, startAt])\n  @@index([serviceType, startAt])\n}\n\nmodel ReservationTreatment {\n  id              String      @id @default(cuid())\n  reservationId   String\n  treatmentId     String\n  quantity        Int         @default(1)\n  unitPrice       Decimal     @db.Decimal(10, 2)\n  durationMinutes Int\n  notes           String?     @db.Text\n  reservation     Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)\n  treatment       Treatment   @relation(fields: [treatmentId], references: [id], onDelete: Restrict)\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt\n\n  @@unique([reservationId, treatmentId])\n  @@index([reservationId])\n  @@index([treatmentId])\n}\n\nmodel ReservationAuditLog {\n  id            String                 @id @default(cuid())\n  reservationId String\n  action        ReservationAuditAction\n  fromStatus    ReservationStatus?\n  toStatus      ReservationStatus?\n  actorId       String?\n  message       String?                @db.Text\n  reservation   Reservation            @relation(fields: [reservationId], references: [id], onDelete: Cascade)\n  actor         User?                  @relation(\"ReservationAuditActor\", fields: [actorId], references: [id], onDelete: SetNull)\n  createdAt     DateTime               @default(now())\n  updatedAt     DateTime               @updatedAt\n\n  @@index([reservationId, createdAt])\n  @@index([actorId, createdAt])\n  @@index([action, createdAt])\n}\n\nmodel Notification {\n  id            String             @id @default(cuid())\n  type          NotificationType\n  status        NotificationStatus @default(UNREAD)\n  userId        String?\n  reservationId String?\n  title         String\n  body          String             @db.Text\n  readAt        DateTime?\n  user          User?              @relation(fields: [userId], references: [id], onDelete: SetNull)\n  reservation   Reservation?       @relation(fields: [reservationId], references: [id], onDelete: SetNull)\n  createdAt     DateTime           @default(now())\n  updatedAt     DateTime           @updatedAt\n\n  @@index([userId, status, createdAt])\n  @@index([reservationId])\n  @@index([type, createdAt])\n}\n",
+  "inlineSchemaHash": "6f315610e53ac0721bc3c31dc24ef9e266cd292c34985b6bf7099dce5da7e414",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerAccountId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"access_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"token_type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"scope\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session_state\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"},{\"name\":\"refresh_token_expires_in\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null},\"Session\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionToken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SessionToUser\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailVerified\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"Role\"},{\"name\":\"accounts\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"Session\",\"relationName\":\"SessionToUser\"}],\"dbName\":null},\"VerificationToken\":{\"fields\":[{\"name\":\"identifier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"providerAccountId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"refresh_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"access_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"token_type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"scope\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id_token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"session_state\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"},{\"name\":\"refresh_token_expires_in\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null},\"Session\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionToken\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SessionToUser\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"emailVerified\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"image\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"Role\"},{\"name\":\"accounts\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"Session\",\"relationName\":\"SessionToUser\"},{\"name\":\"midwifeReservations\",\"kind\":\"object\",\"type\":\"Reservation\",\"relationName\":\"ReservationMidwife\"},{\"name\":\"reservationAuditLogs\",\"kind\":\"object\",\"type\":\"ReservationAuditLog\",\"relationName\":\"ReservationAuditActor\"},{\"name\":\"notifications\",\"kind\":\"object\",\"type\":\"Notification\",\"relationName\":\"NotificationToUser\"}],\"dbName\":null},\"VerificationToken\":{\"fields\":[{\"name\":\"identifier\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Customer\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"motherName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"motherPhone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"motherEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deletedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"babies\",\"kind\":\"object\",\"type\":\"Baby\",\"relationName\":\"BabyToCustomer\"},{\"name\":\"reservations\",\"kind\":\"object\",\"type\":\"Reservation\",\"relationName\":\"CustomerToReservation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Baby\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"customerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gender\",\"kind\":\"enum\",\"type\":\"BabyGender\"},{\"name\":\"birthDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"deletedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"customer\",\"kind\":\"object\",\"type\":\"Customer\",\"relationName\":\"BabyToCustomer\"},{\"name\":\"reservations\",\"kind\":\"object\",\"type\":\"Reservation\",\"relationName\":\"BabyToReservation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Treatment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationMinutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"basePrice\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"deletedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"reservationItems\",\"kind\":\"object\",\"type\":\"ReservationTreatment\",\"relationName\":\"ReservationTreatmentToTreatment\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Reservation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"customerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"babyId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"midwifeId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"startAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"endAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"ReservationStatus\"},{\"name\":\"channel\",\"kind\":\"enum\",\"type\":\"ReservationChannel\"},{\"name\":\"serviceType\",\"kind\":\"enum\",\"type\":\"ServiceType\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"cancelledAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"customer\",\"kind\":\"object\",\"type\":\"Customer\",\"relationName\":\"CustomerToReservation\"},{\"name\":\"baby\",\"kind\":\"object\",\"type\":\"Baby\",\"relationName\":\"BabyToReservation\"},{\"name\":\"midwife\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ReservationMidwife\"},{\"name\":\"items\",\"kind\":\"object\",\"type\":\"ReservationTreatment\",\"relationName\":\"ReservationToReservationTreatment\"},{\"name\":\"auditLogs\",\"kind\":\"object\",\"type\":\"ReservationAuditLog\",\"relationName\":\"ReservationToReservationAuditLog\"},{\"name\":\"notifications\",\"kind\":\"object\",\"type\":\"Notification\",\"relationName\":\"NotificationToReservation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"ReservationTreatment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"reservationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"treatmentId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"quantity\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"unitPrice\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"durationMinutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"reservation\",\"kind\":\"object\",\"type\":\"Reservation\",\"relationName\":\"ReservationToReservationTreatment\"},{\"name\":\"treatment\",\"kind\":\"object\",\"type\":\"Treatment\",\"relationName\":\"ReservationTreatmentToTreatment\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"ReservationAuditLog\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"reservationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"action\",\"kind\":\"enum\",\"type\":\"ReservationAuditAction\"},{\"name\":\"fromStatus\",\"kind\":\"enum\",\"type\":\"ReservationStatus\"},{\"name\":\"toStatus\",\"kind\":\"enum\",\"type\":\"ReservationStatus\"},{\"name\":\"actorId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"message\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"reservation\",\"kind\":\"object\",\"type\":\"Reservation\",\"relationName\":\"ReservationToReservationAuditLog\"},{\"name\":\"actor\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ReservationAuditActor\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Notification\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"NotificationType\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"NotificationStatus\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"reservationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"body\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"readAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"NotificationToUser\"},{\"name\":\"reservation\",\"kind\":\"object\",\"type\":\"Reservation\",\"relationName\":\"NotificationToReservation\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
