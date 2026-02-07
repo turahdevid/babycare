@@ -8,6 +8,10 @@ import { archiveTreatment, toggleTreatmentActive } from "./_actions";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
+type PageProps = {
+  searchParams?: Promise<SearchParams>;
+};
+
 function formatRupiah(amount: number) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -28,12 +32,9 @@ function formatDuration(minutes: number) {
   return `${hours} jam ${remainingMinutes} menit`;
 }
 
-export default async function TreatmentPage({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
+export default async function TreatmentPage(props: PageProps) {
   const session = await auth();
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
 
   if (!session?.user) {
     redirect("/");

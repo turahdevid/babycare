@@ -8,12 +8,11 @@ import { RupiahInput } from "../_components/rupiah-input";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-export default async function NewTreatmentPage({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
+export default async function NewTreatmentPage(props: {
+  searchParams?: Promise<SearchParams>;
 }) {
   const session = await auth();
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
 
   if (!session?.user) {
     redirect("/");

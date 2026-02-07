@@ -29,7 +29,7 @@ function getFormString(value: FormDataEntryValue | null): string | null {
 export default async function ChangePasswordPage({
   searchParams,
 }: {
-  searchParams?: SearchParams;
+  searchParams?: Promise<SearchParams>;
 }) {
   const session = await auth();
 
@@ -37,8 +37,10 @@ export default async function ChangePasswordPage({
     redirect("/");
   }
 
-  const errorParam = typeof searchParams?.error === "string" ? searchParams.error : undefined;
-  const successParam = typeof searchParams?.success === "string" ? searchParams.success : undefined;
+  const resolvedSearch = searchParams ? await searchParams : undefined;
+  const errorParam = typeof resolvedSearch?.error === "string" ? resolvedSearch.error : undefined;
+  const successParam =
+    typeof resolvedSearch?.success === "string" ? resolvedSearch.success : undefined;
 
   const showSuccess = successParam === "1";
   const showInvalid = errorParam === "invalid";

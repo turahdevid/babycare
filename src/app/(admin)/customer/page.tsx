@@ -6,10 +6,10 @@ import { db } from "~/server/db";
 import { GlassCard } from "../_components/glass-card";
 import { CustomerSearch } from "./_components/customer-search";
 
-type SearchParams = Promise<{
+type SearchParams = {
   q?: string;
   page?: string;
-}>;
+};
 
 function normalizeIndoPhone(phone: string): string {
   const trimmed = phone.trim();
@@ -19,9 +19,12 @@ function normalizeIndoPhone(phone: string): string {
   return `62${trimmed}`;
 }
 
-export default async function CustomerPage(props: { searchParams: SearchParams }) {
+export default async function CustomerPage(props: { searchParams?: Promise<SearchParams> }) {
   const session = await auth();
-  const searchParams = await props.searchParams;
+  let searchParams: SearchParams = {};
+  if (props.searchParams) {
+    searchParams = await props.searchParams;
+  }
 
   if (!session?.user) {
     redirect("/");

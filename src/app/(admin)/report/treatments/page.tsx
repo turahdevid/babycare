@@ -14,15 +14,18 @@ import {
   parseReportPeriod,
 } from "~/app/(admin)/report/_utils";
 
-type SearchParams = Promise<{
+type SearchParams = {
   period?: string;
-}>;
+};
 
 export default async function ReportTreatmentsPage(props: {
-  searchParams: SearchParams;
+  searchParams?: Promise<SearchParams>;
 }) {
   const session = await auth();
-  const searchParams = await props.searchParams;
+  let searchParams: SearchParams = {};
+  if (props.searchParams) {
+    searchParams = await props.searchParams;
+  }
 
   if (!session?.user) {
     redirect("/");

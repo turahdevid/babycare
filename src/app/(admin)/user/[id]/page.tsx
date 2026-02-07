@@ -10,14 +10,12 @@ type SearchParams = Record<string, string | string[] | undefined>;
 
 type Params = Promise<{ id: string }>;
 
-export default async function EditUserPage({
-  params,
-  searchParams,
-}: {
+export default async function EditUserPage(props: {
   params: Params;
-  searchParams?: SearchParams;
+  searchParams?: Promise<SearchParams>;
 }) {
   const session = await auth();
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
 
   if (!session?.user) {
     redirect("/");
@@ -27,7 +25,7 @@ export default async function EditUserPage({
     redirect("/dashboard");
   }
 
-  const { id } = await params;
+  const { id } = await props.params;
 
   const user = await db.user.findUnique({
     where: { id },

@@ -17,14 +17,12 @@ function formatRupiah(value: number) {
   }).format(value);
 }
 
-export default async function TreatmentEditPage({
-  params,
-  searchParams,
-}: {
+export default async function TreatmentEditPage(props: {
   params: Promise<{ id: string }>;
-  searchParams?: SearchParams;
+  searchParams?: Promise<SearchParams>;
 }) {
   const session = await auth();
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
 
   if (!session?.user) {
     redirect("/");
@@ -34,7 +32,7 @@ export default async function TreatmentEditPage({
     redirect("/dashboard");
   }
 
-  const { id } = await params;
+  const { id } = await props.params;
 
   const treatment = await db.treatment.findFirst({
     where: { id, deletedAt: null },
