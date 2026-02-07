@@ -49,3 +49,10 @@ export function formatShortDate(date: Date): string {
     dateStyle: "medium",
   }).format(date);
 }
+
+export function formatDateTime(date: Date): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
+}

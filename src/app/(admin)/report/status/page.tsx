@@ -5,6 +5,9 @@ import { GlassCard } from "~/app/(admin)/_components/glass-card";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { PeriodSelector } from "~/app/(admin)/report/_components/period-selector";
+import { ReportActions } from "~/app/(admin)/report/_components/report-actions";
+import { TransactionDetailTable } from "~/app/(admin)/report/_components/transaction-detail-table";
+import { fetchTransactionDetails } from "~/app/(admin)/report/_queries";
 import {
   getPeriodEndDate,
   getPeriodStartDate,
@@ -41,9 +44,11 @@ export default async function ReportStatusPage(props: { searchParams: SearchPara
 
   const total = statusBreakdown.reduce((sum, s) => sum + s._count, 0);
 
+  const transactions = await fetchTransactionDetails({ gte: start, lt: end });
+
   return (
     <section className="grid gap-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 print:hidden">
         <Link
           className="text-sm text-slate-700/80 transition hover:text-slate-900"
           href="/report"
@@ -55,7 +60,13 @@ export default async function ReportStatusPage(props: { searchParams: SearchPara
       <GlassCard>
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-base font-semibold text-slate-900">Status reservasi</h2>
-          <PeriodSelector basePath="/report/status" />
+          <div className="flex items-center gap-2 print:hidden">
+            <PeriodSelector basePath="/report/status" />
+            <ReportActions
+              pdfHref={`/api/report/export?type=status&period=${period}&format=pdf`}
+              csvHref={`/api/report/export?type=status&period=${period}`}
+            />
+          </div>
         </div>
       </GlassCard>
 
@@ -81,6 +92,13 @@ export default async function ReportStatusPage(props: { searchParams: SearchPara
               </div>
             ))
           )}
+        </div>
+      </GlassCard>
+
+      <GlassCard>
+        <h3 className="text-base font-semibold text-slate-900">Detail transaksi</h3>
+        <div className="mt-4">
+          <TransactionDetailTable rows={transactions} />
         </div>
       </GlassCard>
     </section>

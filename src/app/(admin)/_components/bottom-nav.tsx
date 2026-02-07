@@ -207,7 +207,7 @@ export function DashboardBottomNav() {
   return (
     <nav
       aria-label="Bottom navigation"
-      className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-[1024px] px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
+      className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-[1024px] px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] print:hidden"
     >
       <div className="rounded-t-[26px] rounded-b-[26px] border border-white/55 bg-white/35 shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl">
         <div className="grid h-[76px] grid-cols-4 items-center">

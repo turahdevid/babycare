@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { GlassCard } from "~/app/(admin)/_components/glass-card";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { ReportActions } from "~/app/(admin)/report/_components/report-actions";
+import { TransactionDetailTable } from "~/app/(admin)/report/_components/transaction-detail-table";
+import { fetchTransactionDetails } from "~/app/(admin)/report/_queries";
 import { formatCurrency, formatShortDate } from "~/app/(admin)/report/_utils";
 
 export default async function ReportTodayPage() {
@@ -56,9 +59,11 @@ export default async function ReportTodayPage() {
     0,
   );
 
+  const transactions = await fetchTransactionDetails({ gte: start, lt: end });
+
   return (
     <section className="grid gap-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 print:hidden">
         <Link
           className="text-sm text-slate-700/80 transition hover:text-slate-900"
           href="/report"
@@ -75,6 +80,11 @@ export default async function ReportTodayPage() {
             </h2>
             <p className="mt-1 text-sm text-slate-700/80">{formatShortDate(now)}</p>
           </div>
+
+          <ReportActions
+            pdfHref="/api/report/export?type=today&format=pdf"
+            csvHref="/api/report/export?type=today"
+          />
         </div>
       </GlassCard>
 
@@ -124,6 +134,13 @@ export default async function ReportTodayPage() {
           </div>
         </GlassCard>
       </div>
+
+      <GlassCard>
+        <h3 className="text-base font-semibold text-slate-900">Detail transaksi</h3>
+        <div className="mt-4">
+          <TransactionDetailTable rows={transactions} />
+        </div>
+      </GlassCard>
     </section>
   );
 }

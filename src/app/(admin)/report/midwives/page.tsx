@@ -5,6 +5,9 @@ import { GlassCard } from "~/app/(admin)/_components/glass-card";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { PeriodSelector } from "~/app/(admin)/report/_components/period-selector";
+import { ReportActions } from "~/app/(admin)/report/_components/report-actions";
+import { TransactionDetailTable } from "~/app/(admin)/report/_components/transaction-detail-table";
+import { fetchTransactionDetails } from "~/app/(admin)/report/_queries";
 import {
   getPeriodEndDate,
   getPeriodStartDate,
@@ -88,9 +91,11 @@ export default async function ReportMidwivesPage(props: {
     })
     .sort((a, b) => b.completed - a.completed);
 
+  const transactions = await fetchTransactionDetails({ gte: start, lt: end });
+
   return (
     <section className="grid gap-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 print:hidden">
         <Link
           className="text-sm text-slate-700/80 transition hover:text-slate-900"
           href="/report"
@@ -102,7 +107,13 @@ export default async function ReportMidwivesPage(props: {
       <GlassCard>
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-base font-semibold text-slate-900">Performa bidan</h2>
-          <PeriodSelector basePath="/report/midwives" />
+          <div className="flex items-center gap-2 print:hidden">
+            <PeriodSelector basePath="/report/midwives" />
+            <ReportActions
+              pdfHref={`/api/report/export?type=midwives&period=${period}&format=pdf`}
+              csvHref={`/api/report/export?type=midwives&period=${period}`}
+            />
+          </div>
         </div>
       </GlassCard>
 
@@ -136,6 +147,13 @@ export default async function ReportMidwivesPage(props: {
               )}
             </tbody>
           </table>
+        </div>
+      </GlassCard>
+
+      <GlassCard>
+        <h3 className="text-base font-semibold text-slate-900">Detail transaksi</h3>
+        <div className="mt-4">
+          <TransactionDetailTable rows={transactions} />
         </div>
       </GlassCard>
     </section>
