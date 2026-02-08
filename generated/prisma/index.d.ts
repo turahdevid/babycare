@@ -129,6 +129,14 @@ export const ReservationAuditAction: {
 export type ReservationAuditAction = (typeof ReservationAuditAction)[keyof typeof ReservationAuditAction]
 
 
+export const TreatmentCategory: {
+  BABY: 'BABY',
+  KIDS: 'KIDS'
+};
+
+export type TreatmentCategory = (typeof TreatmentCategory)[keyof typeof TreatmentCategory]
+
+
 export const NotificationType: {
   RESERVATION_CREATED: 'RESERVATION_CREATED',
   RESERVATION_STATUS_CHANGED: 'RESERVATION_STATUS_CHANGED',
@@ -171,6 +179,10 @@ export const ServiceType: typeof $Enums.ServiceType
 export type ReservationAuditAction = $Enums.ReservationAuditAction
 
 export const ReservationAuditAction: typeof $Enums.ReservationAuditAction
+
+export type TreatmentCategory = $Enums.TreatmentCategory
+
+export const TreatmentCategory: typeof $Enums.TreatmentCategory
 
 export type NotificationType = $Enums.NotificationType
 
@@ -7988,6 +8000,7 @@ export namespace Prisma {
   export type TreatmentMinAggregateOutputType = {
     id: string | null
     name: string | null
+    category: $Enums.TreatmentCategory | null
     description: string | null
     durationMinutes: number | null
     basePrice: Decimal | null
@@ -8000,6 +8013,7 @@ export namespace Prisma {
   export type TreatmentMaxAggregateOutputType = {
     id: string | null
     name: string | null
+    category: $Enums.TreatmentCategory | null
     description: string | null
     durationMinutes: number | null
     basePrice: Decimal | null
@@ -8012,6 +8026,7 @@ export namespace Prisma {
   export type TreatmentCountAggregateOutputType = {
     id: number
     name: number
+    category: number
     description: number
     durationMinutes: number
     basePrice: number
@@ -8036,6 +8051,7 @@ export namespace Prisma {
   export type TreatmentMinAggregateInputType = {
     id?: true
     name?: true
+    category?: true
     description?: true
     durationMinutes?: true
     basePrice?: true
@@ -8048,6 +8064,7 @@ export namespace Prisma {
   export type TreatmentMaxAggregateInputType = {
     id?: true
     name?: true
+    category?: true
     description?: true
     durationMinutes?: true
     basePrice?: true
@@ -8060,6 +8077,7 @@ export namespace Prisma {
   export type TreatmentCountAggregateInputType = {
     id?: true
     name?: true
+    category?: true
     description?: true
     durationMinutes?: true
     basePrice?: true
@@ -8159,6 +8177,7 @@ export namespace Prisma {
   export type TreatmentGroupByOutputType = {
     id: string
     name: string
+    category: $Enums.TreatmentCategory
     description: string | null
     durationMinutes: number
     basePrice: Decimal
@@ -8190,6 +8209,7 @@ export namespace Prisma {
   export type TreatmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    category?: boolean
     description?: boolean
     durationMinutes?: boolean
     basePrice?: boolean
@@ -8206,6 +8226,7 @@ export namespace Prisma {
   export type TreatmentSelectScalar = {
     id?: boolean
     name?: boolean
+    category?: boolean
     description?: boolean
     durationMinutes?: boolean
     basePrice?: boolean
@@ -8215,7 +8236,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type TreatmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "durationMinutes" | "basePrice" | "isActive" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["treatment"]>
+  export type TreatmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "category" | "description" | "durationMinutes" | "basePrice" | "isActive" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["treatment"]>
   export type TreatmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reservationItems?: boolean | Treatment$reservationItemsArgs<ExtArgs>
     _count?: boolean | TreatmentCountOutputTypeDefaultArgs<ExtArgs>
@@ -8229,6 +8250,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
+      category: $Enums.TreatmentCategory
       description: string | null
       durationMinutes: number
       basePrice: Prisma.Decimal
@@ -8608,6 +8630,7 @@ export namespace Prisma {
   interface TreatmentFieldRefs {
     readonly id: FieldRef<"Treatment", 'String'>
     readonly name: FieldRef<"Treatment", 'String'>
+    readonly category: FieldRef<"Treatment", 'TreatmentCategory'>
     readonly description: FieldRef<"Treatment", 'String'>
     readonly durationMinutes: FieldRef<"Treatment", 'Int'>
     readonly basePrice: FieldRef<"Treatment", 'Decimal'>
@@ -13299,6 +13322,7 @@ export namespace Prisma {
   export const TreatmentScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    category: 'category',
     description: 'description',
     durationMinutes: 'durationMinutes',
     basePrice: 'basePrice',
@@ -13548,6 +13572,13 @@ export namespace Prisma {
    * Reference to a field of type 'BabyGender'
    */
   export type EnumBabyGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BabyGender'>
+    
+
+
+  /**
+   * Reference to a field of type 'TreatmentCategory'
+   */
+  export type EnumTreatmentCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TreatmentCategory'>
     
 
 
@@ -14053,6 +14084,7 @@ export namespace Prisma {
     NOT?: TreatmentWhereInput | TreatmentWhereInput[]
     id?: StringFilter<"Treatment"> | string
     name?: StringFilter<"Treatment"> | string
+    category?: EnumTreatmentCategoryFilter<"Treatment"> | $Enums.TreatmentCategory
     description?: StringNullableFilter<"Treatment"> | string | null
     durationMinutes?: IntFilter<"Treatment"> | number
     basePrice?: DecimalFilter<"Treatment"> | Decimal | DecimalJsLike | number | string
@@ -14066,6 +14098,7 @@ export namespace Prisma {
   export type TreatmentOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
+    category?: SortOrder
     description?: SortOrderInput | SortOrder
     durationMinutes?: SortOrder
     basePrice?: SortOrder
@@ -14083,6 +14116,7 @@ export namespace Prisma {
     OR?: TreatmentWhereInput[]
     NOT?: TreatmentWhereInput | TreatmentWhereInput[]
     name?: StringFilter<"Treatment"> | string
+    category?: EnumTreatmentCategoryFilter<"Treatment"> | $Enums.TreatmentCategory
     description?: StringNullableFilter<"Treatment"> | string | null
     durationMinutes?: IntFilter<"Treatment"> | number
     basePrice?: DecimalFilter<"Treatment"> | Decimal | DecimalJsLike | number | string
@@ -14096,6 +14130,7 @@ export namespace Prisma {
   export type TreatmentOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
+    category?: SortOrder
     description?: SortOrderInput | SortOrder
     durationMinutes?: SortOrder
     basePrice?: SortOrder
@@ -14116,6 +14151,7 @@ export namespace Prisma {
     NOT?: TreatmentScalarWhereWithAggregatesInput | TreatmentScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Treatment"> | string
     name?: StringWithAggregatesFilter<"Treatment"> | string
+    category?: EnumTreatmentCategoryWithAggregatesFilter<"Treatment"> | $Enums.TreatmentCategory
     description?: StringNullableWithAggregatesFilter<"Treatment"> | string | null
     durationMinutes?: IntWithAggregatesFilter<"Treatment"> | number
     basePrice?: DecimalWithAggregatesFilter<"Treatment"> | Decimal | DecimalJsLike | number | string
@@ -14960,6 +14996,7 @@ export namespace Prisma {
   export type TreatmentCreateInput = {
     id?: string
     name: string
+    category?: $Enums.TreatmentCategory
     description?: string | null
     durationMinutes: number
     basePrice: Decimal | DecimalJsLike | number | string
@@ -14973,6 +15010,7 @@ export namespace Prisma {
   export type TreatmentUncheckedCreateInput = {
     id?: string
     name: string
+    category?: $Enums.TreatmentCategory
     description?: string | null
     durationMinutes: number
     basePrice: Decimal | DecimalJsLike | number | string
@@ -14986,6 +15024,7 @@ export namespace Prisma {
   export type TreatmentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    category?: EnumTreatmentCategoryFieldUpdateOperationsInput | $Enums.TreatmentCategory
     description?: NullableStringFieldUpdateOperationsInput | string | null
     durationMinutes?: IntFieldUpdateOperationsInput | number
     basePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -14999,6 +15038,7 @@ export namespace Prisma {
   export type TreatmentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    category?: EnumTreatmentCategoryFieldUpdateOperationsInput | $Enums.TreatmentCategory
     description?: NullableStringFieldUpdateOperationsInput | string | null
     durationMinutes?: IntFieldUpdateOperationsInput | number
     basePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -15012,6 +15052,7 @@ export namespace Prisma {
   export type TreatmentCreateManyInput = {
     id?: string
     name: string
+    category?: $Enums.TreatmentCategory
     description?: string | null
     durationMinutes: number
     basePrice: Decimal | DecimalJsLike | number | string
@@ -15024,6 +15065,7 @@ export namespace Prisma {
   export type TreatmentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    category?: EnumTreatmentCategoryFieldUpdateOperationsInput | $Enums.TreatmentCategory
     description?: NullableStringFieldUpdateOperationsInput | string | null
     durationMinutes?: IntFieldUpdateOperationsInput | number
     basePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -15036,6 +15078,7 @@ export namespace Prisma {
   export type TreatmentUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    category?: EnumTreatmentCategoryFieldUpdateOperationsInput | $Enums.TreatmentCategory
     description?: NullableStringFieldUpdateOperationsInput | string | null
     durationMinutes?: IntFieldUpdateOperationsInput | number
     basePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -15923,6 +15966,13 @@ export namespace Prisma {
     _max?: NestedEnumBabyGenderNullableFilter<$PrismaModel>
   }
 
+  export type EnumTreatmentCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.TreatmentCategory | EnumTreatmentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TreatmentCategory[]
+    notIn?: $Enums.TreatmentCategory[]
+    not?: NestedEnumTreatmentCategoryFilter<$PrismaModel> | $Enums.TreatmentCategory
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -15969,6 +16019,7 @@ export namespace Prisma {
   export type TreatmentCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    category?: SortOrder
     description?: SortOrder
     durationMinutes?: SortOrder
     basePrice?: SortOrder
@@ -15986,6 +16037,7 @@ export namespace Prisma {
   export type TreatmentMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    category?: SortOrder
     description?: SortOrder
     durationMinutes?: SortOrder
     basePrice?: SortOrder
@@ -15998,6 +16050,7 @@ export namespace Prisma {
   export type TreatmentMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    category?: SortOrder
     description?: SortOrder
     durationMinutes?: SortOrder
     basePrice?: SortOrder
@@ -16010,6 +16063,16 @@ export namespace Prisma {
   export type TreatmentSumOrderByAggregateInput = {
     durationMinutes?: SortOrder
     basePrice?: SortOrder
+  }
+
+  export type EnumTreatmentCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TreatmentCategory | EnumTreatmentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TreatmentCategory[]
+    notIn?: $Enums.TreatmentCategory[]
+    not?: NestedEnumTreatmentCategoryWithAggregatesFilter<$PrismaModel> | $Enums.TreatmentCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTreatmentCategoryFilter<$PrismaModel>
+    _max?: NestedEnumTreatmentCategoryFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -16828,6 +16891,10 @@ export namespace Prisma {
     connect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
   }
 
+  export type EnumTreatmentCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.TreatmentCategory
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -17365,6 +17432,13 @@ export namespace Prisma {
     _max?: NestedEnumBabyGenderNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumTreatmentCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.TreatmentCategory | EnumTreatmentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TreatmentCategory[]
+    notIn?: $Enums.TreatmentCategory[]
+    not?: NestedEnumTreatmentCategoryFilter<$PrismaModel> | $Enums.TreatmentCategory
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -17379,6 +17453,16 @@ export namespace Prisma {
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedEnumTreatmentCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TreatmentCategory | EnumTreatmentCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.TreatmentCategory[]
+    notIn?: $Enums.TreatmentCategory[]
+    not?: NestedEnumTreatmentCategoryWithAggregatesFilter<$PrismaModel> | $Enums.TreatmentCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTreatmentCategoryFilter<$PrismaModel>
+    _max?: NestedEnumTreatmentCategoryFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -18751,6 +18835,7 @@ export namespace Prisma {
   export type TreatmentCreateWithoutReservationItemsInput = {
     id?: string
     name: string
+    category?: $Enums.TreatmentCategory
     description?: string | null
     durationMinutes: number
     basePrice: Decimal | DecimalJsLike | number | string
@@ -18763,6 +18848,7 @@ export namespace Prisma {
   export type TreatmentUncheckedCreateWithoutReservationItemsInput = {
     id?: string
     name: string
+    category?: $Enums.TreatmentCategory
     description?: string | null
     durationMinutes: number
     basePrice: Decimal | DecimalJsLike | number | string
@@ -18840,6 +18926,7 @@ export namespace Prisma {
   export type TreatmentUpdateWithoutReservationItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    category?: EnumTreatmentCategoryFieldUpdateOperationsInput | $Enums.TreatmentCategory
     description?: NullableStringFieldUpdateOperationsInput | string | null
     durationMinutes?: IntFieldUpdateOperationsInput | number
     basePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -18852,6 +18939,7 @@ export namespace Prisma {
   export type TreatmentUncheckedUpdateWithoutReservationItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    category?: EnumTreatmentCategoryFieldUpdateOperationsInput | $Enums.TreatmentCategory
     description?: NullableStringFieldUpdateOperationsInput | string | null
     durationMinutes?: IntFieldUpdateOperationsInput | number
     basePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string

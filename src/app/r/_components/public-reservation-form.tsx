@@ -16,6 +16,7 @@ import { GlassCard } from "../../(admin)/_components/glass-card";
 type TreatmentItem = {
   id: string;
   name: string;
+  category: "BABY" | "KIDS";
   description: string | null;
   durationMinutes: number;
   basePrice: number;
@@ -447,60 +448,80 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
             3. Pilih Treatment
           </h2>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {treatments.map((treatment) => {
-              const selected = selectedTreatments.find(
-                (t) => t.treatmentId === treatment.id,
-              );
+          {(["BABY", "KIDS"] as const).map((cat) => {
+            const grouped = treatments.filter((t) => t.category === cat);
+            if (grouped.length === 0) return null;
 
-              return (
-                <div
-                  key={treatment.id}
-                  className="rounded-xl border border-white/55 bg-white/25 px-4 py-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-900">
-                        {treatment.name}
-                      </p>
-                      {treatment.description ? (
-                        <p className="mt-1 text-xs text-slate-700/80">
-                          {treatment.description}
-                        </p>
-                      ) : null}
-                      <p className="mt-1 text-xs text-slate-700/80">
-                        {treatment.durationMinutes} menit • {" "}
-                        {formatRupiah(treatment.basePrice)}
-                      </p>
-                    </div>
+            return (
+              <div key={cat} className="mt-4">
+                <h3 className="mb-3 text-sm font-semibold text-slate-700">
+                  <span
+                    className={
+                      cat === "BABY"
+                        ? "inline-flex rounded-full border border-pink-200/60 bg-pink-50/50 px-3 py-1 text-xs font-medium text-pink-700"
+                        : "inline-flex rounded-full border border-sky-200/60 bg-sky-50/50 px-3 py-1 text-xs font-medium text-sky-700"
+                    }
+                  >
+                    {cat === "BABY" ? "Baby" : "Kids"}
+                  </span>
+                </h3>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {grouped.map((treatment) => {
+                    const selected = selectedTreatments.find(
+                      (t) => t.treatmentId === treatment.id,
+                    );
 
-                    {selected ? (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-900">
-                          x{selected.quantity}
-                        </span>
-                        <button
-                          className="rounded-lg border border-rose-200/60 bg-rose-50/50 px-2 py-1 text-xs font-medium text-rose-700 transition hover:bg-rose-50/70"
-                          onClick={() => removeTreatment(treatment.id)}
-                          type="button"
-                        >
-                          Hapus
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        className="rounded-lg border border-sky-200/60 bg-sky-50/50 px-3 py-1 text-xs font-medium text-sky-700 transition hover:bg-sky-50/70"
-                        onClick={() => addTreatment(treatment.id)}
-                        type="button"
+                    return (
+                      <div
+                        key={treatment.id}
+                        className="rounded-xl border border-white/55 bg-white/25 px-4 py-3"
                       >
-                        Tambah
-                      </button>
-                    )}
-                  </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-slate-900">
+                              {treatment.name}
+                            </p>
+                            {treatment.description ? (
+                              <p className="mt-1 text-xs text-slate-700/80">
+                                {treatment.description}
+                              </p>
+                            ) : null}
+                            <p className="mt-1 text-xs text-slate-700/80">
+                              {treatment.durationMinutes} menit •{" "}
+                              {formatRupiah(treatment.basePrice)}
+                            </p>
+                          </div>
+
+                          {selected ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-slate-900">
+                                x{selected.quantity}
+                              </span>
+                              <button
+                                className="rounded-lg border border-rose-200/60 bg-rose-50/50 px-2 py-1 text-xs font-medium text-rose-700 transition hover:bg-rose-50/70"
+                                onClick={() => removeTreatment(treatment.id)}
+                                type="button"
+                              >
+                                Hapus
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              className="rounded-lg border border-sky-200/60 bg-sky-50/50 px-3 py-1 text-xs font-medium text-sky-700 transition hover:bg-sky-50/70"
+                              onClick={() => addTreatment(treatment.id)}
+                              type="button"
+                            >
+                              Tambah
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
 
           {selectedTreatments.length > 0 ? (
             <div className="mt-4 rounded-xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-3">

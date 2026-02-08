@@ -9,6 +9,7 @@ import { db } from "~/server/db";
 
 const treatmentSchema = z.object({
   name: z.string().min(1, "Nama treatment wajib diisi"),
+  category: z.enum(["BABY", "KIDS"]),
   description: z.string().optional(),
   durationMinutes: z.coerce
     .number()
@@ -45,6 +46,7 @@ export async function createTreatment(formData: FormData) {
 
   const parsed = treatmentSchema.safeParse({
     name: formData.get("name"),
+    category: formData.get("category"),
     description: formData.get("description"),
     durationMinutes: formData.get("durationMinutes"),
     basePrice: formData.get("basePrice"),
@@ -58,6 +60,7 @@ export async function createTreatment(formData: FormData) {
   await db.treatment.create({
     data: {
       name: parsed.data.name,
+      category: parsed.data.category,
       description: toNullableString(parsed.data.description),
       durationMinutes: parsed.data.durationMinutes,
       basePrice: parsed.data.basePrice,
@@ -74,6 +77,7 @@ export async function updateTreatment(treatmentId: string, formData: FormData) {
 
   const parsed = treatmentSchema.safeParse({
     name: formData.get("name"),
+    category: formData.get("category"),
     description: formData.get("description"),
     durationMinutes: formData.get("durationMinutes"),
     basePrice: formData.get("basePrice"),
@@ -97,6 +101,7 @@ export async function updateTreatment(treatmentId: string, formData: FormData) {
     where: { id: treatmentId },
     data: {
       name: parsed.data.name,
+      category: parsed.data.category,
       description: toNullableString(parsed.data.description),
       durationMinutes: parsed.data.durationMinutes,
       basePrice: parsed.data.basePrice,

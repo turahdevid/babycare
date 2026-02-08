@@ -6,6 +6,7 @@ import { PublicReservationForm } from "./_components/public-reservation-form";
 type TreatmentItem = {
   id: string;
   name: string;
+  category: "BABY" | "KIDS";
   description: string | null;
   durationMinutes: number;
   basePrice: number;
@@ -15,10 +16,11 @@ export default async function PublicReservationPage() {
 
   const treatments = await db.treatment.findMany({
     where: { deletedAt: null, isActive: true },
-    orderBy: { name: "asc" },
+    orderBy: [{ category: "asc" }, { name: "asc" }],
     select: {
       id: true,
       name: true,
+      category: true,
       description: true,
       durationMinutes: true,
       basePrice: true,
@@ -28,6 +30,7 @@ export default async function PublicReservationPage() {
   const uiTreatments: TreatmentItem[] = treatments.map((t) => ({
     id: t.id,
     name: t.name,
+    category: t.category,
     description: t.description,
     durationMinutes: t.durationMinutes,
     basePrice: t.basePrice.toNumber(),

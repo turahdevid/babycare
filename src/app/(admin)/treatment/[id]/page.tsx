@@ -76,22 +76,43 @@ export default async function TreatmentEditPage(props: {
       <form action={updateAction}>
         <GlassCard>
           <div className="space-y-4">
-            <div>
-              <label
-                className="block text-sm font-medium text-slate-700"
-                htmlFor="name"
-              >
-                Nama Treatment <span className="text-rose-600">*</span>
-              </label>
-              <input
-                className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                defaultValue={treatment.name}
-                id="name"
-                name="name"
-                placeholder="Contoh: Pijat bayi"
-                required
-                type="text"
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor="name"
+                >
+                  Nama Treatment <span className="text-rose-600">*</span>
+                </label>
+                <input
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  defaultValue={treatment.name}
+                  id="name"
+                  name="name"
+                  placeholder="Contoh: Baby Massage"
+                  required
+                  type="text"
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor="category"
+                >
+                  Kategori <span className="text-rose-600">*</span>
+                </label>
+                <select
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  defaultValue={treatment.category}
+                  id="category"
+                  name="category"
+                  required
+                >
+                  <option value="BABY">Baby</option>
+                  <option value="KIDS">Kids</option>
+                </select>
+              </div>
             </div>
 
             <div>

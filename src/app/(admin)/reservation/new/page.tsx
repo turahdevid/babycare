@@ -29,7 +29,7 @@ export default async function NewReservationPage() {
     }),
     db.treatment.findMany({
       where: { deletedAt: null, isActive: true },
-      orderBy: { name: "asc" },
+      orderBy: [{ category: "asc" }, { name: "asc" }],
     }),
     db.user.findMany({
       where: { role: "MIDWIFE" },
@@ -45,6 +45,7 @@ export default async function NewReservationPage() {
   const uiTreatments = treatments.map((t) => ({
     id: t.id,
     name: t.name,
+    category: t.category,
     description: t.description,
     durationMinutes: t.durationMinutes,
     basePrice: t.basePrice.toNumber(),

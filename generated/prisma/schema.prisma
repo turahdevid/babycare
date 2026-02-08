@@ -90,6 +90,11 @@ enum ReservationChannel {
   CUSTOMER
 }
 
+enum ServiceType {
+  OUTLET
+  HOMECARE
+}
+
 enum ReservationAuditAction {
   CREATE
   UPDATE_STATUS
@@ -97,6 +102,11 @@ enum ReservationAuditAction {
   UPDATE_SCHEDULE
   CANCEL
   COMPLETE
+}
+
+enum TreatmentCategory {
+  BABY
+  KIDS
 }
 
 enum NotificationType {
@@ -151,6 +161,7 @@ model Baby {
 model Treatment {
   id               String                 @id @default(cuid())
   name             String
+  category         TreatmentCategory      @default(BABY)
   description      String?                @db.Text
   durationMinutes  Int
   basePrice        Decimal                @db.Decimal(10, 2)
@@ -162,6 +173,7 @@ model Treatment {
 
   @@index([isActive])
   @@index([name])
+  @@index([category])
   @@index([deletedAt])
 }
 
@@ -174,6 +186,7 @@ model Reservation {
   endAt         DateTime
   status        ReservationStatus      @default(PENDING)
   channel       ReservationChannel     @default(ADMIN)
+  serviceType   ServiceType            @default(OUTLET)
   notes         String?                @db.Text
   cancelledAt   DateTime?
   completedAt   DateTime?
@@ -193,6 +206,7 @@ model Reservation {
   @@index([midwifeId, startAt])
   @@index([customerId, startAt])
   @@index([babyId, startAt])
+  @@index([serviceType, startAt])
 }
 
 model ReservationTreatment {

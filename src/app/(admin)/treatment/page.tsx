@@ -46,7 +46,7 @@ export default async function TreatmentPage(props: PageProps) {
 
   const treatments = await db.treatment.findMany({
     where: { deletedAt: null },
-    orderBy: { name: "asc" },
+    orderBy: [{ category: "asc" }, { name: "asc" }],
   });
 
   const successParam =
@@ -152,6 +152,9 @@ export default async function TreatmentPage(props: PageProps) {
                   <th className="whitespace-nowrap border-b border-white/60 bg-white/30 px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
                     Nama
                   </th>
+                  <th className="whitespace-nowrap border-b border-white/60 bg-white/30 px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                    Kategori
+                  </th>
                   <th className="border-b border-white/60 bg-white/30 px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
                     Deskripsi
                   </th>
@@ -186,6 +189,17 @@ export default async function TreatmentPage(props: PageProps) {
                         <div className="font-medium text-slate-900">
                           {treatment.name}
                         </div>
+                      </td>
+                      <td className="whitespace-nowrap border-b border-white/40 px-3 py-3 align-top">
+                        <span
+                          className={
+                            treatment.category === "BABY"
+                              ? "inline-flex rounded-full border border-pink-200/60 bg-pink-50/50 px-2.5 py-1 text-xs font-medium text-pink-700"
+                              : "inline-flex rounded-full border border-sky-200/60 bg-sky-50/50 px-2.5 py-1 text-xs font-medium text-sky-700"
+                          }
+                        >
+                          {treatment.category === "BABY" ? "Baby" : "Kids"}
+                        </span>
                       </td>
                       <td className="border-b border-white/40 px-3 py-3 align-top">
                         {treatment.description ? (

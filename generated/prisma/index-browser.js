@@ -187,6 +187,7 @@ exports.Prisma.BabyScalarFieldEnum = {
 exports.Prisma.TreatmentScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  category: 'category',
   description: 'description',
   durationMinutes: 'durationMinutes',
   basePrice: 'basePrice',
@@ -352,6 +353,11 @@ exports.Role = exports.$Enums.Role = {
 exports.BabyGender = exports.$Enums.BabyGender = {
   MALE: 'MALE',
   FEMALE: 'FEMALE'
+};
+
+exports.TreatmentCategory = exports.$Enums.TreatmentCategory = {
+  BABY: 'BABY',
+  KIDS: 'KIDS'
 };
 
 exports.ReservationStatus = exports.$Enums.ReservationStatus = {

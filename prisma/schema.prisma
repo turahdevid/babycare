@@ -104,6 +104,11 @@ enum ReservationAuditAction {
     COMPLETE
 }
 
+enum TreatmentCategory {
+    BABY
+    KIDS
+}
+
 enum NotificationType {
     RESERVATION_CREATED
     RESERVATION_STATUS_CHANGED
@@ -154,19 +159,21 @@ model Baby {
 }
 
 model Treatment {
-    id              String   @id @default(cuid())
+    id              String            @id @default(cuid())
     name            String
-    description     String?  @db.Text
+    category        TreatmentCategory @default(BABY)
+    description     String?           @db.Text
     durationMinutes Int
-    basePrice       Decimal  @db.Decimal(10, 2)
-    isActive        Boolean  @default(true)
+    basePrice       Decimal           @db.Decimal(10, 2)
+    isActive        Boolean           @default(true)
     deletedAt       DateTime?
     reservationItems ReservationTreatment[]
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
 
     @@index([isActive])
     @@index([name])
+    @@index([category])
     @@index([deletedAt])
 }
 
