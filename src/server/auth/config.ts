@@ -131,6 +131,7 @@ export const authConfig = {
       return session;
     },
   },
+  trustHost: true,
   pages: {
     signIn: "/",
   },
