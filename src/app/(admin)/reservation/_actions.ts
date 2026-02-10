@@ -28,15 +28,21 @@ export async function completeReservation(reservationId: string, formData: FormD
 
   const babyIdValue = formData.get("babyId");
   const midwifeIdValue = formData.get("midwifeId");
+  const paymentMethodValue = formData.get("paymentMethod");
 
   const input = {
     babyId: typeof babyIdValue === "string" ? babyIdValue.trim() : "",
     midwifeId: typeof midwifeIdValue === "string" ? midwifeIdValue.trim() : "",
+    paymentMethod:
+      typeof paymentMethodValue === "string" && paymentMethodValue.length > 0
+        ? paymentMethodValue
+        : undefined,
   };
 
   const completionSchema = z.object({
     babyId: z.string().min(1, "Baby wajib dipilih"),
     midwifeId: z.string().min(1, "Bidan wajib dipilih"),
+    paymentMethod: z.enum(["CASH", "TRANSFER"]).optional(),
   });
 
   const validated = completionSchema.safeParse(input);
@@ -69,6 +75,7 @@ export async function completeReservation(reservationId: string, formData: FormD
         data: {
           babyId: validated.data.babyId,
           midwifeId: validated.data.midwifeId,
+          paymentMethod: validated.data.paymentMethod ?? null,
           status: "COMPLETED",
           completedAt: now,
         },

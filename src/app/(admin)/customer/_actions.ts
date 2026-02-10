@@ -9,6 +9,7 @@ import { db } from "~/server/db";
 
 const customerSchema = z.object({
   motherName: z.string().min(1, "Nama bunda wajib diisi"),
+  fatherName: z.string().optional(),
   motherPhone: z.string().min(1, "Nomor WhatsApp wajib diisi"),
   motherEmail: z.string().email("Email tidak valid").optional().or(z.literal("")),
   address: z.string().optional(),
@@ -32,6 +33,7 @@ export async function createCustomer(formData: FormData) {
 
   const data = {
     motherName: formData.get("motherName"),
+    fatherName: formData.get("fatherName"),
     motherPhone: formData.get("motherPhone"),
     motherEmail: formData.get("motherEmail"),
     address: formData.get("address"),
@@ -42,7 +44,10 @@ export async function createCustomer(formData: FormData) {
 
   const babyNameValue = formData.get("babyName");
   const babyGenderValue = formData.get("babyGender");
+  const babyBirthPlaceValue = formData.get("babyBirthPlace");
   const babyBirthDateValue = formData.get("babyBirthDate");
+  const babyAllergyValue = formData.get("babyAllergy");
+  const babyAgeAtTreatmentValue = formData.get("babyAgeAtTreatment");
   const babyNotesValue = formData.get("babyNotes");
 
   const babyName = typeof babyNameValue === "string" ? babyNameValue.trim() : "";
@@ -51,15 +56,28 @@ export async function createCustomer(formData: FormData) {
     (babyGenderValue === "MALE" || babyGenderValue === "FEMALE")
       ? babyGenderValue
       : null;
+  const babyBirthPlace =
+    typeof babyBirthPlaceValue === "string" && babyBirthPlaceValue.trim().length > 0
+      ? babyBirthPlaceValue.trim()
+      : null;
   const babyBirthDate =
     typeof babyBirthDateValue === "string" && babyBirthDateValue.length > 0
       ? babyBirthDateValue
+      : null;
+  const babyAllergy =
+    typeof babyAllergyValue === "string" && babyAllergyValue.trim().length > 0
+      ? babyAllergyValue.trim()
+      : null;
+  const babyAgeAtTreatment =
+    typeof babyAgeAtTreatmentValue === "string" && babyAgeAtTreatmentValue.trim().length > 0
+      ? babyAgeAtTreatmentValue.trim()
       : null;
   const babyNotes = typeof babyNotesValue === "string" ? babyNotesValue : "";
 
   const customer = await db.customer.create({
     data: {
       motherName: validated.motherName,
+      fatherName: toNullableString(validated.fatherName),
       motherPhone: validated.motherPhone,
       motherEmail: toNullableString(validated.motherEmail),
       address: toNullableString(validated.address),
@@ -73,7 +91,10 @@ export async function createCustomer(formData: FormData) {
         customerId: customer.id,
         name: babyName,
         gender: babyGender,
+        birthPlace: babyBirthPlace,
         birthDate: babyBirthDate ? new Date(babyBirthDate) : null,
+        allergy: babyAllergy,
+        ageAtTreatment: babyAgeAtTreatment,
         notes: toNullableString(babyNotes),
       },
     });
@@ -92,6 +113,7 @@ export async function updateCustomer(customerId: string, formData: FormData) {
 
   const data = {
     motherName: formData.get("motherName"),
+    fatherName: formData.get("fatherName"),
     motherPhone: formData.get("motherPhone"),
     motherEmail: formData.get("motherEmail"),
     address: formData.get("address"),
@@ -104,6 +126,7 @@ export async function updateCustomer(customerId: string, formData: FormData) {
     where: { id: customerId },
     data: {
       motherName: validated.motherName,
+      fatherName: toNullableString(validated.fatherName),
       motherPhone: validated.motherPhone,
       motherEmail: toNullableString(validated.motherEmail),
       address: toNullableString(validated.address),
@@ -119,7 +142,10 @@ export async function updateCustomer(customerId: string, formData: FormData) {
 const babySchema = z.object({
   name: z.string().min(1, "Nama baby wajib diisi"),
   gender: z.enum(["MALE", "FEMALE"]).optional().or(z.literal("")),
+  birthPlace: z.string().optional(),
   birthDate: z.string().optional().or(z.literal("")),
+  allergy: z.string().optional(),
+  ageAtTreatment: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -133,7 +159,10 @@ export async function addBaby(customerId: string, formData: FormData) {
   const data = {
     name: formData.get("name"),
     gender: formData.get("gender"),
+    birthPlace: formData.get("birthPlace"),
     birthDate: formData.get("birthDate"),
+    allergy: formData.get("allergy"),
+    ageAtTreatment: formData.get("ageAtTreatment"),
     notes: formData.get("notes"),
   };
 
@@ -153,7 +182,10 @@ export async function addBaby(customerId: string, formData: FormData) {
       customerId,
       name: validated.name,
       gender,
+      birthPlace: toNullableString(validated.birthPlace),
       birthDate: birthDateValue ? new Date(birthDateValue) : null,
+      allergy: toNullableString(validated.allergy),
+      ageAtTreatment: toNullableString(validated.ageAtTreatment),
       notes: toNullableString(validated.notes),
     },
   });

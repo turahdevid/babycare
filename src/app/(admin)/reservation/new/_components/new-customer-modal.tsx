@@ -11,7 +11,10 @@ export type NewCustomerPayload = {
   baby?: {
     name: string;
     gender?: "MALE" | "FEMALE";
+    birthPlace?: string;
     birthDate?: string;
+    allergy?: string;
+    ageAtTreatment?: string;
     notes?: string;
   };
 };
@@ -30,7 +33,10 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
 
   const [babyName, setBabyName] = useState("");
   const [babyGender, setBabyGender] = useState<"" | "MALE" | "FEMALE">("");
+  const [babyBirthPlace, setBabyBirthPlace] = useState("");
   const [babyBirthDate, setBabyBirthDate] = useState("");
+  const [babyAllergy, setBabyAllergy] = useState("");
+  const [babyAgeAtTreatment, setBabyAgeAtTreatment] = useState("");
   const [babyNotes, setBabyNotes] = useState("");
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -39,7 +45,10 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
     const normalizedEmail = motherEmail.trim();
     const normalizedNotes = notes.trim();
     const normalizedBabyName = babyName.trim();
+    const normalizedBabyBirthPlace = babyBirthPlace.trim();
     const normalizedBabyBirthDate = babyBirthDate.trim();
+    const normalizedBabyAllergy = babyAllergy.trim();
+    const normalizedBabyAgeAtTreatment = babyAgeAtTreatment.trim();
     const normalizedBabyNotes = babyNotes.trim();
 
     const payload: NewCustomerPayload = {
@@ -65,8 +74,20 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
         baby.gender = babyGender;
       }
 
+      if (normalizedBabyBirthPlace.length > 0) {
+        baby.birthPlace = normalizedBabyBirthPlace;
+      }
+
       if (normalizedBabyBirthDate.length > 0) {
         baby.birthDate = normalizedBabyBirthDate;
+      }
+
+      if (normalizedBabyAllergy.length > 0) {
+        baby.allergy = normalizedBabyAllergy;
+      }
+
+      if (normalizedBabyAgeAtTreatment.length > 0) {
+        baby.ageAtTreatment = normalizedBabyAgeAtTreatment;
       }
 
       if (normalizedBabyNotes.length > 0) {
@@ -82,7 +103,7 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-3 sm:p-4">
       <div className="flex w-full max-w-3xl flex-col rounded-3xl border border-white/60 bg-white/90 shadow-xl backdrop-blur-md" style={{ maxHeight: '85vh' }}>
-        <div className="flex-shrink-0 border-b border-slate-200/50 px-5 py-4">
+        <div className="shrink-0 border-b border-slate-200/50 px-5 py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900">
@@ -254,6 +275,23 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
                 <div>
                   <label
                     className="block text-sm font-medium text-slate-700"
+                    htmlFor="modal-babyBirthPlace"
+                  >
+                    Tempat Lahir
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="modal-babyBirthPlace"
+                    onChange={(e) => setBabyBirthPlace(e.target.value)}
+                    placeholder="Contoh: Jakarta"
+                    type="text"
+                    value={babyBirthPlace}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
                     htmlFor="modal-babyBirthDate"
                   >
                     Tanggal Lahir
@@ -267,18 +305,52 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
                   />
                 </div>
 
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="modal-babyAllergy"
+                  >
+                    Alergi
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="modal-babyAllergy"
+                    onChange={(e) => setBabyAllergy(e.target.value)}
+                    placeholder="Contoh: Susu sapi"
+                    type="text"
+                    value={babyAllergy}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="modal-babyAgeAtTreatment"
+                  >
+                    Usia saat Treatment
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="modal-babyAgeAtTreatment"
+                    onChange={(e) => setBabyAgeAtTreatment(e.target.value)}
+                    placeholder="Contoh: 1 bulan 2 minggu"
+                    type="text"
+                    value={babyAgeAtTreatment}
+                  />
+                </div>
+
                 <div className="sm:col-span-2">
                   <label
                     className="block text-sm font-medium text-slate-700"
                     htmlFor="modal-babyNotes"
                   >
-                    Usia Baby / Catatan (Opsional)
+                    Catatan Baby (Opsional)
                   </label>
                   <input
                     className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="modal-babyNotes"
                     onChange={(e) => setBabyNotes(e.target.value)}
-                    placeholder="Contoh: 1 bulan 2 minggu"
+                    placeholder="Catatan tambahan"
                     type="text"
                     value={babyNotes}
                   />
@@ -287,7 +359,7 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
             </div>
           </div>
 
-          <div className="flex-shrink-0 border-t border-slate-200/50 bg-white/95 px-5 py-3">
+          <div className="shrink-0 border-t border-slate-200/50 bg-white/95 px-5 py-3">
             <div className="flex gap-3">
               <button
                 className="flex-1 rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70"

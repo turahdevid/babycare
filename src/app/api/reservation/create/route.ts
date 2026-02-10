@@ -15,7 +15,10 @@ const newCustomerSchema = z.object({
     .object({
       name: z.string().min(1),
       gender: z.enum(["MALE", "FEMALE"]).optional(),
+      birthPlace: z.string().optional(),
       birthDate: z.string().min(1).optional(),
+      allergy: z.string().optional(),
+      ageAtTreatment: z.string().optional(),
       notes: z.string().optional(),
     })
     .optional(),
@@ -36,6 +39,7 @@ const createReservationSchema = z
     time: z.string().min(1),
     serviceType: z.enum(["OUTLET", "HOMECARE"]),
     midwifeId: z.string().optional(),
+    paymentMethod: z.enum(["CASH", "TRANSFER"]).optional(),
     notes: z.string().optional(),
     treatments: z.string().min(1),
     newCustomer: z.string().optional(),
@@ -70,6 +74,8 @@ export async function POST(request: Request) {
     const notesValue = formData.get("notes");
     const newCustomerValue = formData.get("newCustomer");
 
+    const paymentMethodValue = formData.get("paymentMethod");
+
     const data = {
       customerId: typeof customerIdValue === "string" ? customerIdValue : undefined,
       babyId: typeof babyIdValue === "string" ? babyIdValue : undefined,
@@ -77,6 +83,10 @@ export async function POST(request: Request) {
       time: formData.get("time"),
       serviceType: formData.get("serviceType"),
       midwifeId: typeof midwifeIdValue === "string" ? midwifeIdValue : undefined,
+      paymentMethod:
+        typeof paymentMethodValue === "string" && paymentMethodValue.length > 0
+          ? paymentMethodValue
+          : undefined,
       notes: typeof notesValue === "string" ? notesValue : undefined,
       treatments: formData.get("treatments"),
       newCustomer:
@@ -166,7 +176,10 @@ export async function POST(request: Request) {
             customerId,
             name: newCustomerData.baby.name,
             gender: newCustomerData.baby.gender ?? null,
+            birthPlace: newCustomerData.baby.birthPlace ?? null,
             birthDate: birthDateValue ? new Date(birthDateValue) : null,
+            allergy: newCustomerData.baby.allergy ?? null,
+            ageAtTreatment: newCustomerData.baby.ageAtTreatment ?? null,
             notes: newCustomerData.baby.notes ?? null,
           },
           select: { id: true },
@@ -279,6 +292,7 @@ export async function POST(request: Request) {
         status: "PENDING",
         channel: "ADMIN",
         serviceType: validated.serviceType,
+        paymentMethod: validated.paymentMethod ?? null,
         notes: validated.notes ?? null,
         items: {
           create: treatments.map((item) => {

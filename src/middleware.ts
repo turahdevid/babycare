@@ -1,15 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { auth } from "~/server/auth/edge";
 
-function hasAuthCookie(req: NextRequest): boolean {
-  return Boolean(
-    req.cookies.get("authjs.session-token") ??
-      req.cookies.get("__Secure-authjs.session-token"),
-  );
-}
-
-export default function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isLoggedIn = hasAuthCookie(req);
+  const session = await auth();
+  const isLoggedIn = Boolean(session?.user);
 
   if (pathname === "/" && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));

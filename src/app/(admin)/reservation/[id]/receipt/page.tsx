@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "~/app/(admin)/_components/glass-card";
 import { PrintReceiptButton } from "./_components/print-receipt-button";
 
@@ -130,6 +131,11 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
               <span className="text-slate-700/80">Baby</span>
               <span className="text-right font-medium text-slate-900">
                 {reservation.baby?.name ?? "-"}
+                {reservation.baby?.birthDate ? (
+                  <span className="ml-1 text-xs font-normal text-slate-600">
+                    ({calculateAge(reservation.baby.birthDate)})
+                  </span>
+                ) : null}
               </span>
             </div>
 
@@ -169,6 +175,15 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
               <span className="font-semibold text-slate-900">Total</span>
               <span className="text-base font-semibold text-slate-900">{formatCurrency(totalPrice)}</span>
             </div>
+
+            {reservation.paymentMethod ? (
+              <div className="mt-3 flex items-center justify-between text-sm">
+                <span className="text-slate-700/80">Pembayaran</span>
+                <span className="font-medium text-slate-900">
+                  {reservation.paymentMethod === "CASH" ? "Cash" : "Transfer"}
+                </span>
+              </div>
+            ) : null}
           </div>
 
           <div className="mt-6 text-center text-xs text-slate-700/80">

@@ -2,7 +2,7 @@ import { env } from "~/env";
 import { PrismaClient } from "../../generated/prisma";
 
 export type { Prisma } from "../../generated/prisma";
-export { ReservationStatus, ServiceType } from "../../generated/prisma";
+export { ReservationStatus, ServiceType, PaymentMethod } from "../../generated/prisma";
 export type { Customer, Baby, Treatment, User } from "../../generated/prisma";
 
 const createPrismaClient = () =>

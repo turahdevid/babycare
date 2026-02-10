@@ -537,14 +537,42 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
 
           <GlassCard>
             <h3 className="text-base font-semibold text-slate-900">
-              4. Catatan (Opsional)
+              4. Metode Pembayaran & Catatan
             </h3>
-            <textarea
-              className="mt-4 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-              name="notes"
-              placeholder="Catatan tambahan untuk reservasi ini"
-              rows={3}
-            />
+            <div className="mt-4 space-y-4">
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor="paymentMethod"
+                >
+                  Metode Pembayaran
+                </label>
+                <select
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  id="paymentMethod"
+                  name="paymentMethod"
+                >
+                  <option value="">Belum dipilih</option>
+                  <option value="CASH">Cash</option>
+                  <option value="TRANSFER">Transfer</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor="notes"
+                >
+                  Catatan (Opsional)
+                </label>
+                <textarea
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  id="notes"
+                  name="notes"
+                  placeholder="Catatan tambahan untuk reservasi ini"
+                  rows={3}
+                />
+              </div>
+            </div>
           </GlassCard>
 
           <GlassCard>

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
 import { completeReservation } from "../_actions";
@@ -154,7 +155,14 @@ export default async function ReservationDetailPage(props: {
             {reservation.baby ? (
               <div>
                 <span className="font-medium text-slate-700">Nama Baby:</span>
-                <p className="mt-1 text-slate-900">{reservation.baby.name}</p>
+                <p className="mt-1 text-slate-900">
+                  {reservation.baby.name}
+                  {reservation.baby.birthDate ? (
+                    <span className="ml-2 text-xs text-slate-600">
+                      ({calculateAge(reservation.baby.birthDate)})
+                    </span>
+                  ) : null}
+                </p>
               </div>
             ) : null}
           </div>
@@ -226,6 +234,14 @@ export default async function ReservationDetailPage(props: {
               {formatCurrency(totalPrice)}
             </span>
           </div>
+          {reservation.paymentMethod ? (
+            <div className="mt-3 flex items-center justify-between text-sm">
+              <span className="font-medium text-slate-700">Metode Pembayaran</span>
+              <span className="rounded-full border border-emerald-200/60 bg-emerald-50/50 px-3 py-1 text-xs font-medium text-emerald-700">
+                {reservation.paymentMethod === "CASH" ? "Cash" : "Transfer"}
+              </span>
+            </div>
+          ) : null}
         </div>
       </GlassCard>
 
@@ -365,6 +381,25 @@ export default async function ReservationDetailPage(props: {
                     </select>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor="complete-paymentMethod"
+                >
+                  Metode Pembayaran
+                </label>
+                <select
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  defaultValue={reservation.paymentMethod ?? ""}
+                  id="complete-paymentMethod"
+                  name="paymentMethod"
+                >
+                  <option value="">Belum dipilih</option>
+                  <option value="CASH">Cash</option>
+                  <option value="TRANSFER">Transfer</option>
+                </select>
               </div>
 
               <button

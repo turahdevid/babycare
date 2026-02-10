@@ -121,9 +121,15 @@ enum NotificationStatus {
     ARCHIVED
 }
 
+enum PaymentMethod {
+    CASH
+    TRANSFER
+}
+
 model Customer {
     id          String   @id @default(cuid())
     motherName  String
+    fatherName  String?
     motherPhone String
     motherEmail String?  @db.VarChar(255)
     address     String?  @db.Text
@@ -141,12 +147,15 @@ model Customer {
 }
 
 model Baby {
-    id         String     @id @default(cuid())
-    customerId String
-    name       String
-    gender     BabyGender?
-    birthDate  DateTime?
-    notes      String?    @db.Text
+    id              String     @id @default(cuid())
+    customerId      String
+    name            String
+    gender          BabyGender?
+    birthPlace      String?
+    birthDate       DateTime?
+    allergy         String?    @db.Text
+    ageAtTreatment  String?
+    notes           String?    @db.Text
     deletedAt  DateTime?
     customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
     reservations Reservation[]
@@ -186,8 +195,9 @@ model Reservation {
     endAt       DateTime
     status      ReservationStatus  @default(PENDING)
     channel     ReservationChannel @default(ADMIN)
-    serviceType ServiceType        @default(OUTLET)
-    notes       String?            @db.Text
+    serviceType    ServiceType        @default(OUTLET)
+    paymentMethod  PaymentMethod?
+    notes          String?            @db.Text
     cancelledAt DateTime?
     completedAt DateTime?
     customer    Customer           @relation(fields: [customerId], references: [id], onDelete: Restrict)

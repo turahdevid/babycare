@@ -154,6 +154,14 @@ export const NotificationStatus: {
 
 export type NotificationStatus = (typeof NotificationStatus)[keyof typeof NotificationStatus]
 
+
+export const PaymentMethod: {
+  CASH: 'CASH',
+  TRANSFER: 'TRANSFER'
+};
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
 }
 
 export type Role = $Enums.Role
@@ -191,6 +199,10 @@ export const NotificationType: typeof $Enums.NotificationType
 export type NotificationStatus = $Enums.NotificationStatus
 
 export const NotificationStatus: typeof $Enums.NotificationStatus
+
+export type PaymentMethod = $Enums.PaymentMethod
+
+export const PaymentMethod: typeof $Enums.PaymentMethod
 
 /**
  * ##  Prisma Client ʲˢ
@@ -5958,6 +5970,7 @@ export namespace Prisma {
   export type CustomerMinAggregateOutputType = {
     id: string | null
     motherName: string | null
+    fatherName: string | null
     motherPhone: string | null
     motherEmail: string | null
     address: string | null
@@ -5970,6 +5983,7 @@ export namespace Prisma {
   export type CustomerMaxAggregateOutputType = {
     id: string | null
     motherName: string | null
+    fatherName: string | null
     motherPhone: string | null
     motherEmail: string | null
     address: string | null
@@ -5982,6 +5996,7 @@ export namespace Prisma {
   export type CustomerCountAggregateOutputType = {
     id: number
     motherName: number
+    fatherName: number
     motherPhone: number
     motherEmail: number
     address: number
@@ -5996,6 +6011,7 @@ export namespace Prisma {
   export type CustomerMinAggregateInputType = {
     id?: true
     motherName?: true
+    fatherName?: true
     motherPhone?: true
     motherEmail?: true
     address?: true
@@ -6008,6 +6024,7 @@ export namespace Prisma {
   export type CustomerMaxAggregateInputType = {
     id?: true
     motherName?: true
+    fatherName?: true
     motherPhone?: true
     motherEmail?: true
     address?: true
@@ -6020,6 +6037,7 @@ export namespace Prisma {
   export type CustomerCountAggregateInputType = {
     id?: true
     motherName?: true
+    fatherName?: true
     motherPhone?: true
     motherEmail?: true
     address?: true
@@ -6105,6 +6123,7 @@ export namespace Prisma {
   export type CustomerGroupByOutputType = {
     id: string
     motherName: string
+    fatherName: string | null
     motherPhone: string
     motherEmail: string | null
     address: string | null
@@ -6134,6 +6153,7 @@ export namespace Prisma {
   export type CustomerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     motherName?: boolean
+    fatherName?: boolean
     motherPhone?: boolean
     motherEmail?: boolean
     address?: boolean
@@ -6151,6 +6171,7 @@ export namespace Prisma {
   export type CustomerSelectScalar = {
     id?: boolean
     motherName?: boolean
+    fatherName?: boolean
     motherPhone?: boolean
     motherEmail?: boolean
     address?: boolean
@@ -6160,7 +6181,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "motherName" | "motherPhone" | "motherEmail" | "address" | "notes" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["customer"]>
+  export type CustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "motherName" | "fatherName" | "motherPhone" | "motherEmail" | "address" | "notes" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["customer"]>
   export type CustomerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     babies?: boolean | Customer$babiesArgs<ExtArgs>
     reservations?: boolean | Customer$reservationsArgs<ExtArgs>
@@ -6176,6 +6197,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       motherName: string
+      fatherName: string | null
       motherPhone: string
       motherEmail: string | null
       address: string | null
@@ -6556,6 +6578,7 @@ export namespace Prisma {
   interface CustomerFieldRefs {
     readonly id: FieldRef<"Customer", 'String'>
     readonly motherName: FieldRef<"Customer", 'String'>
+    readonly fatherName: FieldRef<"Customer", 'String'>
     readonly motherPhone: FieldRef<"Customer", 'String'>
     readonly motherEmail: FieldRef<"Customer", 'String'>
     readonly address: FieldRef<"Customer", 'String'>
@@ -6987,7 +7010,10 @@ export namespace Prisma {
     customerId: string | null
     name: string | null
     gender: $Enums.BabyGender | null
+    birthPlace: string | null
     birthDate: Date | null
+    allergy: string | null
+    ageAtTreatment: string | null
     notes: string | null
     deletedAt: Date | null
     createdAt: Date | null
@@ -6999,7 +7025,10 @@ export namespace Prisma {
     customerId: string | null
     name: string | null
     gender: $Enums.BabyGender | null
+    birthPlace: string | null
     birthDate: Date | null
+    allergy: string | null
+    ageAtTreatment: string | null
     notes: string | null
     deletedAt: Date | null
     createdAt: Date | null
@@ -7011,7 +7040,10 @@ export namespace Prisma {
     customerId: number
     name: number
     gender: number
+    birthPlace: number
     birthDate: number
+    allergy: number
+    ageAtTreatment: number
     notes: number
     deletedAt: number
     createdAt: number
@@ -7025,7 +7057,10 @@ export namespace Prisma {
     customerId?: true
     name?: true
     gender?: true
+    birthPlace?: true
     birthDate?: true
+    allergy?: true
+    ageAtTreatment?: true
     notes?: true
     deletedAt?: true
     createdAt?: true
@@ -7037,7 +7072,10 @@ export namespace Prisma {
     customerId?: true
     name?: true
     gender?: true
+    birthPlace?: true
     birthDate?: true
+    allergy?: true
+    ageAtTreatment?: true
     notes?: true
     deletedAt?: true
     createdAt?: true
@@ -7049,7 +7087,10 @@ export namespace Prisma {
     customerId?: true
     name?: true
     gender?: true
+    birthPlace?: true
     birthDate?: true
+    allergy?: true
+    ageAtTreatment?: true
     notes?: true
     deletedAt?: true
     createdAt?: true
@@ -7134,7 +7175,10 @@ export namespace Prisma {
     customerId: string
     name: string
     gender: $Enums.BabyGender | null
+    birthPlace: string | null
     birthDate: Date | null
+    allergy: string | null
+    ageAtTreatment: string | null
     notes: string | null
     deletedAt: Date | null
     createdAt: Date
@@ -7163,7 +7207,10 @@ export namespace Prisma {
     customerId?: boolean
     name?: boolean
     gender?: boolean
+    birthPlace?: boolean
     birthDate?: boolean
+    allergy?: boolean
+    ageAtTreatment?: boolean
     notes?: boolean
     deletedAt?: boolean
     createdAt?: boolean
@@ -7180,14 +7227,17 @@ export namespace Prisma {
     customerId?: boolean
     name?: boolean
     gender?: boolean
+    birthPlace?: boolean
     birthDate?: boolean
+    allergy?: boolean
+    ageAtTreatment?: boolean
     notes?: boolean
     deletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type BabyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerId" | "name" | "gender" | "birthDate" | "notes" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["baby"]>
+  export type BabyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerId" | "name" | "gender" | "birthPlace" | "birthDate" | "allergy" | "ageAtTreatment" | "notes" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["baby"]>
   export type BabyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     reservations?: boolean | Baby$reservationsArgs<ExtArgs>
@@ -7205,7 +7255,10 @@ export namespace Prisma {
       customerId: string
       name: string
       gender: $Enums.BabyGender | null
+      birthPlace: string | null
       birthDate: Date | null
+      allergy: string | null
+      ageAtTreatment: string | null
       notes: string | null
       deletedAt: Date | null
       createdAt: Date
@@ -7585,7 +7638,10 @@ export namespace Prisma {
     readonly customerId: FieldRef<"Baby", 'String'>
     readonly name: FieldRef<"Baby", 'String'>
     readonly gender: FieldRef<"Baby", 'BabyGender'>
+    readonly birthPlace: FieldRef<"Baby", 'String'>
     readonly birthDate: FieldRef<"Baby", 'DateTime'>
+    readonly allergy: FieldRef<"Baby", 'String'>
+    readonly ageAtTreatment: FieldRef<"Baby", 'String'>
     readonly notes: FieldRef<"Baby", 'String'>
     readonly deletedAt: FieldRef<"Baby", 'DateTime'>
     readonly createdAt: FieldRef<"Baby", 'DateTime'>
@@ -9043,6 +9099,7 @@ export namespace Prisma {
     status: $Enums.ReservationStatus | null
     channel: $Enums.ReservationChannel | null
     serviceType: $Enums.ServiceType | null
+    paymentMethod: $Enums.PaymentMethod | null
     notes: string | null
     cancelledAt: Date | null
     completedAt: Date | null
@@ -9060,6 +9117,7 @@ export namespace Prisma {
     status: $Enums.ReservationStatus | null
     channel: $Enums.ReservationChannel | null
     serviceType: $Enums.ServiceType | null
+    paymentMethod: $Enums.PaymentMethod | null
     notes: string | null
     cancelledAt: Date | null
     completedAt: Date | null
@@ -9077,6 +9135,7 @@ export namespace Prisma {
     status: number
     channel: number
     serviceType: number
+    paymentMethod: number
     notes: number
     cancelledAt: number
     completedAt: number
@@ -9096,6 +9155,7 @@ export namespace Prisma {
     status?: true
     channel?: true
     serviceType?: true
+    paymentMethod?: true
     notes?: true
     cancelledAt?: true
     completedAt?: true
@@ -9113,6 +9173,7 @@ export namespace Prisma {
     status?: true
     channel?: true
     serviceType?: true
+    paymentMethod?: true
     notes?: true
     cancelledAt?: true
     completedAt?: true
@@ -9130,6 +9191,7 @@ export namespace Prisma {
     status?: true
     channel?: true
     serviceType?: true
+    paymentMethod?: true
     notes?: true
     cancelledAt?: true
     completedAt?: true
@@ -9220,6 +9282,7 @@ export namespace Prisma {
     status: $Enums.ReservationStatus
     channel: $Enums.ReservationChannel
     serviceType: $Enums.ServiceType
+    paymentMethod: $Enums.PaymentMethod | null
     notes: string | null
     cancelledAt: Date | null
     completedAt: Date | null
@@ -9254,6 +9317,7 @@ export namespace Prisma {
     status?: boolean
     channel?: boolean
     serviceType?: boolean
+    paymentMethod?: boolean
     notes?: boolean
     cancelledAt?: boolean
     completedAt?: boolean
@@ -9280,6 +9344,7 @@ export namespace Prisma {
     status?: boolean
     channel?: boolean
     serviceType?: boolean
+    paymentMethod?: boolean
     notes?: boolean
     cancelledAt?: boolean
     completedAt?: boolean
@@ -9287,7 +9352,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerId" | "babyId" | "midwifeId" | "startAt" | "endAt" | "status" | "channel" | "serviceType" | "notes" | "cancelledAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["reservation"]>
+  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerId" | "babyId" | "midwifeId" | "startAt" | "endAt" | "status" | "channel" | "serviceType" | "paymentMethod" | "notes" | "cancelledAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["reservation"]>
   export type ReservationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     baby?: boolean | Reservation$babyArgs<ExtArgs>
@@ -9318,6 +9383,7 @@ export namespace Prisma {
       status: $Enums.ReservationStatus
       channel: $Enums.ReservationChannel
       serviceType: $Enums.ServiceType
+      paymentMethod: $Enums.PaymentMethod | null
       notes: string | null
       cancelledAt: Date | null
       completedAt: Date | null
@@ -9707,6 +9773,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Reservation", 'ReservationStatus'>
     readonly channel: FieldRef<"Reservation", 'ReservationChannel'>
     readonly serviceType: FieldRef<"Reservation", 'ServiceType'>
+    readonly paymentMethod: FieldRef<"Reservation", 'PaymentMethod'>
     readonly notes: FieldRef<"Reservation", 'String'>
     readonly cancelledAt: FieldRef<"Reservation", 'DateTime'>
     readonly completedAt: FieldRef<"Reservation", 'DateTime'>
@@ -13292,6 +13359,7 @@ export namespace Prisma {
   export const CustomerScalarFieldEnum: {
     id: 'id',
     motherName: 'motherName',
+    fatherName: 'fatherName',
     motherPhone: 'motherPhone',
     motherEmail: 'motherEmail',
     address: 'address',
@@ -13309,7 +13377,10 @@ export namespace Prisma {
     customerId: 'customerId',
     name: 'name',
     gender: 'gender',
+    birthPlace: 'birthPlace',
     birthDate: 'birthDate',
+    allergy: 'allergy',
+    ageAtTreatment: 'ageAtTreatment',
     notes: 'notes',
     deletedAt: 'deletedAt',
     createdAt: 'createdAt',
@@ -13345,6 +13416,7 @@ export namespace Prisma {
     status: 'status',
     channel: 'channel',
     serviceType: 'serviceType',
+    paymentMethod: 'paymentMethod',
     notes: 'notes',
     cancelledAt: 'cancelledAt',
     completedAt: 'completedAt',
@@ -13465,6 +13537,7 @@ export namespace Prisma {
   export const CustomerOrderByRelevanceFieldEnum: {
     id: 'id',
     motherName: 'motherName',
+    fatherName: 'fatherName',
     motherPhone: 'motherPhone',
     motherEmail: 'motherEmail',
     address: 'address',
@@ -13478,6 +13551,9 @@ export namespace Prisma {
     id: 'id',
     customerId: 'customerId',
     name: 'name',
+    birthPlace: 'birthPlace',
+    allergy: 'allergy',
+    ageAtTreatment: 'ageAtTreatment',
     notes: 'notes'
   };
 
@@ -13614,6 +13690,13 @@ export namespace Prisma {
    * Reference to a field of type 'ServiceType'
    */
   export type EnumServiceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ServiceType'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentMethod'
+   */
+  export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
     
 
 
@@ -13926,6 +14009,7 @@ export namespace Prisma {
     NOT?: CustomerWhereInput | CustomerWhereInput[]
     id?: StringFilter<"Customer"> | string
     motherName?: StringFilter<"Customer"> | string
+    fatherName?: StringNullableFilter<"Customer"> | string | null
     motherPhone?: StringFilter<"Customer"> | string
     motherEmail?: StringNullableFilter<"Customer"> | string | null
     address?: StringNullableFilter<"Customer"> | string | null
@@ -13940,6 +14024,7 @@ export namespace Prisma {
   export type CustomerOrderByWithRelationInput = {
     id?: SortOrder
     motherName?: SortOrder
+    fatherName?: SortOrderInput | SortOrder
     motherPhone?: SortOrder
     motherEmail?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
@@ -13958,6 +14043,7 @@ export namespace Prisma {
     OR?: CustomerWhereInput[]
     NOT?: CustomerWhereInput | CustomerWhereInput[]
     motherName?: StringFilter<"Customer"> | string
+    fatherName?: StringNullableFilter<"Customer"> | string | null
     motherPhone?: StringFilter<"Customer"> | string
     motherEmail?: StringNullableFilter<"Customer"> | string | null
     address?: StringNullableFilter<"Customer"> | string | null
@@ -13972,6 +14058,7 @@ export namespace Prisma {
   export type CustomerOrderByWithAggregationInput = {
     id?: SortOrder
     motherName?: SortOrder
+    fatherName?: SortOrderInput | SortOrder
     motherPhone?: SortOrder
     motherEmail?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
@@ -13990,6 +14077,7 @@ export namespace Prisma {
     NOT?: CustomerScalarWhereWithAggregatesInput | CustomerScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Customer"> | string
     motherName?: StringWithAggregatesFilter<"Customer"> | string
+    fatherName?: StringNullableWithAggregatesFilter<"Customer"> | string | null
     motherPhone?: StringWithAggregatesFilter<"Customer"> | string
     motherEmail?: StringNullableWithAggregatesFilter<"Customer"> | string | null
     address?: StringNullableWithAggregatesFilter<"Customer"> | string | null
@@ -14007,7 +14095,10 @@ export namespace Prisma {
     customerId?: StringFilter<"Baby"> | string
     name?: StringFilter<"Baby"> | string
     gender?: EnumBabyGenderNullableFilter<"Baby"> | $Enums.BabyGender | null
+    birthPlace?: StringNullableFilter<"Baby"> | string | null
     birthDate?: DateTimeNullableFilter<"Baby"> | Date | string | null
+    allergy?: StringNullableFilter<"Baby"> | string | null
+    ageAtTreatment?: StringNullableFilter<"Baby"> | string | null
     notes?: StringNullableFilter<"Baby"> | string | null
     deletedAt?: DateTimeNullableFilter<"Baby"> | Date | string | null
     createdAt?: DateTimeFilter<"Baby"> | Date | string
@@ -14021,7 +14112,10 @@ export namespace Prisma {
     customerId?: SortOrder
     name?: SortOrder
     gender?: SortOrderInput | SortOrder
+    birthPlace?: SortOrderInput | SortOrder
     birthDate?: SortOrderInput | SortOrder
+    allergy?: SortOrderInput | SortOrder
+    ageAtTreatment?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -14039,7 +14133,10 @@ export namespace Prisma {
     customerId?: StringFilter<"Baby"> | string
     name?: StringFilter<"Baby"> | string
     gender?: EnumBabyGenderNullableFilter<"Baby"> | $Enums.BabyGender | null
+    birthPlace?: StringNullableFilter<"Baby"> | string | null
     birthDate?: DateTimeNullableFilter<"Baby"> | Date | string | null
+    allergy?: StringNullableFilter<"Baby"> | string | null
+    ageAtTreatment?: StringNullableFilter<"Baby"> | string | null
     notes?: StringNullableFilter<"Baby"> | string | null
     deletedAt?: DateTimeNullableFilter<"Baby"> | Date | string | null
     createdAt?: DateTimeFilter<"Baby"> | Date | string
@@ -14053,7 +14150,10 @@ export namespace Prisma {
     customerId?: SortOrder
     name?: SortOrder
     gender?: SortOrderInput | SortOrder
+    birthPlace?: SortOrderInput | SortOrder
     birthDate?: SortOrderInput | SortOrder
+    allergy?: SortOrderInput | SortOrder
+    ageAtTreatment?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -14071,7 +14171,10 @@ export namespace Prisma {
     customerId?: StringWithAggregatesFilter<"Baby"> | string
     name?: StringWithAggregatesFilter<"Baby"> | string
     gender?: EnumBabyGenderNullableWithAggregatesFilter<"Baby"> | $Enums.BabyGender | null
+    birthPlace?: StringNullableWithAggregatesFilter<"Baby"> | string | null
     birthDate?: DateTimeNullableWithAggregatesFilter<"Baby"> | Date | string | null
+    allergy?: StringNullableWithAggregatesFilter<"Baby"> | string | null
+    ageAtTreatment?: StringNullableWithAggregatesFilter<"Baby"> | string | null
     notes?: StringNullableWithAggregatesFilter<"Baby"> | string | null
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Baby"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Baby"> | Date | string
@@ -14174,6 +14277,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
     channel?: EnumReservationChannelFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFilter<"Reservation"> | $Enums.ServiceType
+    paymentMethod?: EnumPaymentMethodNullableFilter<"Reservation"> | $Enums.PaymentMethod | null
     notes?: StringNullableFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
@@ -14197,6 +14301,7 @@ export namespace Prisma {
     status?: SortOrder
     channel?: SortOrder
     serviceType?: SortOrder
+    paymentMethod?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
@@ -14225,6 +14330,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
     channel?: EnumReservationChannelFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFilter<"Reservation"> | $Enums.ServiceType
+    paymentMethod?: EnumPaymentMethodNullableFilter<"Reservation"> | $Enums.PaymentMethod | null
     notes?: StringNullableFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
@@ -14248,6 +14354,7 @@ export namespace Prisma {
     status?: SortOrder
     channel?: SortOrder
     serviceType?: SortOrder
+    paymentMethod?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
@@ -14271,6 +14378,7 @@ export namespace Prisma {
     status?: EnumReservationStatusWithAggregatesFilter<"Reservation"> | $Enums.ReservationStatus
     channel?: EnumReservationChannelWithAggregatesFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeWithAggregatesFilter<"Reservation"> | $Enums.ServiceType
+    paymentMethod?: EnumPaymentMethodNullableWithAggregatesFilter<"Reservation"> | $Enums.PaymentMethod | null
     notes?: StringNullableWithAggregatesFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableWithAggregatesFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"Reservation"> | Date | string | null
@@ -14817,6 +14925,7 @@ export namespace Prisma {
   export type CustomerCreateInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -14831,6 +14940,7 @@ export namespace Prisma {
   export type CustomerUncheckedCreateInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -14845,6 +14955,7 @@ export namespace Prisma {
   export type CustomerUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14859,6 +14970,7 @@ export namespace Prisma {
   export type CustomerUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14873,6 +14985,7 @@ export namespace Prisma {
   export type CustomerCreateManyInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -14885,6 +14998,7 @@ export namespace Prisma {
   export type CustomerUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14897,6 +15011,7 @@ export namespace Prisma {
   export type CustomerUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14910,7 +15025,10 @@ export namespace Prisma {
     id?: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -14924,7 +15042,10 @@ export namespace Prisma {
     customerId: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -14936,7 +15057,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14950,7 +15074,10 @@ export namespace Prisma {
     customerId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14963,7 +15090,10 @@ export namespace Prisma {
     customerId: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -14974,7 +15104,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14986,7 +15119,10 @@ export namespace Prisma {
     customerId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15095,6 +15231,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15118,6 +15255,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15135,6 +15273,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15158,6 +15297,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15178,6 +15318,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15192,6 +15333,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15209,6 +15351,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15869,6 +16012,7 @@ export namespace Prisma {
   export type CustomerCountOrderByAggregateInput = {
     id?: SortOrder
     motherName?: SortOrder
+    fatherName?: SortOrder
     motherPhone?: SortOrder
     motherEmail?: SortOrder
     address?: SortOrder
@@ -15881,6 +16025,7 @@ export namespace Prisma {
   export type CustomerMaxOrderByAggregateInput = {
     id?: SortOrder
     motherName?: SortOrder
+    fatherName?: SortOrder
     motherPhone?: SortOrder
     motherEmail?: SortOrder
     address?: SortOrder
@@ -15893,6 +16038,7 @@ export namespace Prisma {
   export type CustomerMinOrderByAggregateInput = {
     id?: SortOrder
     motherName?: SortOrder
+    fatherName?: SortOrder
     motherPhone?: SortOrder
     motherEmail?: SortOrder
     address?: SortOrder
@@ -15925,7 +16071,10 @@ export namespace Prisma {
     customerId?: SortOrder
     name?: SortOrder
     gender?: SortOrder
+    birthPlace?: SortOrder
     birthDate?: SortOrder
+    allergy?: SortOrder
+    ageAtTreatment?: SortOrder
     notes?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
@@ -15937,7 +16086,10 @@ export namespace Prisma {
     customerId?: SortOrder
     name?: SortOrder
     gender?: SortOrder
+    birthPlace?: SortOrder
     birthDate?: SortOrder
+    allergy?: SortOrder
+    ageAtTreatment?: SortOrder
     notes?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
@@ -15949,7 +16101,10 @@ export namespace Prisma {
     customerId?: SortOrder
     name?: SortOrder
     gender?: SortOrder
+    birthPlace?: SortOrder
     birthDate?: SortOrder
+    allergy?: SortOrder
+    ageAtTreatment?: SortOrder
     notes?: SortOrder
     deletedAt?: SortOrder
     createdAt?: SortOrder
@@ -16136,6 +16291,13 @@ export namespace Prisma {
     not?: NestedEnumServiceTypeFilter<$PrismaModel> | $Enums.ServiceType
   }
 
+  export type EnumPaymentMethodNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | null
+    notIn?: $Enums.PaymentMethod[] | null
+    not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
+  }
+
   export type BabyNullableScalarRelationFilter = {
     is?: BabyWhereInput | null
     isNot?: BabyWhereInput | null
@@ -16167,6 +16329,7 @@ export namespace Prisma {
     status?: SortOrder
     channel?: SortOrder
     serviceType?: SortOrder
+    paymentMethod?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
     completedAt?: SortOrder
@@ -16184,6 +16347,7 @@ export namespace Prisma {
     status?: SortOrder
     channel?: SortOrder
     serviceType?: SortOrder
+    paymentMethod?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
     completedAt?: SortOrder
@@ -16201,6 +16365,7 @@ export namespace Prisma {
     status?: SortOrder
     channel?: SortOrder
     serviceType?: SortOrder
+    paymentMethod?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
     completedAt?: SortOrder
@@ -16236,6 +16401,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumServiceTypeFilter<$PrismaModel>
     _max?: NestedEnumServiceTypeFilter<$PrismaModel>
+  }
+
+  export type EnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | null
+    notIn?: $Enums.PaymentMethod[] | null
+    not?: NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+    _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
   }
 
   export type ReservationScalarRelationFilter = {
@@ -17015,6 +17190,10 @@ export namespace Prisma {
     set?: $Enums.ServiceType
   }
 
+  export type NullableEnumPaymentMethodFieldUpdateOperationsInput = {
+    set?: $Enums.PaymentMethod | null
+  }
+
   export type CustomerUpdateOneRequiredWithoutReservationsNestedInput = {
     create?: XOR<CustomerCreateWithoutReservationsInput, CustomerUncheckedCreateWithoutReservationsInput>
     connectOrCreate?: CustomerCreateOrConnectWithoutReservationsInput
@@ -17537,6 +17716,13 @@ export namespace Prisma {
     not?: NestedEnumServiceTypeFilter<$PrismaModel> | $Enums.ServiceType
   }
 
+  export type NestedEnumPaymentMethodNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | null
+    notIn?: $Enums.PaymentMethod[] | null
+    not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
+  }
+
   export type NestedEnumReservationStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ReservationStatus | EnumReservationStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ReservationStatus[]
@@ -17565,6 +17751,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumServiceTypeFilter<$PrismaModel>
     _max?: NestedEnumServiceTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.PaymentMethod[] | null
+    notIn?: $Enums.PaymentMethod[] | null
+    not?: NestedEnumPaymentMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+    _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumReservationAuditActionFilter<$PrismaModel = never> = {
@@ -17848,6 +18044,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -17869,6 +18066,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18045,6 +18243,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
     channel?: EnumReservationChannelFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFilter<"Reservation"> | $Enums.ServiceType
+    paymentMethod?: EnumPaymentMethodNullableFilter<"Reservation"> | $Enums.PaymentMethod | null
     notes?: StringNullableFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
@@ -18119,7 +18318,10 @@ export namespace Prisma {
     id?: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -18131,7 +18333,10 @@ export namespace Prisma {
     id?: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -18156,6 +18361,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18177,6 +18383,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18221,7 +18428,10 @@ export namespace Prisma {
     customerId?: StringFilter<"Baby"> | string
     name?: StringFilter<"Baby"> | string
     gender?: EnumBabyGenderNullableFilter<"Baby"> | $Enums.BabyGender | null
+    birthPlace?: StringNullableFilter<"Baby"> | string | null
     birthDate?: DateTimeNullableFilter<"Baby"> | Date | string | null
+    allergy?: StringNullableFilter<"Baby"> | string | null
+    ageAtTreatment?: StringNullableFilter<"Baby"> | string | null
     notes?: StringNullableFilter<"Baby"> | string | null
     deletedAt?: DateTimeNullableFilter<"Baby"> | Date | string | null
     createdAt?: DateTimeFilter<"Baby"> | Date | string
@@ -18247,6 +18457,7 @@ export namespace Prisma {
   export type CustomerCreateWithoutBabiesInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -18260,6 +18471,7 @@ export namespace Prisma {
   export type CustomerUncheckedCreateWithoutBabiesInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -18282,6 +18494,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18303,6 +18516,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18337,6 +18551,7 @@ export namespace Prisma {
   export type CustomerUpdateWithoutBabiesInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18350,6 +18565,7 @@ export namespace Prisma {
   export type CustomerUncheckedUpdateWithoutBabiesInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18442,6 +18658,7 @@ export namespace Prisma {
   export type CustomerCreateWithoutReservationsInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -18455,6 +18672,7 @@ export namespace Prisma {
   export type CustomerUncheckedCreateWithoutReservationsInput = {
     id?: string
     motherName: string
+    fatherName?: string | null
     motherPhone: string
     motherEmail?: string | null
     address?: string | null
@@ -18474,7 +18692,10 @@ export namespace Prisma {
     id?: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -18487,7 +18708,10 @@ export namespace Prisma {
     customerId: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -18644,6 +18868,7 @@ export namespace Prisma {
   export type CustomerUpdateWithoutReservationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18657,6 +18882,7 @@ export namespace Prisma {
   export type CustomerUncheckedUpdateWithoutReservationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     motherName?: StringFieldUpdateOperationsInput | string
+    fatherName?: NullableStringFieldUpdateOperationsInput | string | null
     motherPhone?: StringFieldUpdateOperationsInput | string
     motherEmail?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18682,7 +18908,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18695,7 +18924,10 @@ export namespace Prisma {
     customerId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18796,6 +19028,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18818,6 +19051,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18881,6 +19115,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -18903,6 +19138,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -18956,6 +19192,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18978,6 +19215,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19043,6 +19281,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19065,6 +19304,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19153,6 +19393,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19175,6 +19416,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19246,6 +19488,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19268,6 +19511,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19307,6 +19551,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19407,6 +19652,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19428,6 +19674,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19447,6 +19694,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19527,7 +19775,10 @@ export namespace Prisma {
     id?: string
     name: string
     gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
     birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
     notes?: string | null
     deletedAt?: Date | string | null
     createdAt?: Date | string
@@ -19543,6 +19794,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19554,7 +19806,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19566,7 +19821,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19578,7 +19836,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19592,6 +19853,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19613,6 +19875,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19632,6 +19895,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19648,6 +19912,7 @@ export namespace Prisma {
     status?: $Enums.ReservationStatus
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
+    paymentMethod?: $Enums.PaymentMethod | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19662,6 +19927,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19683,6 +19949,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19702,6 +19969,7 @@ export namespace Prisma {
     status?: EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
+    paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

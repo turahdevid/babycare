@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
 import { addBaby } from "../_actions";
@@ -21,22 +22,6 @@ function formatTime(date: Date) {
     minute: "2-digit",
     hour12: false,
   }).format(date);
-}
-
-function calculateAge(birthDate: Date) {
-  const today = new Date();
-  const birth = new Date(birthDate);
-  const months = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
-  
-  if (months < 12) {
-    return `${months} bulan`;
-  }
-  const years = Math.floor(months / 12);
-  const remainingMonths = months % 12;
-  if (remainingMonths === 0) {
-    return `${years} tahun`;
-  }
-  return `${years} tahun ${remainingMonths} bulan`;
 }
 
 type Params = Promise<{ id: string }>;
@@ -90,14 +75,30 @@ export default async function CustomerDetailPage(props: { params: Params }) {
       </div>
 
       <GlassCard>
-        <h2 className="text-xl font-semibold text-slate-900">
-          {customer.motherName}
-        </h2>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h2 className="text-xl font-semibold text-slate-900">
+            {customer.motherName}
+          </h2>
+          {isAdmin ? (
+            <Link
+              href={`/customer/${customer.id}/edit`}
+              className="rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70"
+            >
+              Edit Customer
+            </Link>
+          ) : null}
+        </div>
         <div className="mt-4 space-y-2 text-sm">
           <div className="flex items-center gap-2">
             <span className="font-medium text-slate-700">WhatsApp:</span>
             <span className="text-slate-900">{customer.motherPhone}</span>
           </div>
+          {customer.fatherName ? (
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-slate-700">Nama Ayah:</span>
+              <span className="text-slate-900">{customer.fatherName}</span>
+            </div>
+          ) : null}
           {customer.motherEmail ? (
             <div className="flex items-center gap-2">
               <span className="font-medium text-slate-700">Email:</span>
@@ -138,10 +139,25 @@ export default async function CustomerDetailPage(props: { params: Params }) {
                       {baby.gender === "MALE" ? "Laki-laki" : "Perempuan"}
                     </p>
                   ) : null}
-                  {baby.birthDate ? (
+                  {baby.birthPlace && baby.birthDate ? (
                     <p>
-                      Usia: {calculateAge(baby.birthDate)} ({formatDate(baby.birthDate)})
+                      TTL: {baby.birthPlace}, {formatDate(baby.birthDate)}
                     </p>
+                  ) : baby.birthDate ? (
+                    <p>
+                      Tanggal Lahir: {formatDate(baby.birthDate)}
+                    </p>
+                  ) : baby.birthPlace ? (
+                    <p>Tempat Lahir: {baby.birthPlace}</p>
+                  ) : null}
+                  {baby.birthDate ? (
+                    <p>Usia: {calculateAge(baby.birthDate)}</p>
+                  ) : null}
+                  {baby.ageAtTreatment ? (
+                    <p>Usia saat Treatment: {baby.ageAtTreatment}</p>
+                  ) : null}
+                  {baby.allergy ? (
+                    <p>Alergi: {baby.allergy}</p>
                   ) : null}
                   {baby.notes ? <p>Catatan: {baby.notes}</p> : null}
                 </div>
@@ -195,6 +211,22 @@ export default async function CustomerDetailPage(props: { params: Params }) {
                 <div>
                   <label
                     className="block text-sm font-medium text-slate-700"
+                    htmlFor="babyBirthPlace"
+                  >
+                    Tempat Lahir
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="babyBirthPlace"
+                    name="birthPlace"
+                    placeholder="Contoh: Jakarta"
+                    type="text"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
                     htmlFor="babyBirthDate"
                   >
                     Tanggal Lahir
@@ -207,18 +239,50 @@ export default async function CustomerDetailPage(props: { params: Params }) {
                   />
                 </div>
 
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="babyAllergy"
+                  >
+                    Alergi
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="babyAllergy"
+                    name="allergy"
+                    placeholder="Contoh: Susu sapi"
+                    type="text"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="babyAgeAtTreatment"
+                  >
+                    Usia saat Treatment
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="babyAgeAtTreatment"
+                    name="ageAtTreatment"
+                    placeholder="Contoh: 1 bulan 2 minggu"
+                    type="text"
+                  />
+                </div>
+
                 <div className="md:col-span-2">
                   <label
                     className="block text-sm font-medium text-slate-700"
                     htmlFor="babyNotes"
                   >
-                    Usia Baby / Catatan (Opsional)
+                    Catatan Baby (Opsional)
                   </label>
                   <textarea
                     className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="babyNotes"
                     name="notes"
-                    placeholder="Contoh: 1 bulan 2 minggu"
+                    placeholder="Catatan tambahan"
                     rows={2}
                   />
                 </div>

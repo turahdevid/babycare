@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../_components/glass-card";
 import { CustomerSearch } from "./_components/customer-search";
 
@@ -142,9 +143,25 @@ export default async function CustomerPage(props: { searchParams?: Promise<Searc
                       <td className="px-3 py-3 text-slate-900">{c.motherPhone}</td>
                       <td className="px-3 py-3 text-slate-900">{c.motherEmail ?? "-"}</td>
                       <td className="px-3 py-3">
-                        <span className="rounded-full border border-violet-200/60 bg-violet-50/50 px-2.5 py-1 text-xs font-medium text-violet-700">
-                          {c._count.babies}
-                        </span>
+                        {firstBaby ? (
+                          <div className="flex flex-col">
+                            <span className="text-xs font-medium text-slate-900">
+                              {firstBaby.name}
+                            </span>
+                            {firstBaby.birthDate ? (
+                              <span className="text-xs text-slate-600">
+                                {calculateAge(firstBaby.birthDate)}
+                              </span>
+                            ) : null}
+                            {c._count.babies > 1 ? (
+                              <span className="mt-0.5 text-xs text-slate-500">
+                                +{c._count.babies - 1} lainnya
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-500">-</span>
+                        )}
                       </td>
                       <td className="px-3 py-3">
                         <span className="rounded-full border border-sky-200/60 bg-sky-50/50 px-2.5 py-1 text-xs font-medium text-sky-700">
@@ -159,6 +176,14 @@ export default async function CustomerPage(props: { searchParams?: Promise<Searc
                           >
                             Detail
                           </Link>
+                          {session.user.role === "ADMIN" ? (
+                            <Link
+                              href={`/customer/${c.id}/edit`}
+                              className="rounded-xl border border-sky-200/60 bg-sky-50/50 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-50/70"
+                            >
+                              Edit
+                            </Link>
+                          ) : null}
                           <a
                             href={waHref}
                             target="_blank"

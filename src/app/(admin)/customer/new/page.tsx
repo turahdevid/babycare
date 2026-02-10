@@ -59,6 +59,22 @@ export default async function NewCustomerPage() {
             <div>
               <label
                 className="block text-sm font-medium text-slate-700"
+                htmlFor="fatherName"
+              >
+                Nama Ayah (Opsional)
+              </label>
+              <input
+                className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                id="fatherName"
+                name="fatherName"
+                placeholder="Masukkan nama ayah"
+                type="text"
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium text-slate-700"
                 htmlFor="motherPhone"
               >
                 Nomor WhatsApp <span className="text-rose-600">*</span>
@@ -167,6 +183,22 @@ export default async function NewCustomerPage() {
                 <div>
                   <label
                     className="block text-sm font-medium text-slate-700"
+                    htmlFor="babyBirthPlace"
+                  >
+                    Tempat Lahir
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="babyBirthPlace"
+                    name="babyBirthPlace"
+                    placeholder="Contoh: Jakarta"
+                    type="text"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
                     htmlFor="babyBirthDate"
                   >
                     Tanggal Lahir
@@ -179,18 +211,50 @@ export default async function NewCustomerPage() {
                   />
                 </div>
 
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="babyAllergy"
+                  >
+                    Alergi
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="babyAllergy"
+                    name="babyAllergy"
+                    placeholder="Contoh: Susu sapi"
+                    type="text"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="babyAgeAtTreatment"
+                  >
+                    Usia saat Treatment
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id="babyAgeAtTreatment"
+                    name="babyAgeAtTreatment"
+                    placeholder="Contoh: 1 bulan 2 minggu"
+                    type="text"
+                  />
+                </div>
+
                 <div className="md:col-span-2">
                   <label
                     className="block text-sm font-medium text-slate-700"
                     htmlFor="babyNotes"
                   >
-                    Usia Baby / Catatan (Opsional)
+                    Catatan Baby (Opsional)
                   </label>
                   <textarea
                     className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="babyNotes"
                     name="babyNotes"
-                    placeholder="Contoh: 1 bulan 2 minggu"
+                    placeholder="Catatan tambahan"
                     rows={2}
                   />
                 </div>

@@ -163,6 +163,7 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
 exports.Prisma.CustomerScalarFieldEnum = {
   id: 'id',
   motherName: 'motherName',
+  fatherName: 'fatherName',
   motherPhone: 'motherPhone',
   motherEmail: 'motherEmail',
   address: 'address',
@@ -177,7 +178,10 @@ exports.Prisma.BabyScalarFieldEnum = {
   customerId: 'customerId',
   name: 'name',
   gender: 'gender',
+  birthPlace: 'birthPlace',
   birthDate: 'birthDate',
+  allergy: 'allergy',
+  ageAtTreatment: 'ageAtTreatment',
   notes: 'notes',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',
@@ -207,6 +211,7 @@ exports.Prisma.ReservationScalarFieldEnum = {
   status: 'status',
   channel: 'channel',
   serviceType: 'serviceType',
+  paymentMethod: 'paymentMethod',
   notes: 'notes',
   cancelledAt: 'cancelledAt',
   completedAt: 'completedAt',
@@ -297,6 +302,7 @@ exports.Prisma.VerificationTokenOrderByRelevanceFieldEnum = {
 exports.Prisma.CustomerOrderByRelevanceFieldEnum = {
   id: 'id',
   motherName: 'motherName',
+  fatherName: 'fatherName',
   motherPhone: 'motherPhone',
   motherEmail: 'motherEmail',
   address: 'address',
@@ -307,6 +313,9 @@ exports.Prisma.BabyOrderByRelevanceFieldEnum = {
   id: 'id',
   customerId: 'customerId',
   name: 'name',
+  birthPlace: 'birthPlace',
+  allergy: 'allergy',
+  ageAtTreatment: 'ageAtTreatment',
   notes: 'notes'
 };
 
@@ -377,6 +386,11 @@ exports.ReservationChannel = exports.$Enums.ReservationChannel = {
 exports.ServiceType = exports.$Enums.ServiceType = {
   OUTLET: 'OUTLET',
   HOMECARE: 'HOMECARE'
+};
+
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  CASH: 'CASH',
+  TRANSFER: 'TRANSFER'
 };
 
 exports.ReservationAuditAction = exports.$Enums.ReservationAuditAction = {
