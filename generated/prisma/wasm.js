@@ -410,7 +410,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\win10\\Videos\\turahxcode\\babycare\\generated\\prisma",
+      "value": "C:\\Users\\DELL\\Videos\\turahprojects\\babycare\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -424,7 +424,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\win10\\Videos\\turahxcode\\babycare\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\DELL\\Videos\\turahprojects\\babycare\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

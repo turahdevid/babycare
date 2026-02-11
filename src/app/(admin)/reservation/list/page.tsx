@@ -54,6 +54,8 @@ export default async function ReservationListPage(props: {
 
   if (statusFilter && statusFilter !== "ALL") {
     whereClause.status = statusFilter as ReservationStatus;
+  } else {
+    whereClause.status = { not: "COMPLETED" };
   }
 
   if (dateFilter) {

@@ -5,9 +5,14 @@ export const TIME_SLOTS = [
   { start: "15:00", end: "17:00", label: "15:00 - 17:00" },
 ] as const;
 
+export const HOMECARE_TIME_SLOTS = [
+  { start: "10:00", end: "12:00", label: "10:00 (Homecare)" },
+  { start: "15:00", end: "17:00", label: "15:00 (Homecare)" },
+] as const;
+
 export const SLOT_CAPACITY = {
   OUTLET: 2,
-  HOMECARE: 1,
+  HOMECARE: 2,
 } as const;
 
 export function getSlotForTime(time: string): typeof TIME_SLOTS[number] | null {
@@ -19,6 +24,11 @@ export function getSlotForTime(time: string): typeof TIME_SLOTS[number] | null {
   if (hour >= 15 && hour < 17) return TIME_SLOTS[3];
   
   return null;
+}
+
+export function getHomecareSlotForTime(time: string): typeof HOMECARE_TIME_SLOTS[number] | null {
+  const normalized = time.slice(0, 5);
+  return HOMECARE_TIME_SLOTS.find((s) => s.start === normalized) ?? null;
 }
 
 export function isTimeInSlot(time: string, slot: typeof TIME_SLOTS[number]): boolean {

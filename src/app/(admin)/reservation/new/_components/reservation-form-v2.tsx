@@ -342,7 +342,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                     }}
                     type="button"
                   >
-                    🏠 Homecare (Kapasitas: 1/slot)
+                    🏠 Homecare (Kapasitas: 2/slot)
                   </button>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { db } from "~/server/db";
-import { TIME_SLOTS, SLOT_CAPACITY } from "~/lib/time-slots";
+import { TIME_SLOTS, HOMECARE_TIME_SLOTS, SLOT_CAPACITY } from "~/lib/time-slots";
 
 const availableSlotsSchema = z.object({
   date: z.string().min(1),
@@ -14,8 +14,11 @@ export async function POST(request: Request) {
     const body = (await request.json()) as unknown;
     const validated = availableSlotsSchema.parse(body);
 
+    const slotsToCheck =
+      validated.serviceType === "HOMECARE" ? HOMECARE_TIME_SLOTS : TIME_SLOTS;
+
     const availableSlots = await Promise.all(
-      TIME_SLOTS.map(async (slot) => {
+      slotsToCheck.map(async (slot) => {
         const dateStart = new Date(`${validated.date}T${slot.start}`);
         const dateEnd = new Date(`${validated.date}T${slot.end}`);
 
@@ -28,31 +31,24 @@ export async function POST(request: Request) {
             status: {
               notIn: ["CANCELLED", "NO_SHOW"],
             },
+            serviceType: validated.serviceType,
           },
           select: {
             serviceType: true,
           },
         });
 
-        const outletCount = existingReservations.filter(
-          (r) => r.serviceType === "OUTLET",
-        ).length;
-        const homecareCount = existingReservations.filter(
-          (r) => r.serviceType === "HOMECARE",
-        ).length;
-
-        const isAvailable =
-          validated.serviceType === "OUTLET"
-            ? outletCount < SLOT_CAPACITY.OUTLET
-            : homecareCount < SLOT_CAPACITY.HOMECARE;
+        const count = existingReservations.length;
+        const capacity = SLOT_CAPACITY[validated.serviceType];
+        const isAvailable = count < capacity;
 
         return {
           slot: slot.start,
           label: slot.label,
           available: isAvailable,
           current: {
-            outlet: outletCount,
-            homecare: homecareCount,
+            outlet: validated.serviceType === "OUTLET" ? count : 0,
+            homecare: validated.serviceType === "HOMECARE" ? count : 0,
           },
         };
       }),

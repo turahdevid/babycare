@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import { getSlotForTime, SLOT_CAPACITY } from "~/lib/time-slots";
+import { getSlotForTime, getHomecareSlotForTime, SLOT_CAPACITY } from "~/lib/time-slots";
 
 const newCustomerSchema = z.object({
   motherName: z.string().min(1),
@@ -196,10 +196,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const slot = getSlotForTime(validated.time);
+    const slot =
+      validated.serviceType === "HOMECARE"
+        ? getHomecareSlotForTime(validated.time)
+        : getSlotForTime(validated.time);
+
     if (!slot) {
       return NextResponse.json(
-        { error: "Waktu tidak valid. Pilih antara 09:00-17:00" },
+        {
+          error:
+            validated.serviceType === "HOMECARE"
+              ? "Waktu tidak valid. Homecare hanya tersedia jam 10:00 dan 15:00"
+              : "Waktu tidak valid. Pilih antara 09:00-17:00",
+        },
         { status: 400 },
       );
     }
@@ -216,23 +225,16 @@ export async function POST(request: Request) {
         status: {
           notIn: ["CANCELLED", "NO_SHOW"],
         },
+        serviceType: validated.serviceType,
       },
       select: {
         serviceType: true,
       },
     });
 
-    const outletCount = existingReservations.filter(
-      (r) => r.serviceType === "OUTLET",
-    ).length;
-    const homecareCount = existingReservations.filter(
-      (r) => r.serviceType === "HOMECARE",
-    ).length;
-
-    const isSlotAvailable =
-      validated.serviceType === "OUTLET"
-        ? outletCount < SLOT_CAPACITY.OUTLET
-        : homecareCount < SLOT_CAPACITY.HOMECARE;
+    const count = existingReservations.length;
+    const capacity = SLOT_CAPACITY[validated.serviceType];
+    const isSlotAvailable = count < capacity;
 
     if (!isSlotAvailable) {
       return NextResponse.json(
