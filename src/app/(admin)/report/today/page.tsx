@@ -26,7 +26,7 @@ export default async function ReportTodayPage() {
   const end = new Date(start);
   end.setDate(end.getDate() + 1);
 
-  const [totalReservations, completedReservations, statusBreakdown, completedItems] =
+  const [totalReservations, completedReservations, statusBreakdown, completedTotals] =
     await Promise.all([
       db.reservation.count({ where: { startAt: { gte: start, lt: end } } }),
       db.reservation.findMany({
@@ -41,23 +41,35 @@ export default async function ReportTodayPage() {
         where: { startAt: { gte: start, lt: end } },
         _count: true,
       }),
-      db.reservationTreatment.findMany({
+      db.reservation.findMany({
         where: {
-          reservation: {
-            startAt: { gte: start, lt: end },
-            status: "COMPLETED",
-          },
+          startAt: { gte: start, lt: end },
+          status: "COMPLETED",
         },
-        select: { quantity: true, unitPrice: true },
+        select: {
+          subtotalPrice: true,
+          discountPercent: true,
+          discountAmount: true,
+          totalPrice: true,
+          items: { select: { quantity: true, unitPrice: true } },
+        },
       }),
     ]);
 
   const completedCount = completedReservations.length;
 
-  const revenue = completedItems.reduce(
-    (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-    0,
-  );
+  const revenue = completedTotals.reduce((sum, reservation) => {
+    const itemSubtotal = reservation.items.reduce(
+      (subSum, item) => subSum + item.unitPrice.toNumber() * item.quantity,
+      0,
+    );
+    const subtotal = reservation.subtotalPrice?.toNumber() ?? itemSubtotal;
+    const discountAmount =
+      reservation.discountAmount?.toNumber() ??
+      (reservation.discountPercent ? (subtotal * reservation.discountPercent) / 100 : 0);
+    const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
+    return sum + Math.max(total, 0);
+  }, 0);
 
   const transactions = await fetchTransactionDetails({ gte: start, lt: end });
 

@@ -41,30 +41,51 @@ export default async function ReportRevenuePage(props: {
   const start = getPeriodStartDate(period, now);
   const end = getPeriodEndDate(period, now);
 
-  const items = await db.reservationTreatment.findMany({
+  const reservations = await db.reservation.findMany({
     where: {
-      reservation: {
-        startAt: { gte: start, lt: end },
-        status: "COMPLETED",
-      },
+      startAt: { gte: start, lt: end },
+      status: "COMPLETED",
     },
     select: {
-      quantity: true,
-      unitPrice: true,
-      treatment: { select: { name: true } },
+      subtotalPrice: true,
+      discountPercent: true,
+      discountAmount: true,
+      totalPrice: true,
+      items: {
+        select: {
+          quantity: true,
+          unitPrice: true,
+          treatment: { select: { name: true } },
+        },
+      },
     },
+    take: 500,
   });
 
-  const revenue = items.reduce(
-    (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-    0,
-  );
-
   const byTreatment = new Map<string, number>();
-  for (const item of items) {
-    const key = item.treatment.name;
-    const current = byTreatment.get(key) ?? 0;
-    byTreatment.set(key, current + item.unitPrice.toNumber() * item.quantity);
+  let revenue = 0;
+
+  for (const reservation of reservations) {
+    const itemSubtotal = reservation.items.reduce(
+      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+      0,
+    );
+    const subtotal = reservation.subtotalPrice?.toNumber() ?? itemSubtotal;
+    const discountAmount =
+      reservation.discountAmount?.toNumber() ??
+      (reservation.discountPercent ? (subtotal * reservation.discountPercent) / 100 : 0);
+    const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
+    const safeTotal = Math.max(total, 0);
+    revenue += safeTotal;
+
+    const ratio = subtotal > 0 ? safeTotal / subtotal : 0;
+
+    for (const item of reservation.items) {
+      const key = item.treatment.name;
+      const current = byTreatment.get(key) ?? 0;
+      const itemValue = item.unitPrice.toNumber() * item.quantity * ratio;
+      byTreatment.set(key, current + itemValue);
+    }
   }
 
   const rows = Array.from(byTreatment.entries())

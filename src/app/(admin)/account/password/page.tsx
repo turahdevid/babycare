@@ -169,7 +169,7 @@ export default async function ChangePasswordPage({
             </div>
 
             <button
-              className="group relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(120deg,#93C5FD,#FBCFE8,#C4B5FD)] bg-[length:200%_200%] px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_40px_rgba(59,130,246,0.18)] transition hover:bg-[position:100%_0%] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              className="group relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(120deg,#7DD3FC,#E0F2FE,#38BDF8)] bg-size-[200%_200%] px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_40px_rgba(14,165,233,0.2)] transition hover:bg-position-[100%_0%] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
               type="submit"
             >
               <span className="relative z-10">Simpan password</span>

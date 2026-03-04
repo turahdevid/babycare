@@ -225,8 +225,8 @@ function Toast({ toast, visible }: { toast: ToastState; visible: boolean }) {
     toast.kind === "success"
       ? "from-emerald-100/60 via-sky-100/50 to-violet-100/40 text-emerald-800"
       : toast.kind === "error"
-        ? "from-rose-100/60 via-pink-100/50 to-violet-100/40 text-rose-800"
-        : "from-sky-100/60 via-white/40 to-violet-100/40 text-slate-800";
+      ? "from-rose-100/60 via-pink-100/50 to-violet-100/40 text-rose-800"
+      : "from-sky-100/60 via-white/40 to-violet-100/40 text-slate-800";
 
   const icon =
     toast.kind === "success" ? (
@@ -247,7 +247,7 @@ function Toast({ toast, visible }: { toast: ToastState; visible: boolean }) {
       role={toast.kind === "error" ? "alert" : "status"}
     >
       <div
-        className={`flex w-full max-w-md items-center gap-3 rounded-[18px] border border-white/55 bg-gradient-to-r ${toneClassName} bg-white/30 px-4 py-3 shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl`}
+        className={`flex w-full max-w-md items-center gap-3 rounded-[18px] border border-white/55 bg-linear-to-r ${toneClassName} bg-white/30 px-4 py-3 shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-2xl`}
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/55 bg-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
           <span className="text-slate-800/80">{icon}</span>
@@ -273,9 +273,9 @@ function BabycareLogo({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="bcLogoGradient" x1="10" x2="54" y1="10" y2="54">
-          <stop stopColor="#93C5FD" />
-          <stop offset="0.5" stopColor="#FBCFE8" />
-          <stop offset="1" stopColor="#C4B5FD" />
+          <stop stopColor="#7DD3FC" />
+          <stop offset="0.5" stopColor="#E0F2FE" />
+          <stop offset="1" stopColor="#38BDF8" />
         </linearGradient>
         <filter
           colorInterpolationFilters="sRGB"
@@ -331,9 +331,9 @@ function BabycareIllustration({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="bcPanel" x1="70" x2="410" y1="90" y2="510">
-          <stop stopColor="rgba(147,197,253,0.8)" />
-          <stop offset="0.5" stopColor="rgba(251,207,232,0.62)" />
-          <stop offset="1" stopColor="rgba(196,181,253,0.7)" />
+          <stop stopColor="rgba(125,211,252,0.72)" />
+          <stop offset="0.5" stopColor="rgba(224,242,254,0.62)" />
+          <stop offset="1" stopColor="rgba(56,189,248,0.68)" />
           <animate attributeName="x1" dur="14s" repeatCount="indefinite" values="60;110;60" />
         </linearGradient>
         <linearGradient id="bcStroke" x1="90" x2="390" y1="100" y2="520">
@@ -341,9 +341,9 @@ function BabycareIllustration({ className }: { className?: string }) {
           <stop offset="1" stopColor="rgba(255,255,255,0.25)" />
         </linearGradient>
         <linearGradient id="bcAccent" x1="160" x2="330" y1="300" y2="480">
-          <stop stopColor="#93C5FD" />
-          <stop offset="0.55" stopColor="#FBCFE8" />
-          <stop offset="1" stopColor="#C4B5FD" />
+          <stop stopColor="#7DD3FC" />
+          <stop offset="0.55" stopColor="#E0F2FE" />
+          <stop offset="1" stopColor="#38BDF8" />
         </linearGradient>
         <filter
           colorInterpolationFilters="sRGB"
@@ -429,7 +429,7 @@ function BabycareIllustration({ className }: { className?: string }) {
         />
         <path
           d="M122 444h28"
-          stroke="rgba(147,197,253,0.7)"
+          stroke="rgba(14,165,233,0.55)"
           strokeLinecap="round"
           strokeWidth="6"
         />
@@ -595,9 +595,9 @@ export default function Home() {
       {toast ? <Toast toast={toast} visible={toastVisible} /> : null}
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-24 -top-24 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-sky-200/70 via-pink-200/60 to-violet-200/70 blur-3xl" />
-        <div className="absolute -bottom-28 -right-28 h-[560px] w-[560px] rounded-full bg-gradient-to-tr from-amber-100/70 via-pink-200/50 to-sky-200/60 blur-3xl" />
-        <div className="absolute left-1/2 top-1/2 h-[740px] w-[740px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-b from-white/35 to-white/0 blur-3xl" />
+        <div className="absolute -left-24 -top-24 h-[520px] w-[520px] rounded-full bg-linear-to-br from-sky-200/70 via-pink-200/60 to-violet-200/70 blur-3xl" />
+        <div className="absolute -bottom-28 -right-28 h-[560px] w-[560px] rounded-full bg-linear-to-tr from-sage-100/70 via-sage-200/50 to-sage-300/60 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[740px] w-[740px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-b from-white/35 to-white/0 blur-3xl" />
       </div>
 
       <div className="bc-enter relative w-full max-w-[1024px]">
@@ -724,7 +724,7 @@ export default function Home() {
 
                 <div className="pt-1">
                   <button
-                    className="group relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(120deg,#93C5FD,#FBCFE8,#C4B5FD)] bg-[length:200%_200%] px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_40px_rgba(59,130,246,0.18)] transition hover:bg-[position:100%_0%] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                    className="group relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(120deg,#7DD3FC,#E0F2FE,#38BDF8)] bg-size-[200%_200%] px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_40px_rgba(14,165,233,0.2)] transition hover:bg-position-[100%_0%] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                     disabled={isSubmitting}
                     type="submit"
                   >

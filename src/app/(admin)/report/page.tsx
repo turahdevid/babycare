@@ -264,7 +264,7 @@ export default async function ReportPage() {
           <Link key={card.href} href={card.href} className="group">
             <GlassCard className="transition hover:bg-white/45">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(147,197,253,0.55),rgba(251,207,232,0.42),rgba(196,181,253,0.52))] text-slate-900 shadow-[0_12px_28px_rgba(99,102,241,0.16)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(125,211,252,0.55),rgba(224,242,254,0.42),rgba(56,189,248,0.52))] text-slate-900 shadow-[0_12px_28px_rgba(14,165,233,0.16)]">
                   {card.icon({ className: "h-6 w-6 text-slate-900/80" })}
                 </div>
 

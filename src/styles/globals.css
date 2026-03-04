@@ -3,4 +3,58 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-sage-50: #f2f8ff;
+  --color-sage-100: #e0f2fe;
+  --color-sage-200: #bae6fd;
+  --color-sage-300: #7dd3fc;
+  --color-sage-400: #38bdf8;
+  --color-sage-500: #0ea5e9;
+  --color-sage-600: #0284c7;
+  --color-sage-700: #0369a1;
+  --color-sage-800: #075985;
+  --color-sage-900: #0c4a6e;
+  --color-sage-950: #082f49;
+
+  --color-sky-50: var(--color-sage-50);
+  --color-sky-100: var(--color-sage-100);
+  --color-sky-200: var(--color-sage-200);
+  --color-sky-300: var(--color-sage-300);
+  --color-sky-400: var(--color-sage-400);
+  --color-sky-500: var(--color-sage-500);
+  --color-sky-600: var(--color-sage-600);
+  --color-sky-700: var(--color-sage-700);
+  --color-sky-800: var(--color-sage-800);
+  --color-sky-900: var(--color-sage-900);
+  --color-sky-950: var(--color-sage-950);
+
+  --color-pink-50: var(--color-sage-50);
+  --color-pink-100: var(--color-sage-100);
+  --color-pink-200: var(--color-sage-200);
+  --color-pink-300: var(--color-sage-300);
+  --color-pink-400: var(--color-sage-400);
+  --color-pink-500: var(--color-sage-500);
+  --color-pink-600: var(--color-sage-600);
+  --color-pink-700: var(--color-sage-700);
+  --color-pink-800: var(--color-sage-800);
+  --color-pink-900: var(--color-sage-900);
+  --color-pink-950: var(--color-sage-950);
+
+  --color-violet-50: var(--color-sage-50);
+  --color-violet-100: var(--color-sage-100);
+  --color-violet-200: var(--color-sage-200);
+  --color-violet-300: var(--color-sage-300);
+  --color-violet-400: var(--color-sage-400);
+  --color-violet-500: var(--color-sage-500);
+  --color-violet-600: var(--color-sage-600);
+  --color-violet-700: var(--color-sage-700);
+  --color-violet-800: var(--color-sage-800);
+  --color-violet-900: var(--color-sage-900);
+  --color-violet-950: var(--color-sage-950);
+}
+
+@layer base {
+  body {
+    @apply bg-sage-50 text-slate-900;
+  }
 }

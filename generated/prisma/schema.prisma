@@ -187,27 +187,31 @@ model Treatment {
 }
 
 model Reservation {
-  id            String                 @id @default(cuid())
-  customerId    String
-  babyId        String?
-  midwifeId     String?
-  startAt       DateTime
-  endAt         DateTime
-  status        ReservationStatus      @default(PENDING)
-  channel       ReservationChannel     @default(ADMIN)
-  serviceType   ServiceType            @default(OUTLET)
-  paymentMethod PaymentMethod?
-  notes         String?                @db.Text
-  cancelledAt   DateTime?
-  completedAt   DateTime?
-  customer      Customer               @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  baby          Baby?                  @relation(fields: [babyId], references: [id], onDelete: SetNull)
-  midwife       User?                  @relation("ReservationMidwife", fields: [midwifeId], references: [id], onDelete: SetNull)
-  items         ReservationTreatment[]
-  auditLogs     ReservationAuditLog[]
-  notifications Notification[]
-  createdAt     DateTime               @default(now())
-  updatedAt     DateTime               @updatedAt
+  id              String                 @id @default(cuid())
+  customerId      String
+  babyId          String?
+  midwifeId       String?
+  startAt         DateTime
+  endAt           DateTime
+  status          ReservationStatus      @default(PENDING)
+  channel         ReservationChannel     @default(ADMIN)
+  serviceType     ServiceType            @default(OUTLET)
+  paymentMethod   PaymentMethod?
+  subtotalPrice   Decimal?               @db.Decimal(10, 2)
+  discountPercent Int?
+  discountAmount  Decimal?               @db.Decimal(10, 2)
+  totalPrice      Decimal?               @db.Decimal(10, 2)
+  notes           String?                @db.Text
+  cancelledAt     DateTime?
+  completedAt     DateTime?
+  customer        Customer               @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  baby            Baby?                  @relation(fields: [babyId], references: [id], onDelete: SetNull)
+  midwife         User?                  @relation("ReservationMidwife", fields: [midwifeId], references: [id], onDelete: SetNull)
+  items           ReservationTreatment[]
+  auditLogs       ReservationAuditLog[]
+  notifications   Notification[]
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
 
   @@unique([midwifeId, startAt])
   @@index([startAt])

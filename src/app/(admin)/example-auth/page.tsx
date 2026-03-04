@@ -12,7 +12,7 @@ export default async function ExampleAuthPage() {
   const isMidwife = session.user.role === "MIDWIFE";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 p-8">
+    <div className="min-h-screen bg-linear-to-br from-pink-50 via-blue-50 to-purple-50 p-8">
       <div className="mx-auto max-w-4xl">
         <div className="rounded-3xl border border-white/40 bg-white/30 p-8 shadow-xl backdrop-blur-xl">
           <h1 className="mb-6 text-3xl font-bold text-gray-800">

@@ -197,6 +197,10 @@ model Reservation {
     channel     ReservationChannel @default(ADMIN)
     serviceType    ServiceType        @default(OUTLET)
     paymentMethod  PaymentMethod?
+    subtotalPrice   Decimal?           @db.Decimal(10, 2)
+    discountPercent Int?
+    discountAmount  Decimal?           @db.Decimal(10, 2)
+    totalPrice      Decimal?           @db.Decimal(10, 2)
     notes          String?            @db.Text
     cancelledAt DateTime?
     completedAt DateTime?

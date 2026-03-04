@@ -29,6 +29,12 @@ export async function completeReservation(reservationId: string, formData: FormD
   const babyIdValue = formData.get("babyId");
   const midwifeIdValue = formData.get("midwifeId");
   const paymentMethodValue = formData.get("paymentMethod");
+  const discountPercentValue = formData.get("discountPercent");
+
+  const discountPercentInput =
+    typeof discountPercentValue === "string" && discountPercentValue.trim().length > 0
+      ? Number(discountPercentValue)
+      : undefined;
 
   const input = {
     babyId: typeof babyIdValue === "string" ? babyIdValue.trim() : "",
@@ -37,12 +43,14 @@ export async function completeReservation(reservationId: string, formData: FormD
       typeof paymentMethodValue === "string" && paymentMethodValue.length > 0
         ? paymentMethodValue
         : undefined,
+    discountPercent: discountPercentInput,
   };
 
   const completionSchema = z.object({
     babyId: z.string().min(1, "Baby wajib dipilih"),
     midwifeId: z.string().min(1, "Bidan wajib dipilih"),
     paymentMethod: z.enum(["CASH", "TRANSFER"]).optional(),
+    discountPercent: z.number().int().min(10).max(50).optional(),
   });
 
   const validated = completionSchema.safeParse(input);
@@ -58,6 +66,12 @@ export async function completeReservation(reservationId: string, formData: FormD
       completedAt: true,
       babyId: true,
       midwifeId: true,
+      items: {
+        select: {
+          quantity: true,
+          unitPrice: true,
+        },
+      },
     },
   });
 
@@ -69,6 +83,18 @@ export async function completeReservation(reservationId: string, formData: FormD
   const shouldComplete = existing.status !== "COMPLETED" || !existing.completedAt;
 
   if (shouldComplete) {
+    const subtotalPrice = existing.items.reduce(
+      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+      0,
+    );
+
+    const discountPercent = validated.data.discountPercent;
+    const discountAmountRaw = discountPercent
+      ? (subtotalPrice * discountPercent) / 100
+      : 0;
+    const discountAmount = Math.round(discountAmountRaw * 100) / 100;
+    const totalPrice = Math.round((subtotalPrice - discountAmount) * 100) / 100;
+
     await db.$transaction([
       db.reservation.update({
         where: { id: existing.id },
@@ -76,6 +102,10 @@ export async function completeReservation(reservationId: string, formData: FormD
           babyId: validated.data.babyId,
           midwifeId: validated.data.midwifeId,
           paymentMethod: validated.data.paymentMethod ?? null,
+          subtotalPrice,
+          discountPercent: discountPercent ?? null,
+          discountAmount: discountPercent ? discountAmount : null,
+          totalPrice,
           status: "COMPLETED",
           completedAt: now,
         },

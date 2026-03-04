@@ -54,6 +54,10 @@ export async function fetchTransactionDetails(
       startAt: true,
       status: true,
       serviceType: true,
+      subtotalPrice: true,
+      discountPercent: true,
+      discountAmount: true,
+      totalPrice: true,
       customer: { select: { motherName: true } },
       baby: { select: { name: true } },
       midwife: { select: { name: true, email: true } },
@@ -78,9 +82,18 @@ export async function fetchTransactionDetails(
     status: r.status,
     serviceType: r.serviceType,
     treatments: r.items.map((i) => `${i.treatment.name} x${i.quantity}`).join(", "),
-    totalPrice: r.items.reduce(
-      (sum, i) => sum + i.unitPrice.toNumber() * i.quantity,
-      0,
-    ),
+    totalPrice: (() => {
+      const itemSubtotal = r.items.reduce(
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        0,
+      );
+      const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;
+      const discountAmount =
+        r.discountAmount?.toNumber() ??
+        (r.discountPercent ? (subtotal * r.discountPercent) / 100 : 0);
+      const computedTotal = subtotal - discountAmount;
+
+      return Math.max(r.totalPrice?.toNumber() ?? computedTotal, 0);
+    })(),
   }));
 }

@@ -72,6 +72,15 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
     0,
   );
 
+  const storedSubtotal = reservation.subtotalPrice?.toNumber();
+  const storedDiscountAmount = reservation.discountAmount?.toNumber();
+  const storedTotal = reservation.totalPrice?.toNumber();
+
+  const subtotalPrice = storedSubtotal ?? totalPrice;
+  const discountPercent = reservation.discountPercent ?? null;
+  const discountAmount = storedDiscountAmount ?? (discountPercent ? (subtotalPrice * discountPercent) / 100 : 0);
+  const finalTotal = storedTotal ?? Math.max(subtotalPrice - discountAmount, 0);
+
   const cashier = reservation.auditLogs[0]?.actor;
   const cashierText = cashier?.name ?? cashier?.email ?? "-";
 
@@ -172,8 +181,20 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
             </div>
 
             <div className="mt-4 flex items-center justify-between border-t border-slate-200/60 pt-3">
+              <span className="font-semibold text-slate-900">Subtotal</span>
+              <span className="text-base font-semibold text-slate-900">{formatCurrency(subtotalPrice)}</span>
+            </div>
+
+            {discountPercent ? (
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <span className="text-slate-700/80">Discount ({discountPercent}%)</span>
+                <span className="font-medium text-slate-900">-{formatCurrency(discountAmount)}</span>
+              </div>
+            ) : null}
+
+            <div className="mt-2 flex items-center justify-between text-sm">
               <span className="font-semibold text-slate-900">Total</span>
-              <span className="text-base font-semibold text-slate-900">{formatCurrency(totalPrice)}</span>
+              <span className="font-semibold text-slate-900">{formatCurrency(finalTotal)}</span>
             </div>
 
             {reservation.paymentMethod ? (

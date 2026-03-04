@@ -9085,8 +9085,24 @@ export namespace Prisma {
 
   export type AggregateReservation = {
     _count: ReservationCountAggregateOutputType | null
+    _avg: ReservationAvgAggregateOutputType | null
+    _sum: ReservationSumAggregateOutputType | null
     _min: ReservationMinAggregateOutputType | null
     _max: ReservationMaxAggregateOutputType | null
+  }
+
+  export type ReservationAvgAggregateOutputType = {
+    subtotalPrice: Decimal | null
+    discountPercent: number | null
+    discountAmount: Decimal | null
+    totalPrice: Decimal | null
+  }
+
+  export type ReservationSumAggregateOutputType = {
+    subtotalPrice: Decimal | null
+    discountPercent: number | null
+    discountAmount: Decimal | null
+    totalPrice: Decimal | null
   }
 
   export type ReservationMinAggregateOutputType = {
@@ -9100,6 +9116,10 @@ export namespace Prisma {
     channel: $Enums.ReservationChannel | null
     serviceType: $Enums.ServiceType | null
     paymentMethod: $Enums.PaymentMethod | null
+    subtotalPrice: Decimal | null
+    discountPercent: number | null
+    discountAmount: Decimal | null
+    totalPrice: Decimal | null
     notes: string | null
     cancelledAt: Date | null
     completedAt: Date | null
@@ -9118,6 +9138,10 @@ export namespace Prisma {
     channel: $Enums.ReservationChannel | null
     serviceType: $Enums.ServiceType | null
     paymentMethod: $Enums.PaymentMethod | null
+    subtotalPrice: Decimal | null
+    discountPercent: number | null
+    discountAmount: Decimal | null
+    totalPrice: Decimal | null
     notes: string | null
     cancelledAt: Date | null
     completedAt: Date | null
@@ -9136,6 +9160,10 @@ export namespace Prisma {
     channel: number
     serviceType: number
     paymentMethod: number
+    subtotalPrice: number
+    discountPercent: number
+    discountAmount: number
+    totalPrice: number
     notes: number
     cancelledAt: number
     completedAt: number
@@ -9144,6 +9172,20 @@ export namespace Prisma {
     _all: number
   }
 
+
+  export type ReservationAvgAggregateInputType = {
+    subtotalPrice?: true
+    discountPercent?: true
+    discountAmount?: true
+    totalPrice?: true
+  }
+
+  export type ReservationSumAggregateInputType = {
+    subtotalPrice?: true
+    discountPercent?: true
+    discountAmount?: true
+    totalPrice?: true
+  }
 
   export type ReservationMinAggregateInputType = {
     id?: true
@@ -9156,6 +9198,10 @@ export namespace Prisma {
     channel?: true
     serviceType?: true
     paymentMethod?: true
+    subtotalPrice?: true
+    discountPercent?: true
+    discountAmount?: true
+    totalPrice?: true
     notes?: true
     cancelledAt?: true
     completedAt?: true
@@ -9174,6 +9220,10 @@ export namespace Prisma {
     channel?: true
     serviceType?: true
     paymentMethod?: true
+    subtotalPrice?: true
+    discountPercent?: true
+    discountAmount?: true
+    totalPrice?: true
     notes?: true
     cancelledAt?: true
     completedAt?: true
@@ -9192,6 +9242,10 @@ export namespace Prisma {
     channel?: true
     serviceType?: true
     paymentMethod?: true
+    subtotalPrice?: true
+    discountPercent?: true
+    discountAmount?: true
+    totalPrice?: true
     notes?: true
     cancelledAt?: true
     completedAt?: true
@@ -9238,6 +9292,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ReservationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ReservationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ReservationMinAggregateInputType
@@ -9268,6 +9334,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ReservationCountAggregateInputType | true
+    _avg?: ReservationAvgAggregateInputType
+    _sum?: ReservationSumAggregateInputType
     _min?: ReservationMinAggregateInputType
     _max?: ReservationMaxAggregateInputType
   }
@@ -9283,12 +9351,18 @@ export namespace Prisma {
     channel: $Enums.ReservationChannel
     serviceType: $Enums.ServiceType
     paymentMethod: $Enums.PaymentMethod | null
+    subtotalPrice: Decimal | null
+    discountPercent: number | null
+    discountAmount: Decimal | null
+    totalPrice: Decimal | null
     notes: string | null
     cancelledAt: Date | null
     completedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: ReservationCountAggregateOutputType | null
+    _avg: ReservationAvgAggregateOutputType | null
+    _sum: ReservationSumAggregateOutputType | null
     _min: ReservationMinAggregateOutputType | null
     _max: ReservationMaxAggregateOutputType | null
   }
@@ -9318,6 +9392,10 @@ export namespace Prisma {
     channel?: boolean
     serviceType?: boolean
     paymentMethod?: boolean
+    subtotalPrice?: boolean
+    discountPercent?: boolean
+    discountAmount?: boolean
+    totalPrice?: boolean
     notes?: boolean
     cancelledAt?: boolean
     completedAt?: boolean
@@ -9345,6 +9423,10 @@ export namespace Prisma {
     channel?: boolean
     serviceType?: boolean
     paymentMethod?: boolean
+    subtotalPrice?: boolean
+    discountPercent?: boolean
+    discountAmount?: boolean
+    totalPrice?: boolean
     notes?: boolean
     cancelledAt?: boolean
     completedAt?: boolean
@@ -9352,7 +9434,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerId" | "babyId" | "midwifeId" | "startAt" | "endAt" | "status" | "channel" | "serviceType" | "paymentMethod" | "notes" | "cancelledAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["reservation"]>
+  export type ReservationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "customerId" | "babyId" | "midwifeId" | "startAt" | "endAt" | "status" | "channel" | "serviceType" | "paymentMethod" | "subtotalPrice" | "discountPercent" | "discountAmount" | "totalPrice" | "notes" | "cancelledAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["reservation"]>
   export type ReservationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     baby?: boolean | Reservation$babyArgs<ExtArgs>
@@ -9384,6 +9466,10 @@ export namespace Prisma {
       channel: $Enums.ReservationChannel
       serviceType: $Enums.ServiceType
       paymentMethod: $Enums.PaymentMethod | null
+      subtotalPrice: Prisma.Decimal | null
+      discountPercent: number | null
+      discountAmount: Prisma.Decimal | null
+      totalPrice: Prisma.Decimal | null
       notes: string | null
       cancelledAt: Date | null
       completedAt: Date | null
@@ -9774,6 +9860,10 @@ export namespace Prisma {
     readonly channel: FieldRef<"Reservation", 'ReservationChannel'>
     readonly serviceType: FieldRef<"Reservation", 'ServiceType'>
     readonly paymentMethod: FieldRef<"Reservation", 'PaymentMethod'>
+    readonly subtotalPrice: FieldRef<"Reservation", 'Decimal'>
+    readonly discountPercent: FieldRef<"Reservation", 'Int'>
+    readonly discountAmount: FieldRef<"Reservation", 'Decimal'>
+    readonly totalPrice: FieldRef<"Reservation", 'Decimal'>
     readonly notes: FieldRef<"Reservation", 'String'>
     readonly cancelledAt: FieldRef<"Reservation", 'DateTime'>
     readonly completedAt: FieldRef<"Reservation", 'DateTime'>
@@ -13417,6 +13507,10 @@ export namespace Prisma {
     channel: 'channel',
     serviceType: 'serviceType',
     paymentMethod: 'paymentMethod',
+    subtotalPrice: 'subtotalPrice',
+    discountPercent: 'discountPercent',
+    discountAmount: 'discountAmount',
+    totalPrice: 'totalPrice',
     notes: 'notes',
     cancelledAt: 'cancelledAt',
     completedAt: 'completedAt',
@@ -14278,6 +14372,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFilter<"Reservation"> | $Enums.ServiceType
     paymentMethod?: EnumPaymentMethodNullableFilter<"Reservation"> | $Enums.PaymentMethod | null
+    subtotalPrice?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: IntNullableFilter<"Reservation"> | number | null
+    discountAmount?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
     notes?: StringNullableFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
@@ -14302,6 +14400,10 @@ export namespace Prisma {
     channel?: SortOrder
     serviceType?: SortOrder
     paymentMethod?: SortOrderInput | SortOrder
+    subtotalPrice?: SortOrderInput | SortOrder
+    discountPercent?: SortOrderInput | SortOrder
+    discountAmount?: SortOrderInput | SortOrder
+    totalPrice?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
@@ -14331,6 +14433,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFilter<"Reservation"> | $Enums.ServiceType
     paymentMethod?: EnumPaymentMethodNullableFilter<"Reservation"> | $Enums.PaymentMethod | null
+    subtotalPrice?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: IntNullableFilter<"Reservation"> | number | null
+    discountAmount?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
     notes?: StringNullableFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
@@ -14355,14 +14461,20 @@ export namespace Prisma {
     channel?: SortOrder
     serviceType?: SortOrder
     paymentMethod?: SortOrderInput | SortOrder
+    subtotalPrice?: SortOrderInput | SortOrder
+    discountPercent?: SortOrderInput | SortOrder
+    discountAmount?: SortOrderInput | SortOrder
+    totalPrice?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     cancelledAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ReservationCountOrderByAggregateInput
+    _avg?: ReservationAvgOrderByAggregateInput
     _max?: ReservationMaxOrderByAggregateInput
     _min?: ReservationMinOrderByAggregateInput
+    _sum?: ReservationSumOrderByAggregateInput
   }
 
   export type ReservationScalarWhereWithAggregatesInput = {
@@ -14379,6 +14491,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelWithAggregatesFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeWithAggregatesFilter<"Reservation"> | $Enums.ServiceType
     paymentMethod?: EnumPaymentMethodNullableWithAggregatesFilter<"Reservation"> | $Enums.PaymentMethod | null
+    subtotalPrice?: DecimalNullableWithAggregatesFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: IntNullableWithAggregatesFilter<"Reservation"> | number | null
+    discountAmount?: DecimalNullableWithAggregatesFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: DecimalNullableWithAggregatesFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
     notes?: StringNullableWithAggregatesFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableWithAggregatesFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"Reservation"> | Date | string | null
@@ -15232,6 +15348,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15256,6 +15376,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15274,6 +15398,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15298,6 +15426,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15319,6 +15451,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15334,6 +15470,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15352,6 +15492,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16298,6 +16442,17 @@ export namespace Prisma {
     not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
   }
 
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
   export type BabyNullableScalarRelationFilter = {
     is?: BabyWhereInput | null
     isNot?: BabyWhereInput | null
@@ -16330,11 +16485,22 @@ export namespace Prisma {
     channel?: SortOrder
     serviceType?: SortOrder
     paymentMethod?: SortOrder
+    subtotalPrice?: SortOrder
+    discountPercent?: SortOrder
+    discountAmount?: SortOrder
+    totalPrice?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ReservationAvgOrderByAggregateInput = {
+    subtotalPrice?: SortOrder
+    discountPercent?: SortOrder
+    discountAmount?: SortOrder
+    totalPrice?: SortOrder
   }
 
   export type ReservationMaxOrderByAggregateInput = {
@@ -16348,6 +16514,10 @@ export namespace Prisma {
     channel?: SortOrder
     serviceType?: SortOrder
     paymentMethod?: SortOrder
+    subtotalPrice?: SortOrder
+    discountPercent?: SortOrder
+    discountAmount?: SortOrder
+    totalPrice?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
     completedAt?: SortOrder
@@ -16366,11 +16536,22 @@ export namespace Prisma {
     channel?: SortOrder
     serviceType?: SortOrder
     paymentMethod?: SortOrder
+    subtotalPrice?: SortOrder
+    discountPercent?: SortOrder
+    discountAmount?: SortOrder
+    totalPrice?: SortOrder
     notes?: SortOrder
     cancelledAt?: SortOrder
     completedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ReservationSumOrderByAggregateInput = {
+    subtotalPrice?: SortOrder
+    discountPercent?: SortOrder
+    discountAmount?: SortOrder
+    totalPrice?: SortOrder
   }
 
   export type EnumReservationStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -16411,6 +16592,22 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
     _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
   export type ReservationScalarRelationFilter = {
@@ -17194,6 +17391,14 @@ export namespace Prisma {
     set?: $Enums.PaymentMethod | null
   }
 
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
   export type CustomerUpdateOneRequiredWithoutReservationsNestedInput = {
     create?: XOR<CustomerCreateWithoutReservationsInput, CustomerUncheckedCreateWithoutReservationsInput>
     connectOrCreate?: CustomerCreateOrConnectWithoutReservationsInput
@@ -17723,6 +17928,17 @@ export namespace Prisma {
     not?: NestedEnumPaymentMethodNullableFilter<$PrismaModel> | $Enums.PaymentMethod | null
   }
 
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
   export type NestedEnumReservationStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ReservationStatus | EnumReservationStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ReservationStatus[]
@@ -17761,6 +17977,22 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
     _max?: NestedEnumPaymentMethodNullableFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumReservationAuditActionFilter<$PrismaModel = never> = {
@@ -18045,6 +18277,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18067,6 +18303,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18244,6 +18484,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFilter<"Reservation"> | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFilter<"Reservation"> | $Enums.ServiceType
     paymentMethod?: EnumPaymentMethodNullableFilter<"Reservation"> | $Enums.PaymentMethod | null
+    subtotalPrice?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: IntNullableFilter<"Reservation"> | number | null
+    discountAmount?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: DecimalNullableFilter<"Reservation"> | Decimal | DecimalJsLike | number | string | null
     notes?: StringNullableFilter<"Reservation"> | string | null
     cancelledAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"Reservation"> | Date | string | null
@@ -18362,6 +18606,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18384,6 +18632,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18495,6 +18747,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18517,6 +18773,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19029,6 +19289,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19052,6 +19316,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19116,6 +19384,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19139,6 +19411,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19193,6 +19469,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19216,6 +19496,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19282,6 +19566,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19305,6 +19593,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19394,6 +19686,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19417,6 +19713,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19489,6 +19789,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19512,6 +19816,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19552,6 +19860,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19653,6 +19965,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19675,6 +19991,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19695,6 +20015,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19795,6 +20119,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19854,6 +20182,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19876,6 +20208,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19896,6 +20232,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19913,6 +20253,10 @@ export namespace Prisma {
     channel?: $Enums.ReservationChannel
     serviceType?: $Enums.ServiceType
     paymentMethod?: $Enums.PaymentMethod | null
+    subtotalPrice?: Decimal | DecimalJsLike | number | string | null
+    discountPercent?: number | null
+    discountAmount?: Decimal | DecimalJsLike | number | string | null
+    totalPrice?: Decimal | DecimalJsLike | number | string | null
     notes?: string | null
     cancelledAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19928,6 +20272,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19950,6 +20298,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19970,6 +20322,10 @@ export namespace Prisma {
     channel?: EnumReservationChannelFieldUpdateOperationsInput | $Enums.ReservationChannel
     serviceType?: EnumServiceTypeFieldUpdateOperationsInput | $Enums.ServiceType
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    subtotalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discountPercent?: NullableIntFieldUpdateOperationsInput | number | null
+    discountAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalPrice?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

@@ -98,6 +98,15 @@ export default async function ReservationDetailPage(props: {
     0,
   );
 
+  const storedSubtotal = reservation.subtotalPrice?.toNumber();
+  const storedDiscountAmount = reservation.discountAmount?.toNumber();
+  const storedTotal = reservation.totalPrice?.toNumber();
+
+  const subtotalPrice = storedSubtotal ?? totalPrice;
+  const discountPercent = reservation.discountPercent ?? null;
+  const discountAmount = storedDiscountAmount ?? (discountPercent ? (subtotalPrice * discountPercent) / 100 : 0);
+  const finalTotal = storedTotal ?? Math.max(subtotalPrice - discountAmount, 0);
+
   const canComplete = isAdmin || (isMidwife && isOwnReservation);
   const canPrintReceipt = Boolean(reservation.completedAt);
 
@@ -229,9 +238,23 @@ export default async function ReservationDetailPage(props: {
             </div>
           ))}
           <div className="flex items-center justify-between border-t border-white/55 pt-3">
-            <span className="font-semibold text-slate-900">Total</span>
+            <span className="font-semibold text-slate-900">Subtotal</span>
             <span className="text-lg font-semibold text-slate-900">
-              {formatCurrency(totalPrice)}
+              {formatCurrency(subtotalPrice)}
+            </span>
+          </div>
+          {discountPercent ? (
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span className="font-medium text-slate-700">Discount ({discountPercent}%)</span>
+              <span className="font-medium text-slate-900">
+                -{formatCurrency(discountAmount)}
+              </span>
+            </div>
+          ) : null}
+          <div className="mt-2 flex items-center justify-between text-sm">
+            <span className="font-semibold text-slate-900">Total</span>
+            <span className="text-base font-semibold text-slate-900">
+              {formatCurrency(finalTotal)}
             </span>
           </div>
           {reservation.paymentMethod ? (
@@ -400,6 +423,26 @@ export default async function ReservationDetailPage(props: {
                   <option value="CASH">Cash</option>
                   <option value="TRANSFER">Transfer</option>
                 </select>
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor="complete-discountPercent"
+                >
+                  Discount (%)
+                </label>
+                <input
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  id="complete-discountPercent"
+                  inputMode="numeric"
+                  max={50}
+                  min={10}
+                  name="discountPercent"
+                  placeholder="10 - 50"
+                  type="number"
+                />
+                <p className="mt-1 text-xs text-slate-600/80">Range diskon 10% - 50%</p>
               </div>
 
               <button

@@ -172,8 +172,8 @@ export default async function DashboardPage() {
               </div>
 
               <div className="relative hidden h-24 w-24 shrink-0 sm:block">
-                <div className="absolute inset-0 rounded-[26px] bg-[linear-gradient(135deg,rgba(147,197,253,0.55),rgba(251,207,232,0.42),rgba(196,181,253,0.52))] shadow-[0_14px_36px_rgba(99,102,241,0.18)]" />
-                <div className="absolute inset-[1px] rounded-[25px] bg-white/40 backdrop-blur-xl" />
+                <div className="absolute inset-0 rounded-[26px] bg-[linear-gradient(135deg,rgba(125,211,252,0.55),rgba(224,242,254,0.42),rgba(56,189,248,0.52))] shadow-[0_14px_36px_rgba(14,165,233,0.18)]" />
+                <div className="absolute inset-px rounded-[25px] bg-white/40 backdrop-blur-xl" />
                 <div className="absolute inset-0 flex items-center justify-center text-slate-900">
                   <CalendarIcon className="h-8 w-8" />
                 </div>
@@ -251,8 +251,8 @@ export default async function DashboardPage() {
                     Create a new booking in seconds.
                   </p>
                 </div>
-                <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(147,197,253,0.55),rgba(251,207,232,0.42),rgba(196,181,253,0.52))] shadow-[0_12px_28px_rgba(99,102,241,0.16)]">
-                  <span className="absolute inset-[1px] rounded-2xl bg-white/35" />
+                <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(125,211,252,0.55),rgba(224,242,254,0.42),rgba(56,189,248,0.52))] shadow-[0_12px_28px_rgba(14,165,233,0.16)]">
+                  <span className="absolute inset-px rounded-2xl bg-white/35" />
                   <span className="relative text-slate-900">
                     <svg
                       aria-hidden="true"

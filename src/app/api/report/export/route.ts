@@ -382,6 +382,10 @@ async function fetchPdfTransactions(
       startAt: true,
       status: true,
       serviceType: true,
+      subtotalPrice: true,
+      discountPercent: true,
+      discountAmount: true,
+      totalPrice: true,
       customer: { select: { motherName: true } },
       baby: { select: { name: true } },
       midwife: { select: { name: true, email: true } },
@@ -405,9 +409,18 @@ async function fetchPdfTransactions(
     service: r.serviceType,
     treatments: r.items.map((i) => `${i.treatment.name} x${i.quantity}`).join(", "),
     status: r.status,
-    total: formatCurrencyNumber(
-      r.items.reduce((sum, i) => sum + i.unitPrice.toNumber() * i.quantity, 0),
-    ),
+    total: (() => {
+      const itemSubtotal = r.items.reduce(
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        0,
+      );
+      const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;
+      const discountAmount =
+        r.discountAmount?.toNumber() ??
+        (r.discountPercent ? (subtotal * r.discountPercent) / 100 : 0);
+      const total = r.totalPrice?.toNumber() ?? subtotal - discountAmount;
+      return formatCurrencyNumber(Math.max(total, 0));
+    })(),
   }));
 }
 
@@ -424,6 +437,10 @@ async function fetchCsvTransactionRows(
       startAt: true,
       status: true,
       serviceType: true,
+      subtotalPrice: true,
+      discountPercent: true,
+      discountAmount: true,
+      totalPrice: true,
       customer: { select: { motherName: true } },
       baby: { select: { name: true } },
       midwife: { select: { name: true, email: true } },
@@ -448,7 +465,18 @@ async function fetchCsvTransactionRows(
     layanan: r.serviceType,
     treatment: r.items.map((i) => `${i.treatment.name} x${i.quantity}`).join(", "),
     status: r.status,
-    total: r.items.reduce((sum, i) => sum + i.unitPrice.toNumber() * i.quantity, 0),
+    total: (() => {
+      const itemSubtotal = r.items.reduce(
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        0,
+      );
+      const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;
+      const discountAmount =
+        r.discountAmount?.toNumber() ??
+        (r.discountPercent ? (subtotal * r.discountPercent) / 100 : 0);
+      const total = r.totalPrice?.toNumber() ?? subtotal - discountAmount;
+      return Math.max(total, 0);
+    })(),
   }));
 }
 
@@ -463,7 +491,7 @@ async function buildPdfPayload(args: {
   const { reportType, start, end, now, periodLabel, createdAtLabel } = args;
 
   if (reportType === "today") {
-    const [totalReservations, completedCount, statusBreakdown, completedItems] =
+    const [totalReservations, completedCount, statusBreakdown, completedTotals] =
       await Promise.all([
         db.reservation.count({ where: { startAt: { gte: start, lt: end } } }),
         db.reservation.count({
@@ -478,21 +506,34 @@ async function buildPdfPayload(args: {
           _count: true,
           orderBy: { status: "asc" },
         }),
-        db.reservationTreatment.findMany({
+        db.reservation.findMany({
           where: {
-            reservation: {
-              startAt: { gte: start, lt: end },
-              status: "COMPLETED",
-            },
+            startAt: { gte: start, lt: end },
+            status: "COMPLETED",
           },
-          select: { quantity: true, unitPrice: true },
+          select: {
+            subtotalPrice: true,
+            discountPercent: true,
+            discountAmount: true,
+            totalPrice: true,
+            items: { select: { quantity: true, unitPrice: true } },
+          },
+          take: 500,
         }),
       ]);
 
-    const revenue = completedItems.reduce(
-      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-      0,
-    );
+    const revenue = completedTotals.reduce((sum, reservation) => {
+      const itemSubtotal = reservation.items.reduce(
+        (subSum, item) => subSum + item.unitPrice.toNumber() * item.quantity,
+        0,
+      );
+      const subtotal = reservation.subtotalPrice?.toNumber() ?? itemSubtotal;
+      const discountAmount =
+        reservation.discountAmount?.toNumber() ??
+        (reservation.discountPercent ? (subtotal * reservation.discountPercent) / 100 : 0);
+      const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
+      return sum + Math.max(total, 0);
+    }, 0);
 
     const transactions = await fetchPdfTransactions({ gte: start, lt: end });
 
@@ -643,32 +684,53 @@ async function buildPdfPayload(args: {
   }
 
   if (reportType === "revenue") {
-    const items = await db.reservationTreatment.findMany({
+    const reservations = await db.reservation.findMany({
       where: {
-        reservation: {
-          startAt: { gte: start, lt: end },
-          status: "COMPLETED",
-        },
+        startAt: { gte: start, lt: end },
+        status: "COMPLETED",
       },
       select: {
-        quantity: true,
-        unitPrice: true,
-        treatment: { select: { name: true } },
+        subtotalPrice: true,
+        discountPercent: true,
+        discountAmount: true,
+        totalPrice: true,
+        items: {
+          select: {
+            quantity: true,
+            unitPrice: true,
+            treatment: { select: { name: true } },
+          },
+        },
       },
+      take: 500,
     });
 
-    const revenue = items.reduce(
-      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-      0,
-    );
-
     const byTreatment = new Map<string, number>();
-    for (const item of items) {
-      const current = byTreatment.get(item.treatment.name) ?? 0;
-      byTreatment.set(
-        item.treatment.name,
-        current + item.unitPrice.toNumber() * item.quantity,
+    let revenue = 0;
+
+    for (const reservation of reservations) {
+      const itemSubtotal = reservation.items.reduce(
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        0,
       );
+      const subtotal = reservation.subtotalPrice?.toNumber() ?? itemSubtotal;
+      const discountAmount =
+        reservation.discountAmount?.toNumber() ??
+        (reservation.discountPercent
+          ? (subtotal * reservation.discountPercent) / 100
+          : 0);
+      const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
+      const safeTotal = Math.max(total, 0);
+      revenue += safeTotal;
+
+      const ratio = subtotal > 0 ? safeTotal / subtotal : 0;
+      for (const item of reservation.items) {
+        const current = byTreatment.get(item.treatment.name) ?? 0;
+        byTreatment.set(
+          item.treatment.name,
+          current + item.unitPrice.toNumber() * item.quantity * ratio,
+        );
+      }
     }
 
     const rows = Array.from(byTreatment.entries())
@@ -1040,28 +1102,41 @@ export async function GET(request: Request) {
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
 
-    const [totalReservations, statusBreakdown, items] = await Promise.all([
+    const [totalReservations, statusBreakdown, completedTotals] = await Promise.all([
       db.reservation.count({ where: { startAt: { gte: start, lt: end } } }),
       db.reservation.groupBy({
         by: ["status"],
         where: { startAt: { gte: start, lt: end } },
         _count: true,
       }),
-      db.reservationTreatment.findMany({
+      db.reservation.findMany({
         where: {
-          reservation: {
-            startAt: { gte: start, lt: end },
-            status: "COMPLETED",
-          },
+          startAt: { gte: start, lt: end },
+          status: "COMPLETED",
         },
-        select: { quantity: true, unitPrice: true },
+        select: {
+          subtotalPrice: true,
+          discountPercent: true,
+          discountAmount: true,
+          totalPrice: true,
+          items: { select: { quantity: true, unitPrice: true } },
+        },
+        take: 500,
       }),
     ]);
 
-    const revenue = items.reduce(
-      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-      0,
-    );
+    const revenue = completedTotals.reduce((sum, reservation) => {
+      const itemSubtotal = reservation.items.reduce(
+        (subSum, item) => subSum + item.unitPrice.toNumber() * item.quantity,
+        0,
+      );
+      const subtotal = reservation.subtotalPrice?.toNumber() ?? itemSubtotal;
+      const discountAmount =
+        reservation.discountAmount?.toNumber() ??
+        (reservation.discountPercent ? (subtotal * reservation.discountPercent) / 100 : 0);
+      const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
+      return sum + Math.max(total, 0);
+    }, 0);
 
     const detailRows = await fetchCsvTransactionRows({ gte: start, lt: end });
 
@@ -1198,32 +1273,53 @@ export async function GET(request: Request) {
         ...detailRows,
       ]);
     } else if (parsed.data.type === "revenue") {
-      const items = await db.reservationTreatment.findMany({
+      const reservations = await db.reservation.findMany({
         where: {
-          reservation: {
-            startAt: { gte: start, lt: end },
-            status: "COMPLETED",
-          },
+          startAt: { gte: start, lt: end },
+          status: "COMPLETED",
         },
         select: {
-          quantity: true,
-          unitPrice: true,
-          treatment: { select: { name: true } },
+          subtotalPrice: true,
+          discountPercent: true,
+          discountAmount: true,
+          totalPrice: true,
+          items: {
+            select: {
+              quantity: true,
+              unitPrice: true,
+              treatment: { select: { name: true } },
+            },
+          },
         },
+        take: 500,
       });
 
-      const revenue = items.reduce(
-        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-        0,
-      );
-
       const byTreatment = new Map<string, number>();
-      for (const item of items) {
-        const current = byTreatment.get(item.treatment.name) ?? 0;
-        byTreatment.set(
-          item.treatment.name,
-          current + item.unitPrice.toNumber() * item.quantity,
+      let revenue = 0;
+
+      for (const reservation of reservations) {
+        const itemSubtotal = reservation.items.reduce(
+          (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+          0,
         );
+        const subtotal = reservation.subtotalPrice?.toNumber() ?? itemSubtotal;
+        const discountAmount =
+          reservation.discountAmount?.toNumber() ??
+          (reservation.discountPercent
+            ? (subtotal * reservation.discountPercent) / 100
+            : 0);
+        const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
+        const safeTotal = Math.max(total, 0);
+        revenue += safeTotal;
+
+        const ratio = subtotal > 0 ? safeTotal / subtotal : 0;
+        for (const item of reservation.items) {
+          const current = byTreatment.get(item.treatment.name) ?? 0;
+          byTreatment.set(
+            item.treatment.name,
+            current + item.unitPrice.toNumber() * item.quantity * ratio,
+          );
+        }
       }
 
       const rows: CsvRow[] = [

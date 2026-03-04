@@ -223,7 +223,7 @@ export function UserMenu() {
         }}
         type="button"
       >
-        <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(147,197,253,0.55),rgba(251,207,232,0.42),rgba(196,181,253,0.52))] text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(99,102,241,0.16)]">
+        <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(125,211,252,0.55),rgba(224,242,254,0.42),rgba(56,189,248,0.52))] text-sm font-semibold text-slate-900 shadow-[0_14px_32px_rgba(14,165,233,0.18)]">
           {initials}
         </span>
         <span className="hidden max-w-[200px] truncate text-sm font-semibold text-slate-900/90 sm:block">
