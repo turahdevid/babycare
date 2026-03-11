@@ -74,7 +74,8 @@ export default async function ReservationListPage(props: {
       items: {
         include: {
           treatment: true,
-        },
+          baby: true,
+        } as any,
       },
     },
     orderBy: { startAt: "desc" },
@@ -127,8 +128,17 @@ export default async function ReservationListPage(props: {
         <div className="grid gap-4">
           {reservations.map((reservation) => {
             const treatmentNames = reservation.items
-              .map((item) => item.treatment.name)
+              .map((item: any) => item.treatment?.name ?? "")
               .join(", ");
+
+            const babyNames = (() => {
+              const map = new Map<string, string>();
+              for (const item of reservation.items as any[]) {
+                if (item.baby) map.set(item.baby.id, item.baby.name);
+              }
+              if (reservation.baby) map.set(reservation.baby.id, reservation.baby.name);
+              return Array.from(map.values());
+            })();
             return (
               <Link
                 key={reservation.id}
@@ -150,10 +160,10 @@ export default async function ReservationListPage(props: {
                           {formatTime(reservation.startAt)} -{" "}
                           {formatTime(reservation.endAt)}
                         </p>
-                        {reservation.baby ? (
+                        {babyNames.length > 0 ? (
                           <p>
-                            <span className="font-medium">Baby:</span>{" "}
-                            {reservation.baby.name}
+                            <span className="font-medium">Anak:</span>{" "}
+                            {babyNames.join(", ")}
                           </p>
                         ) : null}
                         {reservation.midwife ? (

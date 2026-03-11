@@ -373,7 +373,7 @@ async function fetchPdfTransactions(
   where: { gte: Date; lt: Date },
   statusFilter?: string,
 ): Promise<PdfTransactionRow[]> {
-  const reservations = await db.reservation.findMany({
+  const reservations = (await db.reservation.findMany({
     where: {
       startAt: { gte: where.gte, lt: where.lt },
       ...(statusFilter ? { status: statusFilter as never } : {}),
@@ -387,31 +387,56 @@ async function fetchPdfTransactions(
       discountAmount: true,
       totalPrice: true,
       customer: { select: { motherName: true } },
-      baby: { select: { name: true } },
+      baby: { select: { id: true, name: true } },
       midwife: { select: { name: true, email: true } },
       items: {
         select: {
           quantity: true,
           unitPrice: true,
           treatment: { select: { name: true } },
-        },
+          baby: { select: { id: true, name: true } },
+        } as any,
       },
     },
     orderBy: { startAt: "desc" },
     take: 200,
-  });
+  } as any)) as any[];
 
   return reservations.map((r) => ({
     date: formatDateLabel(r.startAt),
     customer: r.customer.motherName,
-    baby: r.baby?.name ?? "-",
+    baby: (() => {
+      const map = new Map<string, string>();
+      for (const item of r.items) {
+        if (item.baby) map.set(item.baby.id, item.baby.name);
+      }
+      if (r.baby) map.set(r.baby.id, r.baby.name);
+      const names = Array.from(map.values());
+      return names.length > 0 ? names.join(", ") : "-";
+    })(),
     midwife: r.midwife?.name ?? r.midwife?.email ?? "-",
     service: r.serviceType,
-    treatments: r.items.map((i) => `${i.treatment.name} x${i.quantity}`).join(", "),
+    treatments: (() => {
+      const map = new Map<string, string[]>();
+      for (const item of r.items) {
+        const key = item.baby?.name ?? "-";
+        const list = map.get(key) ?? [];
+        list.push(`${item.treatment.name} x${item.quantity}`);
+        map.set(key, list);
+      }
+      if (map.size === 0) return "-";
+      if (map.size === 1) {
+        const only = map.values().next().value as string[];
+        return only.join(", ");
+      }
+      return Array.from(map.entries())
+        .map(([babyName, items]) => `${babyName}: ${items.join(", ")}`)
+        .join(" | ");
+    })(),
     status: r.status,
     total: (() => {
       const itemSubtotal = r.items.reduce(
-        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
         0,
       );
       const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;
@@ -428,7 +453,7 @@ async function fetchCsvTransactionRows(
   where: { gte: Date; lt: Date },
   statusFilter?: string,
 ): Promise<CsvRow[]> {
-  const reservations = await db.reservation.findMany({
+  const reservations = (await db.reservation.findMany({
     where: {
       startAt: { gte: where.gte, lt: where.lt },
       ...(statusFilter ? { status: statusFilter as never } : {}),
@@ -442,32 +467,57 @@ async function fetchCsvTransactionRows(
       discountAmount: true,
       totalPrice: true,
       customer: { select: { motherName: true } },
-      baby: { select: { name: true } },
+      baby: { select: { id: true, name: true } },
       midwife: { select: { name: true, email: true } },
       items: {
         select: {
           quantity: true,
           unitPrice: true,
           treatment: { select: { name: true } },
-        },
+          baby: { select: { id: true, name: true } },
+        } as any,
       },
     },
     orderBy: { startAt: "desc" },
     take: 200,
-  });
+  } as any)) as any[];
 
   return reservations.map((r) => ({
     section: "detail",
     tanggal: formatDateLabel(r.startAt),
     customer: r.customer.motherName,
-    bayi: r.baby?.name ?? "-",
+    bayi: (() => {
+      const map = new Map<string, string>();
+      for (const item of r.items) {
+        if (item.baby) map.set(item.baby.id, item.baby.name);
+      }
+      if (r.baby) map.set(r.baby.id, r.baby.name);
+      const names = Array.from(map.values());
+      return names.length > 0 ? names.join(", ") : "-";
+    })(),
     bidan: r.midwife?.name ?? r.midwife?.email ?? "-",
     layanan: r.serviceType,
-    treatment: r.items.map((i) => `${i.treatment.name} x${i.quantity}`).join(", "),
+    treatment: (() => {
+      const map = new Map<string, string[]>();
+      for (const item of r.items) {
+        const key = item.baby?.name ?? "-";
+        const list = map.get(key) ?? [];
+        list.push(`${item.treatment.name} x${item.quantity}`);
+        map.set(key, list);
+      }
+      if (map.size === 0) return "-";
+      if (map.size === 1) {
+        const only = map.values().next().value as string[];
+        return only.join(", ");
+      }
+      return Array.from(map.entries())
+        .map(([babyName, items]) => `${babyName}: ${items.join(", ")}`)
+        .join(" | ");
+    })(),
     status: r.status,
     total: (() => {
       const itemSubtotal = r.items.reduce(
-        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
         0,
       );
       const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;

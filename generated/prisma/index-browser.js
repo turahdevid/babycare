@@ -227,6 +227,7 @@ exports.Prisma.ReservationTreatmentScalarFieldEnum = {
   id: 'id',
   reservationId: 'reservationId',
   treatmentId: 'treatmentId',
+  babyId: 'babyId',
   quantity: 'quantity',
   unitPrice: 'unitPrice',
   durationMinutes: 'durationMinutes',
@@ -341,6 +342,7 @@ exports.Prisma.ReservationTreatmentOrderByRelevanceFieldEnum = {
   id: 'id',
   reservationId: 'reservationId',
   treatmentId: 'treatmentId',
+  babyId: 'babyId',
   notes: 'notes'
 };
 
@@ -370,7 +372,9 @@ exports.BabyGender = exports.$Enums.BabyGender = {
 
 exports.TreatmentCategory = exports.$Enums.TreatmentCategory = {
   BABY: 'BABY',
-  KIDS: 'KIDS'
+  KIDS: 'KIDS',
+  IBU: 'IBU',
+  SPESIAL: 'SPESIAL'
 };
 
 exports.ReservationStatus = exports.$Enums.ReservationStatus = {

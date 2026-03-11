@@ -47,10 +47,10 @@ export async function completeReservation(reservationId: string, formData: FormD
   };
 
   const completionSchema = z.object({
-    babyId: z.string().min(1, "Baby wajib dipilih"),
+    babyId: z.string().optional(),
     midwifeId: z.string().min(1, "Bidan wajib dipilih"),
     paymentMethod: z.enum(["CASH", "TRANSFER"]).optional(),
-    discountPercent: z.number().int().min(10).max(50).optional(),
+    discountPercent: z.number().int().min(0).max(100).optional(),
   });
 
   const validated = completionSchema.safeParse(input);
@@ -68,9 +68,10 @@ export async function completeReservation(reservationId: string, formData: FormD
       midwifeId: true,
       items: {
         select: {
+          babyId: true,
           quantity: true,
           unitPrice: true,
-        },
+        } as any,
       },
     },
   });
@@ -82,13 +83,31 @@ export async function completeReservation(reservationId: string, formData: FormD
   const now = new Date();
   const shouldComplete = existing.status !== "COMPLETED" || !existing.completedAt;
 
+  const inputBabyId =
+    typeof validated.data.babyId === "string" && validated.data.babyId.trim().length > 0
+      ? validated.data.babyId.trim()
+      : undefined;
+  const hasItemBaby = existing.items.some(
+    (item: any) => typeof item.babyId === "string" && item.babyId.length > 0,
+  );
+  const resolvedBabyId = inputBabyId ?? existing.babyId ?? undefined;
+  const shouldRequireBaby = !resolvedBabyId && !hasItemBaby;
+
+  if (shouldRequireBaby) {
+    redirect(`/reservation/${parsed.data}?error=invalid-complete`);
+  }
+
   if (shouldComplete) {
     const subtotalPrice = existing.items.reduce(
-      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+      (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
       0,
     );
 
-    const discountPercent = validated.data.discountPercent;
+    const discountPercent =
+      typeof validated.data.discountPercent === "number" &&
+      validated.data.discountPercent > 0
+        ? validated.data.discountPercent
+        : undefined;
     const discountAmountRaw = discountPercent
       ? (subtotalPrice * discountPercent) / 100
       : 0;
@@ -99,7 +118,7 @@ export async function completeReservation(reservationId: string, formData: FormD
       db.reservation.update({
         where: { id: existing.id },
         data: {
-          babyId: validated.data.babyId,
+          babyId: resolvedBabyId ?? null,
           midwifeId: validated.data.midwifeId,
           paymentMethod: validated.data.paymentMethod ?? null,
           subtotalPrice,

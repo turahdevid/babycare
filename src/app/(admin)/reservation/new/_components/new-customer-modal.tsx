@@ -1,6 +1,60 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+
+function parseLocalDate(value: string): Date | null {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return null;
+  const parts = trimmed.split("-");
+  if (parts.length !== 3) return null;
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > 31) return null;
+  return new Date(year, month - 1, day);
+}
+
+function calculateAgeAt(birthDate: Date, referenceDate: Date): string {
+  const ref = new Date(referenceDate);
+  const birth = new Date(birthDate);
+  if (Number.isNaN(ref.getTime()) || Number.isNaN(birth.getTime())) return "";
+  if (birth.getTime() > ref.getTime()) return "0 hari";
+
+  let years = ref.getFullYear() - birth.getFullYear();
+  let months = ref.getMonth() - birth.getMonth();
+  let days = ref.getDate() - birth.getDate();
+
+  if (days < 0) {
+    months -= 1;
+    const prevMonth = new Date(ref.getFullYear(), ref.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  const parts: string[] = [];
+
+  if (years > 0) {
+    parts.push(`${years} tahun`);
+  }
+
+  if (months > 0) {
+    parts.push(`${months} bulan`);
+  }
+
+  if (years === 0 && months === 0) {
+    parts.push(`${Math.max(0, days)} hari`);
+  } else if (years === 0 && days > 0) {
+    parts.push(`${days} hari`);
+  }
+
+  return parts.join(" ") || "0 hari";
+}
 
 export type NewCustomerPayload = {
   motherName: string;
@@ -22,9 +76,10 @@ export type NewCustomerPayload = {
 type Props = {
   onSave: (customer: NewCustomerPayload) => void;
   onCancel: () => void;
+  treatmentDate?: string;
 };
 
-export function NewCustomerModal({ onSave, onCancel }: Props) {
+export function NewCustomerModal({ onSave, onCancel, treatmentDate }: Props) {
   const [motherName, setMotherName] = useState("");
   const [motherPhone, setMotherPhone] = useState("");
   const [motherEmail, setMotherEmail] = useState("");
@@ -37,7 +92,20 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
   const [babyBirthDate, setBabyBirthDate] = useState("");
   const [babyAllergy, setBabyAllergy] = useState("");
   const [babyAgeAtTreatment, setBabyAgeAtTreatment] = useState("");
+  const [isBabyAgeManual, setIsBabyAgeManual] = useState(false);
   const [babyNotes, setBabyNotes] = useState("");
+
+  useEffect(() => {
+    if (isBabyAgeManual) return;
+    if (!babyBirthDate) return;
+
+    const birth = parseLocalDate(babyBirthDate);
+    if (!birth) return;
+
+    const reference = treatmentDate ? parseLocalDate(treatmentDate) : null;
+    const value = calculateAgeAt(birth, reference ?? new Date());
+    setBabyAgeAtTreatment(value);
+  }, [babyBirthDate, isBabyAgeManual, treatmentDate]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -299,7 +367,10 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
                   <input
                     className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="modal-babyBirthDate"
-                    onChange={(e) => setBabyBirthDate(e.target.value)}
+                    onChange={(e) => {
+                      setBabyBirthDate(e.target.value);
+                      setIsBabyAgeManual(false);
+                    }}
                     type="date"
                     value={babyBirthDate}
                   />
@@ -332,7 +403,10 @@ export function NewCustomerModal({ onSave, onCancel }: Props) {
                   <input
                     className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="modal-babyAgeAtTreatment"
-                    onChange={(e) => setBabyAgeAtTreatment(e.target.value)}
+                    onChange={(e) => {
+                      setIsBabyAgeManual(true);
+                      setBabyAgeAtTreatment(e.target.value);
+                    }}
                     placeholder="Contoh: 1 bulan 2 minggu"
                     type="text"
                     value={babyAgeAtTreatment}

@@ -6,7 +6,37 @@ import { db } from "~/server/db";
 import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
+import {
+  DiscountPercentInput,
+  DiscountPriceSummary,
+  DiscountPreviewProvider,
+} from "./_components/discount-preview-controller";
 import { completeReservation } from "../_actions";
+
+type ReservationItem = {
+  id: string;
+  babyId: string | null;
+  quantity: number;
+  durationMinutes: number;
+  unitPrice: { toNumber: () => number };
+  treatment: { name: string };
+};
+
+type ReservationBaby = {
+  id: string;
+  name: string;
+  birthDate: Date | null;
+};
+
+type ReservationAuditLogEntry = {
+  id: string;
+  action: string;
+  fromStatus: string | null;
+  toStatus: string | null;
+  message: string | null;
+  createdAt: Date;
+  actor: { name: string | null; email: string | null } | null;
+};
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -61,8 +91,9 @@ export default async function ReservationDetailPage(props: {
         items: {
           include: {
             treatment: true,
+            baby: true,
           },
-        },
+        } as any,
         auditLogs: {
           include: {
             actor: true,
@@ -79,7 +110,7 @@ export default async function ReservationDetailPage(props: {
       orderBy: { name: "asc" },
       select: { id: true, name: true, email: true },
     }),
-  ]);
+  ] as const);
 
   if (!reservation) {
     notFound();
@@ -93,47 +124,67 @@ export default async function ReservationDetailPage(props: {
     redirect("/dashboard");
   }
 
-  const totalPrice = reservation.items.reduce(
-    (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+  const items = reservation.items as unknown as ReservationItem[];
+  const auditLogs = reservation.auditLogs as unknown as ReservationAuditLogEntry[];
+
+  const totalPrice = items.reduce(
+    (sum: number, item: ReservationItem) =>
+      sum + item.unitPrice.toNumber() * item.quantity,
     0,
   );
 
-  const storedSubtotal = reservation.subtotalPrice?.toNumber();
-  const storedDiscountAmount = reservation.discountAmount?.toNumber();
-  const storedTotal = reservation.totalPrice?.toNumber();
+  const reservationBabies = (() => {
+    const map = new Map<string, ReservationBaby>();
+    for (const item of reservation.items as any[]) {
+      if (item?.baby) {
+        map.set(item.baby.id, item.baby as ReservationBaby);
+      }
+    }
+    if ((reservation as any).baby) {
+      map.set((reservation as any).baby.id, (reservation as any).baby as ReservationBaby);
+    }
+    return Array.from(map.values());
+  })();
 
+  const hasMultipleBabies = reservationBabies.length > 1;
+
+  const storedSubtotal = reservation.subtotalPrice?.toNumber();
   const subtotalPrice = storedSubtotal ?? totalPrice;
-  const discountPercent = reservation.discountPercent ?? null;
-  const discountAmount = storedDiscountAmount ?? (discountPercent ? (subtotalPrice * discountPercent) / 100 : 0);
-  const finalTotal = storedTotal ?? Math.max(subtotalPrice - discountAmount, 0);
+  const discountPercent = reservation.discountPercent;
 
   const canComplete = isAdmin || (isMidwife && isOwnReservation);
   const canPrintReceipt = Boolean(reservation.completedAt);
 
   return (
-    <section className="grid gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <Link
-          className="text-sm text-slate-700/80 transition hover:text-slate-900"
-          href="/reservation/list"
-        >
-          ← Kembali ke daftar
-        </Link>
-      </div>
-
-      <GlassCard>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-900">
-              Reservasi #{reservation.id.slice(0, 8)}
-            </h2>
-            <p className="mt-1 text-sm text-slate-700/80">
-              Dibuat {formatDate(reservation.createdAt)}
-            </p>
-          </div>
-          <StatusPill status={reservation.status} />
+    <DiscountPreviewProvider
+      initialDiscountPercent={discountPercent}
+      subtotal={subtotalPrice}
+    >
+      <section className="grid gap-6">
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            className="text-sm text-slate-700/80 transition hover:text-slate-900"
+            href={
+              session.user.role === "ADMIN" ? "/reservation/list" : "/reservation"
+            }
+          >
+            ← Kembali ke daftar
+          </Link>
         </div>
-      </GlassCard>
+
+        <GlassCard>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">
+                Reservasi #{reservation.id.slice(0, 8)}
+              </h2>
+              <p className="mt-1 text-sm text-slate-700/80">
+                Dibuat {formatDate(reservation.createdAt)}
+              </p>
+            </div>
+            <StatusPill status={reservation.status} />
+          </div>
+        </GlassCard>
 
       <div className="grid gap-6 md:grid-cols-2">
         <GlassCard>
@@ -161,17 +212,21 @@ export default async function ReservationDetailPage(props: {
                 </p>
               </div>
             ) : null}
-            {reservation.baby ? (
+            {reservationBabies.length > 0 ? (
               <div>
-                <span className="font-medium text-slate-700">Nama Baby:</span>
-                <p className="mt-1 text-slate-900">
-                  {reservation.baby.name}
-                  {reservation.baby.birthDate ? (
-                    <span className="ml-2 text-xs text-slate-600">
-                      ({calculateAge(reservation.baby.birthDate)})
-                    </span>
-                  ) : null}
-                </p>
+                <span className="font-medium text-slate-700">Anak:</span>
+                <div className="mt-1 space-y-1 text-slate-900">
+                  {reservationBabies.map((baby: ReservationBaby) => (
+                    <p key={baby.id}>
+                      {baby.name}
+                      {baby.birthDate ? (
+                        <span className="ml-2 text-xs text-slate-600">
+                          ({calculateAge(baby.birthDate)})
+                        </span>
+                      ) : null}
+                    </p>
+                  ))}
+                </div>
               </div>
             ) : null}
           </div>
@@ -214,49 +269,68 @@ export default async function ReservationDetailPage(props: {
       <GlassCard>
         <h3 className="text-base font-semibold text-slate-900">Treatment</h3>
         <div className="mt-4 space-y-2">
-          {reservation.items.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between rounded-xl border border-white/55 bg-white/25 px-4 py-3"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-slate-900">
-                  {item.treatment.name}
-                </p>
-                <p className="mt-1 text-xs text-slate-700/80">
-                  {item.durationMinutes} menit • {formatCurrency(item.unitPrice.toNumber())}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">
-                  x{item.quantity}
-                </p>
-                <p className="text-xs text-slate-700/80">
-                  {formatCurrency(item.unitPrice.toNumber() * item.quantity)}
-                </p>
-              </div>
-            </div>
-          ))}
-          <div className="flex items-center justify-between border-t border-white/55 pt-3">
-            <span className="font-semibold text-slate-900">Subtotal</span>
-            <span className="text-lg font-semibold text-slate-900">
-              {formatCurrency(subtotalPrice)}
-            </span>
-          </div>
-          {discountPercent ? (
-            <div className="mt-2 flex items-center justify-between text-sm">
-              <span className="font-medium text-slate-700">Discount ({discountPercent}%)</span>
-              <span className="font-medium text-slate-900">
-                -{formatCurrency(discountAmount)}
-              </span>
-            </div>
-          ) : null}
-          <div className="mt-2 flex items-center justify-between text-sm">
-            <span className="font-semibold text-slate-900">Total</span>
-            <span className="text-base font-semibold text-slate-900">
-              {formatCurrency(finalTotal)}
-            </span>
-          </div>
+          {hasMultipleBabies
+            ? reservationBabies.map((baby: ReservationBaby) => {
+                const childItems = items.filter(
+                  (item: ReservationItem) => item.babyId === baby.id,
+                );
+                if (childItems.length === 0) return null;
+
+                return (
+                  <div key={baby.id} className="rounded-2xl border border-white/55 bg-white/20 px-4 py-4">
+                    <p className="text-sm font-semibold text-slate-900">{baby.name}</p>
+                    <div className="mt-3 space-y-2">
+                      {childItems.map((item: ReservationItem) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between rounded-xl border border-white/55 bg-white/25 px-4 py-3"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-slate-900">
+                              {item.treatment.name}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-700/80">
+                              {item.durationMinutes} menit •{" "}
+                              {formatCurrency(item.unitPrice.toNumber())}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-slate-900">
+                              x{item.quantity}
+                            </p>
+                            <p className="text-xs text-slate-700/80">
+                              {formatCurrency(item.unitPrice.toNumber() * item.quantity)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })
+            : items.map((item: ReservationItem) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-xl border border-white/55 bg-white/25 px-4 py-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-slate-900">
+                      {item.treatment.name}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-700/80">
+                      {item.durationMinutes} menit •{" "}
+                      {formatCurrency(item.unitPrice.toNumber())}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-slate-900">x{item.quantity}</p>
+                    <p className="text-xs text-slate-700/80">
+                      {formatCurrency(item.unitPrice.toNumber() * item.quantity)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          <DiscountPriceSummary />
           {reservation.paymentMethod ? (
             <div className="mt-3 flex items-center justify-between text-sm">
               <span className="font-medium text-slate-700">Metode Pembayaran</span>
@@ -275,13 +349,13 @@ export default async function ReservationDetailPage(props: {
         </GlassCard>
       ) : null}
 
-      {reservation.auditLogs.length > 0 ? (
+      {auditLogs.length > 0 ? (
         <GlassCard>
           <h3 className="text-base font-semibold text-slate-900">
             Riwayat Perubahan
           </h3>
           <div className="mt-4 space-y-2">
-            {reservation.auditLogs.map((log) => (
+            {auditLogs.map((log: ReservationAuditLogEntry) => (
               <div
                 key={log.id}
                 className="rounded-xl border border-white/55 bg-white/25 px-4 py-3 text-sm"
@@ -348,9 +422,28 @@ export default async function ReservationDetailPage(props: {
                     className="block text-sm font-medium text-slate-700"
                     htmlFor="complete-babyId"
                   >
-                    Baby <span className="text-rose-600">*</span>
+                    {hasMultipleBabies ? (
+                      "Anak"
+                    ) : (
+                      <>
+                        Baby <span className="text-rose-600">*</span>
+                      </>
+                    )}
                   </label>
-                  {reservation.customer.babies.length > 0 ? (
+                  {hasMultipleBabies ? (
+                    <>
+                      <input
+                        name="babyId"
+                        type="hidden"
+                        value={reservation.babyId ?? reservationBabies[0]?.id ?? ""}
+                      />
+                      <div className="mt-1.5 rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900">
+                        {reservationBabies
+                          .map((baby: ReservationBaby) => baby.name)
+                          .join(", ")}
+                      </div>
+                    </>
+                  ) : reservation.customer.babies.length > 0 ? (
                     <select
                       className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                       defaultValue={reservation.babyId ?? ""}
@@ -359,7 +452,7 @@ export default async function ReservationDetailPage(props: {
                       required
                     >
                       <option value="">Pilih baby</option>
-                      {reservation.customer.babies.map((baby) => (
+                      {reservation.customer.babies.map((baby: { id: string; name: string }) => (
                         <option key={baby.id} value={baby.id}>
                           {baby.name}
                         </option>
@@ -432,17 +525,17 @@ export default async function ReservationDetailPage(props: {
                 >
                   Discount (%)
                 </label>
-                <input
+                <DiscountPercentInput
                   className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                   id="complete-discountPercent"
                   inputMode="numeric"
-                  max={50}
-                  min={10}
+                  max={100}
+                  min={0}
                   name="discountPercent"
-                  placeholder="10 - 50"
+                  placeholder="0 - 100"
                   type="number"
                 />
-                <p className="mt-1 text-xs text-slate-600/80">Range diskon 10% - 50%</p>
+                <p className="mt-1 text-xs text-slate-600/80">Range diskon 0% - 100%</p>
               </div>
 
               <button
@@ -485,6 +578,7 @@ export default async function ReservationDetailPage(props: {
           </p>
         </GlassCard>
       ) : null}
-    </section>
+      </section>
+    </DiscountPreviewProvider>
   );
 }

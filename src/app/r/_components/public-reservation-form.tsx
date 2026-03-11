@@ -16,7 +16,7 @@ import { GlassCard } from "../../(admin)/_components/glass-card";
 type TreatmentItem = {
   id: string;
   name: string;
-  category: "BABY" | "KIDS";
+  category: string;
   description: string | null;
   durationMinutes: number;
   basePrice: number;

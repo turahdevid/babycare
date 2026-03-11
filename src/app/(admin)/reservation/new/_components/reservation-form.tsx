@@ -188,7 +188,6 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
               <input
                 className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                 id="date"
-                min={new Date().toISOString().split("T")[0]}
                 name="date"
                 required
                 type="date"

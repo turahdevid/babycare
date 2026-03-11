@@ -6,7 +6,7 @@ import { PublicReservationForm } from "./_components/public-reservation-form";
 type TreatmentItem = {
   id: string;
   name: string;
-  category: "BABY" | "KIDS";
+  category: string;
   description: string | null;
   durationMinutes: number;
   basePrice: number;
@@ -27,10 +27,10 @@ export default async function PublicReservationPage() {
     },
   });
 
-  const uiTreatments: TreatmentItem[] = treatments.map((t) => ({
+  const uiTreatments = treatments.map((t) => ({
     id: t.id,
     name: t.name,
-    category: t.category,
+    category: String(t.category),
     description: t.description,
     durationMinutes: t.durationMinutes,
     basePrice: t.basePrice.toNumber(),

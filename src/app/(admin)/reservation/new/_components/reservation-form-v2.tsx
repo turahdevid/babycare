@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -35,7 +35,7 @@ const createReservationErrorSchema = z.object({
 type TreatmentItem = {
   id: string;
   name: string;
-  category: "BABY" | "KIDS";
+  category: string;
   description: string | null;
   durationMinutes: number;
   basePrice: number;
@@ -51,6 +51,9 @@ type Props = {
 export function ReservationForm({ customers, treatments, midwives }: Props) {
   const router = useRouter();
   const [selectedCustomerId, setSelectedCustomerId] = useState("");
+  const [selectedBabyIds, setSelectedBabyIds] = useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("");
+  const [activeCategoryByBaby, setActiveCategoryByBaby] = useState<Record<string, string>>({});
   const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
   const [newCustomerData, setNewCustomerData] = useState<NewCustomerPayload | null>(
     null,
@@ -70,10 +73,61 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
   const [selectedTreatments, setSelectedTreatments] = useState<
     { treatmentId: string; quantity: number }[]
   >([]);
+  const [selectedTreatmentsByBaby, setSelectedTreatmentsByBaby] = useState<
+    Record<string, { treatmentId: string; quantity: number }[]>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
+
+  const categories = useMemo(() => {
+    const unique = Array.from(new Set(treatments.map((t) => String(t.category)).filter(Boolean)));
+    const preferred = ["BABY", "KIDS", "IBU"];
+    unique.sort((a, b) => {
+      const ai = preferred.indexOf(a);
+      const bi = preferred.indexOf(b);
+      const ar = ai === -1 ? preferred.length : ai;
+      const br = bi === -1 ? preferred.length : bi;
+      if (ar !== br) return ar - br;
+      return a.localeCompare(b);
+    });
+    return unique;
+  }, [treatments]);
+
+  const formatCategoryLabel = (category: string) => {
+    const value = category.toUpperCase();
+    if (value === "BABY") return "Baby";
+    if (value === "KIDS") return "Kids";
+    if (value === "IBU") return "Ibu";
+    return category;
+  };
+
+  useEffect(() => {
+    if (categories.length === 0) return;
+
+    if (!activeCategory || !categories.includes(activeCategory)) {
+      setActiveCategory(categories[0] ?? "");
+    }
+
+    setActiveCategoryByBaby((current) => {
+      const next = { ...current };
+      for (const babyId of selectedBabyIds) {
+        const existing = next[babyId];
+        if (!existing || !categories.includes(existing)) {
+          next[babyId] = categories[0] ?? "";
+        }
+      }
+      return next;
+    });
+  }, [activeCategory, categories, selectedBabyIds]);
+
+  const selectedTreatmentsFlattened =
+    selectedBabyIds.length > 0
+      ? selectedBabyIds.flatMap(
+          (babyId) => selectedTreatmentsByBaby[babyId] ?? [],
+        )
+      : selectedTreatments;
 
   const handleNewCustomerClick = () => {
     setShowNewCustomerModal(true);
@@ -82,6 +136,9 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
   const handleNewCustomerSave = (customer: NewCustomerPayload) => {
     setNewCustomerData(customer);
     setSelectedCustomerId("new");
+    setSelectedBabyIds([]);
+    setSelectedTreatments([]);
+    setSelectedTreatmentsByBaby({});
     setShowNewCustomerModal(false);
   };
 
@@ -136,6 +193,19 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
     }
   };
 
+  const handleAddTreatmentForBaby = (babyId: string, treatmentId: string) => {
+    setSelectedTreatmentsByBaby((prev) => {
+      const current = prev[babyId] ?? [];
+      const existing = current.find((t) => t.treatmentId === treatmentId);
+      const next = existing
+        ? current.map((t) =>
+            t.treatmentId === treatmentId ? { ...t, quantity: t.quantity + 1 } : t,
+          )
+        : [...current, { treatmentId, quantity: 1 }];
+      return { ...prev, [babyId]: next };
+    });
+  };
+
   const handleAddTreatment = (treatmentId: string) => {
     const existing = selectedTreatments.find((t) => t.treatmentId === treatmentId);
     if (existing) {
@@ -155,6 +225,14 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
     );
   };
 
+  const handleRemoveTreatmentForBaby = (babyId: string, treatmentId: string) => {
+    setSelectedTreatmentsByBaby((prev) => {
+      const current = prev[babyId] ?? [];
+      const next = current.filter((t) => t.treatmentId !== treatmentId);
+      return { ...prev, [babyId]: next };
+    });
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -162,7 +240,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
 
     const formData = new FormData(e.currentTarget);
 
-    if (selectedTreatments.length === 0) {
+    if (selectedTreatmentsFlattened.length === 0) {
       setError("Pilih minimal 1 treatment");
       setIsSubmitting(false);
       return;
@@ -173,7 +251,26 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
       formData.append("newCustomer", JSON.stringify(newCustomerData));
     }
 
-    formData.append("treatments", JSON.stringify(selectedTreatments));
+    if (selectedBabyIds.length > 0) {
+      const treatmentsByBaby = selectedBabyIds.map((babyId) => ({
+        babyId,
+        treatments: selectedTreatmentsByBaby[babyId] ?? [],
+      }));
+
+      const missing = treatmentsByBaby.find((g) => g.treatments.length === 0);
+      if (missing) {
+        const babyName =
+          selectedCustomer?.babies.find((b) => b.id === missing.babyId)?.name ?? "Baby";
+        setError(`Treatment untuk ${babyName} belum dipilih`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      formData.append("treatmentsByBaby", JSON.stringify(treatmentsByBaby));
+      formData.append("babyIds", JSON.stringify(selectedBabyIds));
+    } else {
+      formData.append("treatments", JSON.stringify(selectedTreatments));
+    }
     formData.append("serviceType", selectedServiceType);
 
     try {
@@ -207,12 +304,12 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
     }
   };
 
-  const totalDuration = selectedTreatments.reduce((sum, item) => {
+  const totalDuration = selectedTreatmentsFlattened.reduce((sum, item) => {
     const treatment = treatments.find((t) => t.id === item.treatmentId);
     return sum + (treatment?.durationMinutes ?? 0) * item.quantity;
   }, 0);
 
-  const totalPrice = selectedTreatments.reduce((sum, item) => {
+  const totalPrice = selectedTreatmentsFlattened.reduce((sum, item) => {
     const treatment = treatments.find((t) => t.id === item.treatmentId);
     return sum + (treatment?.basePrice ?? 0) * item.quantity;
   }, 0);
@@ -223,6 +320,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
         <NewCustomerModal
           onCancel={() => setShowNewCustomerModal(false)}
           onSave={handleNewCustomerSave}
+          treatmentDate={selectedDate}
         />
       ) : null}
 
@@ -253,7 +351,14 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                     className="flex-1 rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="customerId"
                     name="customerId"
-                    onChange={(e) => setSelectedCustomerId(e.target.value)}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setSelectedCustomerId(next);
+                      setSelectedBabyIds([]);
+                      setSelectedTreatments([]);
+                      setSelectedTreatmentsByBaby({});
+                      setNewCustomerData((prev) => (next === "new" ? prev : null));
+                    }}
                     required={!newCustomerData}
                     value={selectedCustomerId}
                   >
@@ -281,24 +386,41 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
 
               {selectedCustomer && selectedCustomer.babies.length > 0 ? (
                 <div>
-                  <label
-                    className="block text-sm font-medium text-slate-700"
-                    htmlFor="babyId"
-                  >
-                    Baby (Opsional)
-                  </label>
-                  <select
-                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                    id="babyId"
-                    name="babyId"
-                  >
-                    <option value="">Tidak ada baby</option>
-                    {selectedCustomer.babies.map((baby: Baby) => (
-                      <option key={baby.id} value={baby.id}>
-                        {baby.name}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="block text-sm font-medium text-slate-700">
+                    Pilih Anak (Opsional)
+                  </span>
+                  <div className="mt-2 grid gap-2 rounded-2xl border border-white/55 bg-white/25 px-4 py-3">
+                    {selectedCustomer.babies.map((baby: Baby) => {
+                      const checked = selectedBabyIds.includes(baby.id);
+                      return (
+                        <label
+                          key={baby.id}
+                          className="flex items-center justify-between gap-3 text-sm text-slate-900"
+                        >
+                          <span className="min-w-0 flex-1 truncate">
+                            {baby.name}
+                          </span>
+                          <input
+                            checked={checked}
+                            onChange={(e) => {
+                              const nextChecked = e.target.checked;
+                              setSelectedBabyIds((prev) =>
+                                nextChecked
+                                  ? [...prev, baby.id]
+                                  : prev.filter((id) => id !== baby.id),
+                              );
+                              if (nextChecked) {
+                                setSelectedTreatmentsByBaby((prev) =>
+                                  prev[baby.id] ? prev : { ...prev, [baby.id]: [] },
+                                );
+                              }
+                            }}
+                            type="checkbox"
+                          />
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -358,7 +480,6 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                   <input
                     className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                     id="date"
-                    min={new Date().toISOString().split("T")[0]}
                     name="date"
                     onChange={(e) => {
                       const nextDate = e.target.value;
@@ -449,25 +570,138 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
               3. Pilih Treatment
             </h3>
 
-            {(["BABY", "KIDS"] as const).map((cat) => {
-              const grouped = treatments.filter((t) => t.category === cat);
-              if (grouped.length === 0) return null;
+            {selectedBabyIds.length > 0 ? (
+              <div className="mt-4 space-y-6">
+                {selectedBabyIds.map((babyId) => {
+                  const baby = selectedCustomer?.babies.find((b) => b.id === babyId);
+                  const babyName = baby?.name ?? "-";
+                  const selections = selectedTreatmentsByBaby[babyId] ?? [];
+                  const selectedCategory = activeCategoryByBaby[babyId] || categories[0] || "";
+                  const grouped = treatments.filter(
+                    (t) => String(t.category) === selectedCategory,
+                  );
 
-              return (
-                <div key={cat} className="mt-4">
-                  <h4 className="mb-3 text-sm font-semibold text-slate-700">
-                    <span
-                      className={
-                        cat === "BABY"
-                          ? "inline-flex rounded-full border border-pink-200/60 bg-pink-50/50 px-3 py-1 text-xs font-medium text-pink-700"
-                          : "inline-flex rounded-full border border-sky-200/60 bg-sky-50/50 px-3 py-1 text-xs font-medium text-sky-700"
-                      }
+                  return (
+                    <div
+                      key={babyId}
+                      className="rounded-2xl border border-white/55 bg-white/25 px-4 py-4"
                     >
-                      {cat === "BABY" ? "Baby" : "Kids"}
-                    </span>
-                  </h4>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {grouped.map((treatment) => {
+                      <h4 className="text-sm font-semibold text-slate-900">{babyName}</h4>
+
+                      <div className="mt-4">
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map((cat) => {
+                            const isActive = cat === selectedCategory;
+                            return (
+                              <button
+                                key={cat}
+                                className={
+                                  isActive
+                                    ? "rounded-full border border-sky-200/70 bg-sky-50/70 px-3 py-1 text-xs font-semibold text-sky-800"
+                                    : "rounded-full border border-slate-200/70 bg-white/30 px-3 py-1 text-xs font-medium text-slate-700 transition hover:bg-white/45"
+                                }
+                                onClick={() =>
+                                  setActiveCategoryByBaby((current) => ({
+                                    ...current,
+                                    [babyId]: cat,
+                                  }))
+                                }
+                                type="button"
+                              >
+                                {formatCategoryLabel(cat)}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <div className="mt-3 grid gap-3 md:grid-cols-2">
+                          {grouped.map((treatment) => {
+                            const selected = selections.find(
+                              (t) => t.treatmentId === treatment.id,
+                            );
+
+                            return (
+                              <div
+                                key={treatment.id}
+                                className="rounded-xl border border-white/55 bg-white/25 px-4 py-3"
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-medium text-slate-900">
+                                      {treatment.name}
+                                    </p>
+                                    <p className="mt-1 text-xs text-slate-700/80">
+                                      {treatment.durationMinutes} menit •{" "}
+                                      {new Intl.NumberFormat("id-ID", {
+                                        style: "currency",
+                                        currency: "IDR",
+                                        minimumFractionDigits: 0,
+                                      }).format(treatment.basePrice)}
+                                    </p>
+                                  </div>
+
+                                  {selected ? (
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-medium text-slate-900">
+                                        x{selected.quantity}
+                                      </span>
+                                      <button
+                                        className="rounded-lg border border-rose-200/60 bg-rose-50/50 px-2 py-1 text-xs font-medium text-rose-700 transition hover:bg-rose-50/70"
+                                        onClick={() =>
+                                          handleRemoveTreatmentForBaby(babyId, treatment.id)
+                                        }
+                                        type="button"
+                                      >
+                                        Hapus
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      className="rounded-lg border border-sky-200/60 bg-sky-50/50 px-3 py-1 text-xs font-medium text-sky-700 transition hover:bg-sky-50/70"
+                                      onClick={() =>
+                                        handleAddTreatmentForBaby(babyId, treatment.id)
+                                      }
+                                      type="button"
+                                    >
+                                      Tambah
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-4">
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => {
+                    const isActive = cat === activeCategory;
+                    return (
+                      <button
+                        key={cat}
+                        className={
+                          isActive
+                            ? "rounded-full border border-sky-200/70 bg-sky-50/70 px-3 py-1 text-xs font-semibold text-sky-800"
+                            : "rounded-full border border-slate-200/70 bg-white/30 px-3 py-1 text-xs font-medium text-slate-700 transition hover:bg-white/45"
+                        }
+                        onClick={() => setActiveCategory(cat)}
+                        type="button"
+                      >
+                        {formatCategoryLabel(cat)}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {treatments
+                    .filter((t) => String(t.category) === activeCategory)
+                    .map((treatment) => {
                       const selected = selectedTreatments.find(
                         (t) => t.treatmentId === treatment.id,
                       );
@@ -514,12 +748,11 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                         </div>
                       );
                     })}
-                  </div>
                 </div>
-              );
-            })}
+              </div>
+            )}
 
-            {selectedTreatments.length > 0 ? (
+            {selectedTreatmentsFlattened.length > 0 ? (
               <div className="mt-4 rounded-xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-emerald-900">Total Harga</span>
@@ -579,7 +812,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
             <div className="flex gap-3">
               <button
                 className="flex-1 rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70 disabled:opacity-50"
-                disabled={isSubmitting || !selectedTime}
+                disabled={isSubmitting || !selectedTime || selectedTreatmentsFlattened.length === 0}
                 type="submit"
               >
                 {isSubmitting ? "Menyimpan..." : "Buat Reservasi"}

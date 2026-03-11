@@ -107,6 +107,8 @@ enum ReservationAuditAction {
 enum TreatmentCategory {
     BABY
     KIDS
+    IBU
+    SPESIAL
 }
 
 enum NotificationType {
@@ -159,6 +161,7 @@ model Baby {
     deletedAt  DateTime?
     customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
     reservations Reservation[]
+    reservationItems ReservationTreatment[]
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @updatedAt
 
@@ -227,18 +230,21 @@ model ReservationTreatment {
     id              String      @id @default(cuid())
     reservationId   String
     treatmentId     String
+    babyId          String?
     quantity        Int         @default(1)
     unitPrice       Decimal     @db.Decimal(10, 2)
     durationMinutes Int
     notes           String?     @db.Text
-    reservation     Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
-    treatment       Treatment   @relation(fields: [treatmentId], references: [id], onDelete: Restrict)
+    reservation     Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade, map: "fk_reservation_treatment_reservation")
+    treatment       Treatment   @relation(fields: [treatmentId], references: [id], onDelete: Restrict, map: "fk_reservation_treatment_treatment")
+    baby            Baby?       @relation(fields: [babyId], references: [id], onDelete: SetNull, map: "fk_reservation_treatment_baby")
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
 
-    @@unique([reservationId, treatmentId])
+    @@unique([reservationId, treatmentId, babyId])
     @@index([reservationId])
     @@index([treatmentId])
+    @@index([babyId])
 }
 
 model ReservationAuditLog {
@@ -249,8 +255,8 @@ model ReservationAuditLog {
     toStatus      ReservationStatus?
     actorId       String?
     message       String?              @db.Text
-    reservation   Reservation          @relation(fields: [reservationId], references: [id], onDelete: Cascade)
-    actor         User?                @relation("ReservationAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+    reservation   Reservation          @relation(fields: [reservationId], references: [id], onDelete: Cascade, map: "fk_reservation_audit_reservation")
+    actor         User?                @relation("ReservationAuditActor", fields: [actorId], references: [id], onDelete: SetNull, map: "fk_reservation_audit_actor")
     createdAt     DateTime             @default(now())
     updatedAt     DateTime             @updatedAt
 

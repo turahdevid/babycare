@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "~/app/(admin)/_components/glass-card";
 import { PrintReceiptButton } from "./_components/print-receipt-button";
 
@@ -24,6 +23,12 @@ function formatCurrency(amount: number) {
 }
 
 type Params = Promise<{ id: string }>;
+
+type ReservationBaby = {
+  id: string;
+  name: string;
+  birthDate?: Date | null;
+};
 
 export default async function ReservationReceiptPage(props: { params: Params }) {
   const session = await auth();
@@ -46,7 +51,8 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
       items: {
         include: {
           treatment: true,
-        },
+          baby: true,
+        } as any,
       },
       auditLogs: {
         where: { action: "COMPLETE" },
@@ -68,7 +74,7 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
   }
 
   const totalPrice = reservation.items.reduce(
-    (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+    (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
     0,
   );
 
@@ -77,12 +83,39 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
   const storedTotal = reservation.totalPrice?.toNumber();
 
   const subtotalPrice = storedSubtotal ?? totalPrice;
-  const discountPercent = reservation.discountPercent ?? null;
-  const discountAmount = storedDiscountAmount ?? (discountPercent ? (subtotalPrice * discountPercent) / 100 : 0);
+  const discountPercent = reservation.discountPercent;
+  const discountAmount =
+    storedDiscountAmount ??
+    (typeof discountPercent === "number" && discountPercent > 0
+      ? (subtotalPrice * discountPercent) / 100
+      : 0);
+  const hasDiscount =
+    (typeof discountPercent === "number" && discountPercent > 0) ||
+    discountAmount > 0;
   const finalTotal = storedTotal ?? Math.max(subtotalPrice - discountAmount, 0);
 
   const cashier = reservation.auditLogs[0]?.actor;
   const cashierText = cashier?.name ?? cashier?.email ?? "-";
+
+  const reservationBabies = (() => {
+    const map = new Map<string, ReservationBaby>();
+
+    for (const item of reservation.items as any[]) {
+      const baby = (item?.baby ?? null) as ReservationBaby | null;
+      if (baby?.id) {
+        map.set(baby.id, baby);
+      }
+    }
+
+    const primaryBaby = (reservation.baby ?? null) as unknown as ReservationBaby | null;
+    if (primaryBaby?.id) {
+      map.set(primaryBaby.id, primaryBaby);
+    }
+
+    return Array.from(map.values());
+  })();
+
+  const hasMultipleBabies = reservationBabies.length > 1;
 
   return (
     <section className="grid gap-6">
@@ -137,14 +170,13 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
             </div>
 
             <div className="flex items-start justify-between gap-4">
-              <span className="text-slate-700/80">Baby</span>
+              <span className="text-slate-700/80">Anak</span>
               <span className="text-right font-medium text-slate-900">
-                {reservation.baby?.name ?? "-"}
-                {reservation.baby?.birthDate ? (
-                  <span className="ml-1 text-xs font-normal text-slate-600">
-                    ({calculateAge(reservation.baby.birthDate)})
-                  </span>
-                ) : null}
+                {reservationBabies.length > 0
+                  ? reservationBabies
+                      .map((baby: { name: string }) => baby.name)
+                      .join(", ")
+                  : "-"}
               </span>
             </div>
 
@@ -165,19 +197,55 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
             <h3 className="text-sm font-semibold text-slate-900">Rincian Treatment</h3>
 
             <div className="mt-3 space-y-2">
-              {reservation.items.map((item) => (
-                <div key={item.id} className="flex items-start justify-between gap-4 text-sm">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-900">{item.treatment.name}</p>
-                    <p className="mt-0.5 text-xs text-slate-700/80">
-                      {item.quantity} x {formatCurrency(item.unitPrice.toNumber())}
-                    </p>
-                  </div>
-                  <p className="text-right font-medium text-slate-900">
-                    {formatCurrency(item.unitPrice.toNumber() * item.quantity)}
-                  </p>
-                </div>
-              ))}
+              {hasMultipleBabies
+                ? reservationBabies.map((baby: { id: string; name: string }) => {
+                    const items = reservation.items.filter(
+                      (item: any) => item.babyId === baby.id,
+                    );
+                    if (items.length === 0) return null;
+
+                    return (
+                      <div key={baby.id} className="pt-2">
+                        <p className="text-xs font-semibold text-slate-900">{baby.name}</p>
+                        <div className="mt-2 space-y-2">
+                          {items.map((item: any) => (
+                            <div
+                              key={item.id}
+                              className="flex items-start justify-between gap-4 text-sm"
+                            >
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-slate-900">
+                                  {item.treatment.name}
+                                </p>
+                                <p className="mt-0.5 text-xs text-slate-700/80">
+                                  {item.quantity} x {formatCurrency(item.unitPrice.toNumber())}
+                                </p>
+                              </div>
+                              <p className="text-right font-medium text-slate-900">
+                                {formatCurrency(item.unitPrice.toNumber() * item.quantity)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                : reservation.items.map((item: any) => (
+                    <div
+                      key={item.id}
+                      className="flex items-start justify-between gap-4 text-sm"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-slate-900">{item.treatment.name}</p>
+                        <p className="mt-0.5 text-xs text-slate-700/80">
+                          {item.quantity} x {formatCurrency(item.unitPrice.toNumber())}
+                        </p>
+                      </div>
+                      <p className="text-right font-medium text-slate-900">
+                        {formatCurrency(item.unitPrice.toNumber() * item.quantity)}
+                      </p>
+                    </div>
+                  ))}
             </div>
 
             <div className="mt-4 flex items-center justify-between border-t border-slate-200/60 pt-3">
@@ -185,9 +253,14 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
               <span className="text-base font-semibold text-slate-900">{formatCurrency(subtotalPrice)}</span>
             </div>
 
-            {discountPercent ? (
+            {hasDiscount ? (
               <div className="mt-2 flex items-center justify-between text-sm">
-                <span className="text-slate-700/80">Discount ({discountPercent}%)</span>
+                <span className="text-slate-700/80">
+                  Discount
+                  {typeof discountPercent === "number" && discountPercent > 0
+                    ? ` (${discountPercent}%)`
+                    : ""}
+                </span>
                 <span className="font-medium text-slate-900">-{formatCurrency(discountAmount)}</span>
               </div>
             ) : null}

@@ -42,7 +42,7 @@ export async function fetchTransactionDetails(
     if (reservationIds.length === 0) return [];
   }
 
-  const reservations = await db.reservation.findMany({
+  const reservations = (await db.reservation.findMany(({
     where: {
       startAt: { gte: where.gte, lt: where.lt },
       ...statusFilter,
@@ -59,32 +59,57 @@ export async function fetchTransactionDetails(
       discountAmount: true,
       totalPrice: true,
       customer: { select: { motherName: true } },
-      baby: { select: { name: true } },
+      baby: { select: { id: true, name: true } },
       midwife: { select: { name: true, email: true } },
       items: {
         select: {
           quantity: true,
           unitPrice: true,
           treatment: { select: { name: true } },
-        },
+          baby: { select: { id: true, name: true } },
+        } as any,
       },
     },
     orderBy: { startAt: "desc" },
     take: 200,
-  });
+  } as any))) as any[];
 
-  return reservations.map((r) => ({
+  return reservations.map((r: any) => ({
     id: r.id,
     customerName: r.customer.motherName,
-    babyName: r.baby?.name ?? null,
+    babyName: (() => {
+      const map = new Map<string, string>();
+      for (const item of r.items as any[]) {
+        if (item.baby) map.set(item.baby.id, item.baby.name);
+      }
+      if (r.baby) map.set(r.baby.id, r.baby.name);
+      const names = Array.from(map.values());
+      return names.length > 0 ? names.join(", ") : null;
+    })(),
     midwifeName: r.midwife?.name ?? r.midwife?.email ?? null,
     startAt: r.startAt,
     status: r.status,
     serviceType: r.serviceType,
-    treatments: r.items.map((i) => `${i.treatment.name} x${i.quantity}`).join(", "),
+    treatments: (() => {
+      const map = new Map<string, string[]>();
+      for (const item of r.items as any[]) {
+        const key = item.baby?.name ?? "-";
+        const list = map.get(key) ?? [];
+        list.push(`${item.treatment?.name ?? "-"} x${item.quantity}`);
+        map.set(key, list);
+      }
+      if (map.size === 0) return "-";
+      if (map.size === 1) {
+        const only = map.values().next().value as string[];
+        return only.join(", ");
+      }
+      return Array.from(map.entries())
+        .map(([babyName, items]) => `${babyName}: ${items.join(", ")}`)
+        .join(" | ");
+    })(),
     totalPrice: (() => {
       const itemSubtotal = r.items.reduce(
-        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+        (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
         0,
       );
       const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;

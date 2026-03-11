@@ -131,7 +131,9 @@ export type ReservationAuditAction = (typeof ReservationAuditAction)[keyof typeo
 
 export const TreatmentCategory: {
   BABY: 'BABY',
-  KIDS: 'KIDS'
+  KIDS: 'KIDS',
+  IBU: 'IBU',
+  SPESIAL: 'SPESIAL'
 };
 
 export type TreatmentCategory = (typeof TreatmentCategory)[keyof typeof TreatmentCategory]
@@ -1926,10 +1928,12 @@ export namespace Prisma {
 
   export type BabyCountOutputType = {
     reservations: number
+    reservationItems: number
   }
 
   export type BabyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reservations?: boolean | BabyCountOutputTypeCountReservationsArgs
+    reservationItems?: boolean | BabyCountOutputTypeCountReservationItemsArgs
   }
 
   // Custom InputTypes
@@ -1948,6 +1952,13 @@ export namespace Prisma {
    */
   export type BabyCountOutputTypeCountReservationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReservationWhereInput
+  }
+
+  /**
+   * BabyCountOutputType without action
+   */
+  export type BabyCountOutputTypeCountReservationItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReservationTreatmentWhereInput
   }
 
 
@@ -7217,6 +7228,7 @@ export namespace Prisma {
     updatedAt?: boolean
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     reservations?: boolean | Baby$reservationsArgs<ExtArgs>
+    reservationItems?: boolean | Baby$reservationItemsArgs<ExtArgs>
     _count?: boolean | BabyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["baby"]>
 
@@ -7241,6 +7253,7 @@ export namespace Prisma {
   export type BabyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     customer?: boolean | CustomerDefaultArgs<ExtArgs>
     reservations?: boolean | Baby$reservationsArgs<ExtArgs>
+    reservationItems?: boolean | Baby$reservationItemsArgs<ExtArgs>
     _count?: boolean | BabyCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7249,6 +7262,7 @@ export namespace Prisma {
     objects: {
       customer: Prisma.$CustomerPayload<ExtArgs>
       reservations: Prisma.$ReservationPayload<ExtArgs>[]
+      reservationItems: Prisma.$ReservationTreatmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7605,6 +7619,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     customer<T extends CustomerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CustomerDefaultArgs<ExtArgs>>): Prisma__CustomerClient<$Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     reservations<T extends Baby$reservationsArgs<ExtArgs> = {}>(args?: Subset<T, Baby$reservationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reservationItems<T extends Baby$reservationItemsArgs<ExtArgs> = {}>(args?: Subset<T, Baby$reservationItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReservationTreatmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8010,6 +8025,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ReservationScalarFieldEnum | ReservationScalarFieldEnum[]
+  }
+
+  /**
+   * Baby.reservationItems
+   */
+  export type Baby$reservationItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReservationTreatment
+     */
+    select?: ReservationTreatmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReservationTreatment
+     */
+    omit?: ReservationTreatmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReservationTreatmentInclude<ExtArgs> | null
+    where?: ReservationTreatmentWhereInput
+    orderBy?: ReservationTreatmentOrderByWithRelationInput | ReservationTreatmentOrderByWithRelationInput[]
+    cursor?: ReservationTreatmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReservationTreatmentScalarFieldEnum | ReservationTreatmentScalarFieldEnum[]
   }
 
   /**
@@ -10368,6 +10407,7 @@ export namespace Prisma {
     id: string | null
     reservationId: string | null
     treatmentId: string | null
+    babyId: string | null
     quantity: number | null
     unitPrice: Decimal | null
     durationMinutes: number | null
@@ -10380,6 +10420,7 @@ export namespace Prisma {
     id: string | null
     reservationId: string | null
     treatmentId: string | null
+    babyId: string | null
     quantity: number | null
     unitPrice: Decimal | null
     durationMinutes: number | null
@@ -10392,6 +10433,7 @@ export namespace Prisma {
     id: number
     reservationId: number
     treatmentId: number
+    babyId: number
     quantity: number
     unitPrice: number
     durationMinutes: number
@@ -10418,6 +10460,7 @@ export namespace Prisma {
     id?: true
     reservationId?: true
     treatmentId?: true
+    babyId?: true
     quantity?: true
     unitPrice?: true
     durationMinutes?: true
@@ -10430,6 +10473,7 @@ export namespace Prisma {
     id?: true
     reservationId?: true
     treatmentId?: true
+    babyId?: true
     quantity?: true
     unitPrice?: true
     durationMinutes?: true
@@ -10442,6 +10486,7 @@ export namespace Prisma {
     id?: true
     reservationId?: true
     treatmentId?: true
+    babyId?: true
     quantity?: true
     unitPrice?: true
     durationMinutes?: true
@@ -10541,6 +10586,7 @@ export namespace Prisma {
     id: string
     reservationId: string
     treatmentId: string
+    babyId: string | null
     quantity: number
     unitPrice: Decimal
     durationMinutes: number
@@ -10572,6 +10618,7 @@ export namespace Prisma {
     id?: boolean
     reservationId?: boolean
     treatmentId?: boolean
+    babyId?: boolean
     quantity?: boolean
     unitPrice?: boolean
     durationMinutes?: boolean
@@ -10580,6 +10627,7 @@ export namespace Prisma {
     updatedAt?: boolean
     reservation?: boolean | ReservationDefaultArgs<ExtArgs>
     treatment?: boolean | TreatmentDefaultArgs<ExtArgs>
+    baby?: boolean | ReservationTreatment$babyArgs<ExtArgs>
   }, ExtArgs["result"]["reservationTreatment"]>
 
 
@@ -10588,6 +10636,7 @@ export namespace Prisma {
     id?: boolean
     reservationId?: boolean
     treatmentId?: boolean
+    babyId?: boolean
     quantity?: boolean
     unitPrice?: boolean
     durationMinutes?: boolean
@@ -10596,10 +10645,11 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ReservationTreatmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "reservationId" | "treatmentId" | "quantity" | "unitPrice" | "durationMinutes" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["reservationTreatment"]>
+  export type ReservationTreatmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "reservationId" | "treatmentId" | "babyId" | "quantity" | "unitPrice" | "durationMinutes" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["reservationTreatment"]>
   export type ReservationTreatmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reservation?: boolean | ReservationDefaultArgs<ExtArgs>
     treatment?: boolean | TreatmentDefaultArgs<ExtArgs>
+    baby?: boolean | ReservationTreatment$babyArgs<ExtArgs>
   }
 
   export type $ReservationTreatmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10607,11 +10657,13 @@ export namespace Prisma {
     objects: {
       reservation: Prisma.$ReservationPayload<ExtArgs>
       treatment: Prisma.$TreatmentPayload<ExtArgs>
+      baby: Prisma.$BabyPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       reservationId: string
       treatmentId: string
+      babyId: string | null
       quantity: number
       unitPrice: Prisma.Decimal
       durationMinutes: number
@@ -10960,6 +11012,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     reservation<T extends ReservationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ReservationDefaultArgs<ExtArgs>>): Prisma__ReservationClient<$Result.GetResult<Prisma.$ReservationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     treatment<T extends TreatmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TreatmentDefaultArgs<ExtArgs>>): Prisma__TreatmentClient<$Result.GetResult<Prisma.$TreatmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    baby<T extends ReservationTreatment$babyArgs<ExtArgs> = {}>(args?: Subset<T, ReservationTreatment$babyArgs<ExtArgs>>): Prisma__BabyClient<$Result.GetResult<Prisma.$BabyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10992,6 +11045,7 @@ export namespace Prisma {
     readonly id: FieldRef<"ReservationTreatment", 'String'>
     readonly reservationId: FieldRef<"ReservationTreatment", 'String'>
     readonly treatmentId: FieldRef<"ReservationTreatment", 'String'>
+    readonly babyId: FieldRef<"ReservationTreatment", 'String'>
     readonly quantity: FieldRef<"ReservationTreatment", 'Int'>
     readonly unitPrice: FieldRef<"ReservationTreatment", 'Decimal'>
     readonly durationMinutes: FieldRef<"ReservationTreatment", 'Int'>
@@ -11338,6 +11392,25 @@ export namespace Prisma {
      * Limit how many ReservationTreatments to delete.
      */
     limit?: number
+  }
+
+  /**
+   * ReservationTreatment.baby
+   */
+  export type ReservationTreatment$babyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Baby
+     */
+    select?: BabySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Baby
+     */
+    omit?: BabyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BabyInclude<ExtArgs> | null
+    where?: BabyWhereInput
   }
 
   /**
@@ -13525,6 +13598,7 @@ export namespace Prisma {
     id: 'id',
     reservationId: 'reservationId',
     treatmentId: 'treatmentId',
+    babyId: 'babyId',
     quantity: 'quantity',
     unitPrice: 'unitPrice',
     durationMinutes: 'durationMinutes',
@@ -13678,6 +13752,7 @@ export namespace Prisma {
     id: 'id',
     reservationId: 'reservationId',
     treatmentId: 'treatmentId',
+    babyId: 'babyId',
     notes: 'notes'
   };
 
@@ -14199,6 +14274,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Baby"> | Date | string
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
     reservations?: ReservationListRelationFilter
+    reservationItems?: ReservationTreatmentListRelationFilter
   }
 
   export type BabyOrderByWithRelationInput = {
@@ -14216,6 +14292,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     customer?: CustomerOrderByWithRelationInput
     reservations?: ReservationOrderByRelationAggregateInput
+    reservationItems?: ReservationTreatmentOrderByRelationAggregateInput
     _relevance?: BabyOrderByRelevanceInput
   }
 
@@ -14237,6 +14314,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Baby"> | Date | string
     customer?: XOR<CustomerScalarRelationFilter, CustomerWhereInput>
     reservations?: ReservationListRelationFilter
+    reservationItems?: ReservationTreatmentListRelationFilter
   }, "id">
 
   export type BabyOrderByWithAggregationInput = {
@@ -14509,6 +14587,7 @@ export namespace Prisma {
     id?: StringFilter<"ReservationTreatment"> | string
     reservationId?: StringFilter<"ReservationTreatment"> | string
     treatmentId?: StringFilter<"ReservationTreatment"> | string
+    babyId?: StringNullableFilter<"ReservationTreatment"> | string | null
     quantity?: IntFilter<"ReservationTreatment"> | number
     unitPrice?: DecimalFilter<"ReservationTreatment"> | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFilter<"ReservationTreatment"> | number
@@ -14517,12 +14596,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ReservationTreatment"> | Date | string
     reservation?: XOR<ReservationScalarRelationFilter, ReservationWhereInput>
     treatment?: XOR<TreatmentScalarRelationFilter, TreatmentWhereInput>
+    baby?: XOR<BabyNullableScalarRelationFilter, BabyWhereInput> | null
   }
 
   export type ReservationTreatmentOrderByWithRelationInput = {
     id?: SortOrder
     reservationId?: SortOrder
     treatmentId?: SortOrder
+    babyId?: SortOrderInput | SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
     durationMinutes?: SortOrder
@@ -14531,17 +14612,19 @@ export namespace Prisma {
     updatedAt?: SortOrder
     reservation?: ReservationOrderByWithRelationInput
     treatment?: TreatmentOrderByWithRelationInput
+    baby?: BabyOrderByWithRelationInput
     _relevance?: ReservationTreatmentOrderByRelevanceInput
   }
 
   export type ReservationTreatmentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    reservationId_treatmentId?: ReservationTreatmentReservationIdTreatmentIdCompoundUniqueInput
+    reservationId_treatmentId_babyId?: ReservationTreatmentReservationIdTreatmentIdBabyIdCompoundUniqueInput
     AND?: ReservationTreatmentWhereInput | ReservationTreatmentWhereInput[]
     OR?: ReservationTreatmentWhereInput[]
     NOT?: ReservationTreatmentWhereInput | ReservationTreatmentWhereInput[]
     reservationId?: StringFilter<"ReservationTreatment"> | string
     treatmentId?: StringFilter<"ReservationTreatment"> | string
+    babyId?: StringNullableFilter<"ReservationTreatment"> | string | null
     quantity?: IntFilter<"ReservationTreatment"> | number
     unitPrice?: DecimalFilter<"ReservationTreatment"> | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFilter<"ReservationTreatment"> | number
@@ -14550,12 +14633,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ReservationTreatment"> | Date | string
     reservation?: XOR<ReservationScalarRelationFilter, ReservationWhereInput>
     treatment?: XOR<TreatmentScalarRelationFilter, TreatmentWhereInput>
-  }, "id" | "reservationId_treatmentId">
+    baby?: XOR<BabyNullableScalarRelationFilter, BabyWhereInput> | null
+  }, "id" | "reservationId_treatmentId_babyId">
 
   export type ReservationTreatmentOrderByWithAggregationInput = {
     id?: SortOrder
     reservationId?: SortOrder
     treatmentId?: SortOrder
+    babyId?: SortOrderInput | SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
     durationMinutes?: SortOrder
@@ -14576,6 +14661,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"ReservationTreatment"> | string
     reservationId?: StringWithAggregatesFilter<"ReservationTreatment"> | string
     treatmentId?: StringWithAggregatesFilter<"ReservationTreatment"> | string
+    babyId?: StringNullableWithAggregatesFilter<"ReservationTreatment"> | string | null
     quantity?: IntWithAggregatesFilter<"ReservationTreatment"> | number
     unitPrice?: DecimalWithAggregatesFilter<"ReservationTreatment"> | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntWithAggregatesFilter<"ReservationTreatment"> | number
@@ -15151,6 +15237,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     customer: CustomerCreateNestedOneWithoutBabiesInput
     reservations?: ReservationCreateNestedManyWithoutBabyInput
+    reservationItems?: ReservationTreatmentCreateNestedManyWithoutBabyInput
   }
 
   export type BabyUncheckedCreateInput = {
@@ -15167,6 +15254,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     reservations?: ReservationUncheckedCreateNestedManyWithoutBabyInput
+    reservationItems?: ReservationTreatmentUncheckedCreateNestedManyWithoutBabyInput
   }
 
   export type BabyUpdateInput = {
@@ -15183,6 +15271,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     customer?: CustomerUpdateOneRequiredWithoutBabiesNestedInput
     reservations?: ReservationUpdateManyWithoutBabyNestedInput
+    reservationItems?: ReservationTreatmentUpdateManyWithoutBabyNestedInput
   }
 
   export type BabyUncheckedUpdateInput = {
@@ -15199,6 +15288,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservations?: ReservationUncheckedUpdateManyWithoutBabyNestedInput
+    reservationItems?: ReservationTreatmentUncheckedUpdateManyWithoutBabyNestedInput
   }
 
   export type BabyCreateManyInput = {
@@ -15513,12 +15603,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     reservation: ReservationCreateNestedOneWithoutItemsInput
     treatment: TreatmentCreateNestedOneWithoutReservationItemsInput
+    baby?: BabyCreateNestedOneWithoutReservationItemsInput
   }
 
   export type ReservationTreatmentUncheckedCreateInput = {
     id?: string
     reservationId: string
     treatmentId: string
+    babyId?: string | null
     quantity?: number
     unitPrice: Decimal | DecimalJsLike | number | string
     durationMinutes: number
@@ -15537,12 +15629,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservation?: ReservationUpdateOneRequiredWithoutItemsNestedInput
     treatment?: TreatmentUpdateOneRequiredWithoutReservationItemsNestedInput
+    baby?: BabyUpdateOneWithoutReservationItemsNestedInput
   }
 
   export type ReservationTreatmentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     reservationId?: StringFieldUpdateOperationsInput | string
     treatmentId?: StringFieldUpdateOperationsInput | string
+    babyId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFieldUpdateOperationsInput | number
@@ -15555,6 +15649,7 @@ export namespace Prisma {
     id?: string
     reservationId: string
     treatmentId: string
+    babyId?: string | null
     quantity?: number
     unitPrice: Decimal | DecimalJsLike | number | string
     durationMinutes: number
@@ -15577,6 +15672,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     reservationId?: StringFieldUpdateOperationsInput | string
     treatmentId?: StringFieldUpdateOperationsInput | string
+    babyId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFieldUpdateOperationsInput | number
@@ -16204,6 +16300,16 @@ export namespace Prisma {
     isNot?: CustomerWhereInput
   }
 
+  export type ReservationTreatmentListRelationFilter = {
+    every?: ReservationTreatmentWhereInput
+    some?: ReservationTreatmentWhereInput
+    none?: ReservationTreatmentWhereInput
+  }
+
+  export type ReservationTreatmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type BabyOrderByRelevanceInput = {
     fields: BabyOrderByRelevanceFieldEnum | BabyOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -16297,16 +16403,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type ReservationTreatmentListRelationFilter = {
-    every?: ReservationTreatmentWhereInput
-    some?: ReservationTreatmentWhereInput
-    none?: ReservationTreatmentWhereInput
-  }
-
-  export type ReservationTreatmentOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type TreatmentOrderByRelevanceInput = {
@@ -16626,15 +16722,17 @@ export namespace Prisma {
     search: string
   }
 
-  export type ReservationTreatmentReservationIdTreatmentIdCompoundUniqueInput = {
+  export type ReservationTreatmentReservationIdTreatmentIdBabyIdCompoundUniqueInput = {
     reservationId: string
     treatmentId: string
+    babyId: string
   }
 
   export type ReservationTreatmentCountOrderByAggregateInput = {
     id?: SortOrder
     reservationId?: SortOrder
     treatmentId?: SortOrder
+    babyId?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
     durationMinutes?: SortOrder
@@ -16653,6 +16751,7 @@ export namespace Prisma {
     id?: SortOrder
     reservationId?: SortOrder
     treatmentId?: SortOrder
+    babyId?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
     durationMinutes?: SortOrder
@@ -16665,6 +16764,7 @@ export namespace Prisma {
     id?: SortOrder
     reservationId?: SortOrder
     treatmentId?: SortOrder
+    babyId?: SortOrder
     quantity?: SortOrder
     unitPrice?: SortOrder
     durationMinutes?: SortOrder
@@ -17202,11 +17302,25 @@ export namespace Prisma {
     connect?: ReservationWhereUniqueInput | ReservationWhereUniqueInput[]
   }
 
+  export type ReservationTreatmentCreateNestedManyWithoutBabyInput = {
+    create?: XOR<ReservationTreatmentCreateWithoutBabyInput, ReservationTreatmentUncheckedCreateWithoutBabyInput> | ReservationTreatmentCreateWithoutBabyInput[] | ReservationTreatmentUncheckedCreateWithoutBabyInput[]
+    connectOrCreate?: ReservationTreatmentCreateOrConnectWithoutBabyInput | ReservationTreatmentCreateOrConnectWithoutBabyInput[]
+    createMany?: ReservationTreatmentCreateManyBabyInputEnvelope
+    connect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+  }
+
   export type ReservationUncheckedCreateNestedManyWithoutBabyInput = {
     create?: XOR<ReservationCreateWithoutBabyInput, ReservationUncheckedCreateWithoutBabyInput> | ReservationCreateWithoutBabyInput[] | ReservationUncheckedCreateWithoutBabyInput[]
     connectOrCreate?: ReservationCreateOrConnectWithoutBabyInput | ReservationCreateOrConnectWithoutBabyInput[]
     createMany?: ReservationCreateManyBabyInputEnvelope
     connect?: ReservationWhereUniqueInput | ReservationWhereUniqueInput[]
+  }
+
+  export type ReservationTreatmentUncheckedCreateNestedManyWithoutBabyInput = {
+    create?: XOR<ReservationTreatmentCreateWithoutBabyInput, ReservationTreatmentUncheckedCreateWithoutBabyInput> | ReservationTreatmentCreateWithoutBabyInput[] | ReservationTreatmentUncheckedCreateWithoutBabyInput[]
+    connectOrCreate?: ReservationTreatmentCreateOrConnectWithoutBabyInput | ReservationTreatmentCreateOrConnectWithoutBabyInput[]
+    createMany?: ReservationTreatmentCreateManyBabyInputEnvelope
+    connect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
   }
 
   export type NullableEnumBabyGenderFieldUpdateOperationsInput = {
@@ -17235,6 +17349,20 @@ export namespace Prisma {
     deleteMany?: ReservationScalarWhereInput | ReservationScalarWhereInput[]
   }
 
+  export type ReservationTreatmentUpdateManyWithoutBabyNestedInput = {
+    create?: XOR<ReservationTreatmentCreateWithoutBabyInput, ReservationTreatmentUncheckedCreateWithoutBabyInput> | ReservationTreatmentCreateWithoutBabyInput[] | ReservationTreatmentUncheckedCreateWithoutBabyInput[]
+    connectOrCreate?: ReservationTreatmentCreateOrConnectWithoutBabyInput | ReservationTreatmentCreateOrConnectWithoutBabyInput[]
+    upsert?: ReservationTreatmentUpsertWithWhereUniqueWithoutBabyInput | ReservationTreatmentUpsertWithWhereUniqueWithoutBabyInput[]
+    createMany?: ReservationTreatmentCreateManyBabyInputEnvelope
+    set?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    disconnect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    delete?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    connect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    update?: ReservationTreatmentUpdateWithWhereUniqueWithoutBabyInput | ReservationTreatmentUpdateWithWhereUniqueWithoutBabyInput[]
+    updateMany?: ReservationTreatmentUpdateManyWithWhereWithoutBabyInput | ReservationTreatmentUpdateManyWithWhereWithoutBabyInput[]
+    deleteMany?: ReservationTreatmentScalarWhereInput | ReservationTreatmentScalarWhereInput[]
+  }
+
   export type ReservationUncheckedUpdateManyWithoutBabyNestedInput = {
     create?: XOR<ReservationCreateWithoutBabyInput, ReservationUncheckedCreateWithoutBabyInput> | ReservationCreateWithoutBabyInput[] | ReservationUncheckedCreateWithoutBabyInput[]
     connectOrCreate?: ReservationCreateOrConnectWithoutBabyInput | ReservationCreateOrConnectWithoutBabyInput[]
@@ -17247,6 +17375,20 @@ export namespace Prisma {
     update?: ReservationUpdateWithWhereUniqueWithoutBabyInput | ReservationUpdateWithWhereUniqueWithoutBabyInput[]
     updateMany?: ReservationUpdateManyWithWhereWithoutBabyInput | ReservationUpdateManyWithWhereWithoutBabyInput[]
     deleteMany?: ReservationScalarWhereInput | ReservationScalarWhereInput[]
+  }
+
+  export type ReservationTreatmentUncheckedUpdateManyWithoutBabyNestedInput = {
+    create?: XOR<ReservationTreatmentCreateWithoutBabyInput, ReservationTreatmentUncheckedCreateWithoutBabyInput> | ReservationTreatmentCreateWithoutBabyInput[] | ReservationTreatmentUncheckedCreateWithoutBabyInput[]
+    connectOrCreate?: ReservationTreatmentCreateOrConnectWithoutBabyInput | ReservationTreatmentCreateOrConnectWithoutBabyInput[]
+    upsert?: ReservationTreatmentUpsertWithWhereUniqueWithoutBabyInput | ReservationTreatmentUpsertWithWhereUniqueWithoutBabyInput[]
+    createMany?: ReservationTreatmentCreateManyBabyInputEnvelope
+    set?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    disconnect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    delete?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    connect?: ReservationTreatmentWhereUniqueInput | ReservationTreatmentWhereUniqueInput[]
+    update?: ReservationTreatmentUpdateWithWhereUniqueWithoutBabyInput | ReservationTreatmentUpdateWithWhereUniqueWithoutBabyInput[]
+    updateMany?: ReservationTreatmentUpdateManyWithWhereWithoutBabyInput | ReservationTreatmentUpdateManyWithWhereWithoutBabyInput[]
+    deleteMany?: ReservationTreatmentScalarWhereInput | ReservationTreatmentScalarWhereInput[]
   }
 
   export type ReservationTreatmentCreateNestedManyWithoutTreatmentInput = {
@@ -17523,6 +17665,12 @@ export namespace Prisma {
     connect?: TreatmentWhereUniqueInput
   }
 
+  export type BabyCreateNestedOneWithoutReservationItemsInput = {
+    create?: XOR<BabyCreateWithoutReservationItemsInput, BabyUncheckedCreateWithoutReservationItemsInput>
+    connectOrCreate?: BabyCreateOrConnectWithoutReservationItemsInput
+    connect?: BabyWhereUniqueInput
+  }
+
   export type ReservationUpdateOneRequiredWithoutItemsNestedInput = {
     create?: XOR<ReservationCreateWithoutItemsInput, ReservationUncheckedCreateWithoutItemsInput>
     connectOrCreate?: ReservationCreateOrConnectWithoutItemsInput
@@ -17537,6 +17685,16 @@ export namespace Prisma {
     upsert?: TreatmentUpsertWithoutReservationItemsInput
     connect?: TreatmentWhereUniqueInput
     update?: XOR<XOR<TreatmentUpdateToOneWithWhereWithoutReservationItemsInput, TreatmentUpdateWithoutReservationItemsInput>, TreatmentUncheckedUpdateWithoutReservationItemsInput>
+  }
+
+  export type BabyUpdateOneWithoutReservationItemsNestedInput = {
+    create?: XOR<BabyCreateWithoutReservationItemsInput, BabyUncheckedCreateWithoutReservationItemsInput>
+    connectOrCreate?: BabyCreateOrConnectWithoutReservationItemsInput
+    upsert?: BabyUpsertWithoutReservationItemsInput
+    disconnect?: BabyWhereInput | boolean
+    delete?: BabyWhereInput | boolean
+    connect?: BabyWhereUniqueInput
+    update?: XOR<XOR<BabyUpdateToOneWithWhereWithoutReservationItemsInput, BabyUpdateWithoutReservationItemsInput>, BabyUncheckedUpdateWithoutReservationItemsInput>
   }
 
   export type ReservationCreateNestedOneWithoutAuditLogsInput = {
@@ -18571,6 +18729,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     reservations?: ReservationCreateNestedManyWithoutBabyInput
+    reservationItems?: ReservationTreatmentCreateNestedManyWithoutBabyInput
   }
 
   export type BabyUncheckedCreateWithoutCustomerInput = {
@@ -18586,6 +18745,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     reservations?: ReservationUncheckedCreateNestedManyWithoutBabyInput
+    reservationItems?: ReservationTreatmentUncheckedCreateNestedManyWithoutBabyInput
   }
 
   export type BabyCreateOrConnectWithoutCustomerInput = {
@@ -18797,6 +18957,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ReservationTreatmentCreateWithoutBabyInput = {
+    id?: string
+    quantity?: number
+    unitPrice: Decimal | DecimalJsLike | number | string
+    durationMinutes: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reservation: ReservationCreateNestedOneWithoutItemsInput
+    treatment: TreatmentCreateNestedOneWithoutReservationItemsInput
+  }
+
+  export type ReservationTreatmentUncheckedCreateWithoutBabyInput = {
+    id?: string
+    reservationId: string
+    treatmentId: string
+    quantity?: number
+    unitPrice: Decimal | DecimalJsLike | number | string
+    durationMinutes: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReservationTreatmentCreateOrConnectWithoutBabyInput = {
+    where: ReservationTreatmentWhereUniqueInput
+    create: XOR<ReservationTreatmentCreateWithoutBabyInput, ReservationTreatmentUncheckedCreateWithoutBabyInput>
+  }
+
+  export type ReservationTreatmentCreateManyBabyInputEnvelope = {
+    data: ReservationTreatmentCreateManyBabyInput | ReservationTreatmentCreateManyBabyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CustomerUpsertWithoutBabiesInput = {
     update: XOR<CustomerUpdateWithoutBabiesInput, CustomerUncheckedUpdateWithoutBabiesInput>
     create: XOR<CustomerCreateWithoutBabiesInput, CustomerUncheckedCreateWithoutBabiesInput>
@@ -18852,6 +19046,38 @@ export namespace Prisma {
     data: XOR<ReservationUpdateManyMutationInput, ReservationUncheckedUpdateManyWithoutBabyInput>
   }
 
+  export type ReservationTreatmentUpsertWithWhereUniqueWithoutBabyInput = {
+    where: ReservationTreatmentWhereUniqueInput
+    update: XOR<ReservationTreatmentUpdateWithoutBabyInput, ReservationTreatmentUncheckedUpdateWithoutBabyInput>
+    create: XOR<ReservationTreatmentCreateWithoutBabyInput, ReservationTreatmentUncheckedCreateWithoutBabyInput>
+  }
+
+  export type ReservationTreatmentUpdateWithWhereUniqueWithoutBabyInput = {
+    where: ReservationTreatmentWhereUniqueInput
+    data: XOR<ReservationTreatmentUpdateWithoutBabyInput, ReservationTreatmentUncheckedUpdateWithoutBabyInput>
+  }
+
+  export type ReservationTreatmentUpdateManyWithWhereWithoutBabyInput = {
+    where: ReservationTreatmentScalarWhereInput
+    data: XOR<ReservationTreatmentUpdateManyMutationInput, ReservationTreatmentUncheckedUpdateManyWithoutBabyInput>
+  }
+
+  export type ReservationTreatmentScalarWhereInput = {
+    AND?: ReservationTreatmentScalarWhereInput | ReservationTreatmentScalarWhereInput[]
+    OR?: ReservationTreatmentScalarWhereInput[]
+    NOT?: ReservationTreatmentScalarWhereInput | ReservationTreatmentScalarWhereInput[]
+    id?: StringFilter<"ReservationTreatment"> | string
+    reservationId?: StringFilter<"ReservationTreatment"> | string
+    treatmentId?: StringFilter<"ReservationTreatment"> | string
+    babyId?: StringNullableFilter<"ReservationTreatment"> | string | null
+    quantity?: IntFilter<"ReservationTreatment"> | number
+    unitPrice?: DecimalFilter<"ReservationTreatment"> | Decimal | DecimalJsLike | number | string
+    durationMinutes?: IntFilter<"ReservationTreatment"> | number
+    notes?: StringNullableFilter<"ReservationTreatment"> | string | null
+    createdAt?: DateTimeFilter<"ReservationTreatment"> | Date | string
+    updatedAt?: DateTimeFilter<"ReservationTreatment"> | Date | string
+  }
+
   export type ReservationTreatmentCreateWithoutTreatmentInput = {
     id?: string
     quantity?: number
@@ -18861,11 +19087,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     reservation: ReservationCreateNestedOneWithoutItemsInput
+    baby?: BabyCreateNestedOneWithoutReservationItemsInput
   }
 
   export type ReservationTreatmentUncheckedCreateWithoutTreatmentInput = {
     id?: string
     reservationId: string
+    babyId?: string | null
     quantity?: number
     unitPrice: Decimal | DecimalJsLike | number | string
     durationMinutes: number
@@ -18898,21 +19126,6 @@ export namespace Prisma {
   export type ReservationTreatmentUpdateManyWithWhereWithoutTreatmentInput = {
     where: ReservationTreatmentScalarWhereInput
     data: XOR<ReservationTreatmentUpdateManyMutationInput, ReservationTreatmentUncheckedUpdateManyWithoutTreatmentInput>
-  }
-
-  export type ReservationTreatmentScalarWhereInput = {
-    AND?: ReservationTreatmentScalarWhereInput | ReservationTreatmentScalarWhereInput[]
-    OR?: ReservationTreatmentScalarWhereInput[]
-    NOT?: ReservationTreatmentScalarWhereInput | ReservationTreatmentScalarWhereInput[]
-    id?: StringFilter<"ReservationTreatment"> | string
-    reservationId?: StringFilter<"ReservationTreatment"> | string
-    treatmentId?: StringFilter<"ReservationTreatment"> | string
-    quantity?: IntFilter<"ReservationTreatment"> | number
-    unitPrice?: DecimalFilter<"ReservationTreatment"> | Decimal | DecimalJsLike | number | string
-    durationMinutes?: IntFilter<"ReservationTreatment"> | number
-    notes?: StringNullableFilter<"ReservationTreatment"> | string | null
-    createdAt?: DateTimeFilter<"ReservationTreatment"> | Date | string
-    updatedAt?: DateTimeFilter<"ReservationTreatment"> | Date | string
   }
 
   export type CustomerCreateWithoutReservationsInput = {
@@ -18961,6 +19174,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     customer: CustomerCreateNestedOneWithoutBabiesInput
+    reservationItems?: ReservationTreatmentCreateNestedManyWithoutBabyInput
   }
 
   export type BabyUncheckedCreateWithoutReservationsInput = {
@@ -18976,6 +19190,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    reservationItems?: ReservationTreatmentUncheckedCreateNestedManyWithoutBabyInput
   }
 
   export type BabyCreateOrConnectWithoutReservationsInput = {
@@ -19025,11 +19240,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     treatment: TreatmentCreateNestedOneWithoutReservationItemsInput
+    baby?: BabyCreateNestedOneWithoutReservationItemsInput
   }
 
   export type ReservationTreatmentUncheckedCreateWithoutReservationInput = {
     id?: string
     treatmentId: string
+    babyId?: string | null
     quantity?: number
     unitPrice: Decimal | DecimalJsLike | number | string
     durationMinutes: number
@@ -19177,6 +19394,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     customer?: CustomerUpdateOneRequiredWithoutBabiesNestedInput
+    reservationItems?: ReservationTreatmentUpdateManyWithoutBabyNestedInput
   }
 
   export type BabyUncheckedUpdateWithoutReservationsInput = {
@@ -19192,6 +19410,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reservationItems?: ReservationTreatmentUncheckedUpdateManyWithoutBabyNestedInput
   }
 
   export type UserUpsertWithoutMidwifeReservationsInput = {
@@ -19365,6 +19584,43 @@ export namespace Prisma {
     create: XOR<TreatmentCreateWithoutReservationItemsInput, TreatmentUncheckedCreateWithoutReservationItemsInput>
   }
 
+  export type BabyCreateWithoutReservationItemsInput = {
+    id?: string
+    name: string
+    gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
+    birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
+    notes?: string | null
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customer: CustomerCreateNestedOneWithoutBabiesInput
+    reservations?: ReservationCreateNestedManyWithoutBabyInput
+  }
+
+  export type BabyUncheckedCreateWithoutReservationItemsInput = {
+    id?: string
+    customerId: string
+    name: string
+    gender?: $Enums.BabyGender | null
+    birthPlace?: string | null
+    birthDate?: Date | string | null
+    allergy?: string | null
+    ageAtTreatment?: string | null
+    notes?: string | null
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reservations?: ReservationUncheckedCreateNestedManyWithoutBabyInput
+  }
+
+  export type BabyCreateOrConnectWithoutReservationItemsInput = {
+    where: BabyWhereUniqueInput
+    create: XOR<BabyCreateWithoutReservationItemsInput, BabyUncheckedCreateWithoutReservationItemsInput>
+  }
+
   export type ReservationUpsertWithoutItemsInput = {
     update: XOR<ReservationUpdateWithoutItemsInput, ReservationUncheckedUpdateWithoutItemsInput>
     create: XOR<ReservationCreateWithoutItemsInput, ReservationUncheckedCreateWithoutItemsInput>
@@ -19459,6 +19715,49 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BabyUpsertWithoutReservationItemsInput = {
+    update: XOR<BabyUpdateWithoutReservationItemsInput, BabyUncheckedUpdateWithoutReservationItemsInput>
+    create: XOR<BabyCreateWithoutReservationItemsInput, BabyUncheckedCreateWithoutReservationItemsInput>
+    where?: BabyWhereInput
+  }
+
+  export type BabyUpdateToOneWithWhereWithoutReservationItemsInput = {
+    where?: BabyWhereInput
+    data: XOR<BabyUpdateWithoutReservationItemsInput, BabyUncheckedUpdateWithoutReservationItemsInput>
+  }
+
+  export type BabyUpdateWithoutReservationItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customer?: CustomerUpdateOneRequiredWithoutBabiesNestedInput
+    reservations?: ReservationUpdateManyWithoutBabyNestedInput
+  }
+
+  export type BabyUncheckedUpdateWithoutReservationItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customerId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gender?: NullableEnumBabyGenderFieldUpdateOperationsInput | $Enums.BabyGender | null
+    birthPlace?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    allergy?: NullableStringFieldUpdateOperationsInput | string | null
+    ageAtTreatment?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reservations?: ReservationUncheckedUpdateManyWithoutBabyNestedInput
   }
 
   export type ReservationCreateWithoutAuditLogsInput = {
@@ -20143,6 +20442,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservations?: ReservationUpdateManyWithoutBabyNestedInput
+    reservationItems?: ReservationTreatmentUpdateManyWithoutBabyNestedInput
   }
 
   export type BabyUncheckedUpdateWithoutCustomerInput = {
@@ -20158,6 +20458,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservations?: ReservationUncheckedUpdateManyWithoutBabyNestedInput
+    reservationItems?: ReservationTreatmentUncheckedUpdateManyWithoutBabyNestedInput
   }
 
   export type BabyUncheckedUpdateManyWithoutCustomerInput = {
@@ -20264,6 +20565,18 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ReservationTreatmentCreateManyBabyInput = {
+    id?: string
+    reservationId: string
+    treatmentId: string
+    quantity?: number
+    unitPrice: Decimal | DecimalJsLike | number | string
+    durationMinutes: number
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ReservationUpdateWithoutBabyInput = {
     id?: StringFieldUpdateOperationsInput | string
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20333,9 +20646,46 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ReservationTreatmentUpdateWithoutBabyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    durationMinutes?: IntFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reservation?: ReservationUpdateOneRequiredWithoutItemsNestedInput
+    treatment?: TreatmentUpdateOneRequiredWithoutReservationItemsNestedInput
+  }
+
+  export type ReservationTreatmentUncheckedUpdateWithoutBabyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reservationId?: StringFieldUpdateOperationsInput | string
+    treatmentId?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    durationMinutes?: IntFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReservationTreatmentUncheckedUpdateManyWithoutBabyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reservationId?: StringFieldUpdateOperationsInput | string
+    treatmentId?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    durationMinutes?: IntFieldUpdateOperationsInput | number
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ReservationTreatmentCreateManyTreatmentInput = {
     id?: string
     reservationId: string
+    babyId?: string | null
     quantity?: number
     unitPrice: Decimal | DecimalJsLike | number | string
     durationMinutes: number
@@ -20353,11 +20703,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reservation?: ReservationUpdateOneRequiredWithoutItemsNestedInput
+    baby?: BabyUpdateOneWithoutReservationItemsNestedInput
   }
 
   export type ReservationTreatmentUncheckedUpdateWithoutTreatmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     reservationId?: StringFieldUpdateOperationsInput | string
+    babyId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFieldUpdateOperationsInput | number
@@ -20369,6 +20721,7 @@ export namespace Prisma {
   export type ReservationTreatmentUncheckedUpdateManyWithoutTreatmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     reservationId?: StringFieldUpdateOperationsInput | string
+    babyId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFieldUpdateOperationsInput | number
@@ -20380,6 +20733,7 @@ export namespace Prisma {
   export type ReservationTreatmentCreateManyReservationInput = {
     id?: string
     treatmentId: string
+    babyId?: string | null
     quantity?: number
     unitPrice: Decimal | DecimalJsLike | number | string
     durationMinutes: number
@@ -20420,11 +20774,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     treatment?: TreatmentUpdateOneRequiredWithoutReservationItemsNestedInput
+    baby?: BabyUpdateOneWithoutReservationItemsNestedInput
   }
 
   export type ReservationTreatmentUncheckedUpdateWithoutReservationInput = {
     id?: StringFieldUpdateOperationsInput | string
     treatmentId?: StringFieldUpdateOperationsInput | string
+    babyId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFieldUpdateOperationsInput | number
@@ -20436,6 +20792,7 @@ export namespace Prisma {
   export type ReservationTreatmentUncheckedUpdateManyWithoutReservationInput = {
     id?: StringFieldUpdateOperationsInput | string
     treatmentId?: StringFieldUpdateOperationsInput | string
+    babyId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     durationMinutes?: IntFieldUpdateOperationsInput | number

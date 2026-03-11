@@ -139,7 +139,8 @@ export default async function DashboardPage() {
         items: {
           include: {
             treatment: true,
-          },
+            baby: true,
+          } as any,
         },
       },
       orderBy: { startAt: "asc" },
@@ -199,7 +200,7 @@ export default async function DashboardPage() {
               ) : (
                 todayReservations.map((reservation) => {
                   const treatmentNames = reservation.items
-                    .map((item) => item.treatment.name)
+                    .map((item: any) => item.treatment?.name ?? "")
                     .join(", ");
                   return (
                     <Link

@@ -45,7 +45,7 @@ export default async function NewReservationPage() {
   const uiTreatments = treatments.map((t) => ({
     id: t.id,
     name: t.name,
-    category: t.category,
+    category: String(t.category),
     description: t.description,
     durationMinutes: t.durationMinutes,
     basePrice: t.basePrice.toNumber(),

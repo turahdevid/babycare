@@ -7,6 +7,7 @@ import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
 import { addBaby } from "../_actions";
+import { BabyAgeAutofill } from "./_components/baby-age-autofill";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -172,6 +173,7 @@ export default async function CustomerDetailPage(props: { params: Params }) {
               Tambah Baby
             </h4>
             <form action={addBaby.bind(null, customer.id)} className="mt-4">
+              <BabyAgeAutofill birthDateInputId="babyBirthDate" ageInputId="babyAgeAtTreatment" />
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
                   <label

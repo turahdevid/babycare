@@ -31,17 +31,26 @@ const treatmentsSchema = z.array(
   }),
 );
 
+const treatmentsByBabySchema = z.array(
+  z.object({
+    babyId: z.string().min(1),
+    treatments: treatmentsSchema.min(1),
+  }),
+);
+
 const createReservationSchema = z
   .object({
     customerId: z.string().optional(),
     babyId: z.string().optional(),
+    babyIds: z.string().optional(),
     date: z.string().min(1),
     time: z.string().min(1),
     serviceType: z.enum(["OUTLET", "HOMECARE"]),
     midwifeId: z.string().optional(),
     paymentMethod: z.enum(["CASH", "TRANSFER"]).optional(),
     notes: z.string().optional(),
-    treatments: z.string().min(1),
+    treatments: z.string().optional(),
+    treatmentsByBaby: z.string().optional(),
     newCustomer: z.string().optional(),
   })
   .superRefine((val, ctx) => {
@@ -57,6 +66,17 @@ const createReservationSchema = z
         path: ["customerId"],
       });
     }
+
+    const hasTreatments = typeof val.treatments === "string" && val.treatments.length > 0;
+    const hasTreatmentsByBaby =
+      typeof val.treatmentsByBaby === "string" && val.treatmentsByBaby.length > 0;
+    if (!hasTreatments && !hasTreatmentsByBaby) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Minimal 1 treatment harus dipilih",
+        path: ["treatments"],
+      });
+    }
   });
 
 export async function POST(request: Request) {
@@ -70,15 +90,20 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const customerIdValue = formData.get("customerId");
     const babyIdValue = formData.get("babyId");
+    const babyIdsValue = formData.get("babyIds");
     const midwifeIdValue = formData.get("midwifeId");
     const notesValue = formData.get("notes");
     const newCustomerValue = formData.get("newCustomer");
+
+    const treatmentsValue = formData.get("treatments");
+    const treatmentsByBabyValue = formData.get("treatmentsByBaby");
 
     const paymentMethodValue = formData.get("paymentMethod");
 
     const data = {
       customerId: typeof customerIdValue === "string" ? customerIdValue : undefined,
       babyId: typeof babyIdValue === "string" ? babyIdValue : undefined,
+      babyIds: typeof babyIdsValue === "string" ? babyIdsValue : undefined,
       date: formData.get("date"),
       time: formData.get("time"),
       serviceType: formData.get("serviceType"),
@@ -88,7 +113,9 @@ export async function POST(request: Request) {
           ? paymentMethodValue
           : undefined,
       notes: typeof notesValue === "string" ? notesValue : undefined,
-      treatments: formData.get("treatments"),
+      treatments: typeof treatmentsValue === "string" ? treatmentsValue : undefined,
+      treatmentsByBaby:
+        typeof treatmentsByBabyValue === "string" ? treatmentsByBabyValue : undefined,
       newCustomer:
         typeof newCustomerValue === "string" ? newCustomerValue : undefined,
     };
@@ -106,6 +133,14 @@ export async function POST(request: Request) {
       typeof validated.babyId === "string" && validated.babyId.length > 0
         ? validated.babyId
         : null;
+
+    let resolvedBabyIds: string[] = [];
+    if (typeof validated.babyIds === "string" && validated.babyIds.length > 0) {
+      const parsed: unknown = JSON.parse(validated.babyIds);
+      if (Array.isArray(parsed)) {
+        resolvedBabyIds = parsed.filter((v): v is string => typeof v === "string" && v.length > 0);
+      }
+    }
 
     if (validated.newCustomer) {
       const parsedNewCustomer: unknown = JSON.parse(validated.newCustomer);
@@ -186,6 +221,9 @@ export async function POST(request: Request) {
         });
 
         resolvedBabyId ??= createdBaby.id;
+        if (resolvedBabyIds.length === 0) {
+          resolvedBabyIds = [createdBaby.id];
+        }
       }
     }
 
@@ -245,8 +283,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const parsedTreatments: unknown = JSON.parse(validated.treatments);
-    const treatments = treatmentsSchema.parse(parsedTreatments);
+    const shouldUseTreatmentsByBaby =
+      typeof validated.treatmentsByBaby === "string" && validated.treatmentsByBaby.length > 0;
+
+    const perBabySelections = shouldUseTreatmentsByBaby
+      ? (() => {
+          const parsed: unknown = JSON.parse(validated.treatmentsByBaby!);
+          return treatmentsByBabySchema.parse(parsed);
+        })()
+      : null;
+
+    const treatments = shouldUseTreatmentsByBaby
+      ? perBabySelections!.flatMap((group) => group.treatments)
+      : treatmentsSchema.parse(JSON.parse(validated.treatments ?? "[]") as unknown);
 
     if (treatments.length === 0) {
       return NextResponse.json(
@@ -281,10 +330,36 @@ export async function POST(request: Request) {
     const endDateTime = new Date(startDateTime);
     endDateTime.setMinutes(endDateTime.getMinutes() + totalDuration);
 
+    if (perBabySelections) {
+      const selectionBabyIds = perBabySelections.map((g) => g.babyId);
+      const uniqueIds = Array.from(new Set(selectionBabyIds));
+
+      const babies = await db.baby.findMany({
+        where: {
+          id: { in: uniqueIds },
+          customerId,
+          deletedAt: null,
+        },
+        select: { id: true },
+      });
+
+      if (babies.length !== uniqueIds.length) {
+        return NextResponse.json(
+          { error: "Baby tidak valid" },
+          { status: 400 },
+        );
+      }
+
+      resolvedBabyIds = uniqueIds;
+    }
+
+    const reservationPrimaryBabyId =
+      resolvedBabyId ?? (resolvedBabyIds.length > 0 ? resolvedBabyIds[0] : null);
+
     const reservation = await db.reservation.create({
       data: {
         customerId,
-        babyId: resolvedBabyId,
+        babyId: reservationPrimaryBabyId,
         midwifeId:
           validated.midwifeId && validated.midwifeId.length > 0
             ? validated.midwifeId
@@ -297,15 +372,29 @@ export async function POST(request: Request) {
         paymentMethod: validated.paymentMethod ?? null,
         notes: validated.notes ?? null,
         items: {
-          create: treatments.map((item) => {
-            const treatment = treatmentById.get(item.treatmentId);
-            return {
-              treatmentId: item.treatmentId,
-              quantity: item.quantity,
-              unitPrice: treatment!.basePrice,
-              durationMinutes: treatment!.durationMinutes,
-            };
-          }),
+          create: perBabySelections
+            ? perBabySelections.flatMap((group) =>
+                group.treatments.map((item) => {
+                  const treatment = treatmentById.get(item.treatmentId);
+                  return {
+                    treatmentId: item.treatmentId,
+                    babyId: group.babyId,
+                    quantity: item.quantity,
+                    unitPrice: treatment!.basePrice,
+                    durationMinutes: treatment!.durationMinutes,
+                  };
+                }),
+              )
+            : treatments.map((item) => {
+                const treatment = treatmentById.get(item.treatmentId);
+                return {
+                  treatmentId: item.treatmentId,
+                  babyId: resolvedBabyId,
+                  quantity: item.quantity,
+                  unitPrice: treatment!.basePrice,
+                  durationMinutes: treatment!.durationMinutes,
+                };
+              }),
         },
         auditLogs: {
           create: {
@@ -314,7 +403,7 @@ export async function POST(request: Request) {
             message: "Reservasi dibuat",
           },
         },
-      },
+      } as any,
     });
 
     return NextResponse.json({ reservationId: reservation.id });
