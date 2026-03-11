@@ -5,7 +5,26 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { auth } from "~/server/auth";
-import { db } from "~/server/db";
+import { db, type Prisma } from "~/server/db";
+
+const reservationCompletionSelect = {
+  id: true,
+  status: true,
+  completedAt: true,
+  babyId: true,
+  midwifeId: true,
+  items: {
+    select: {
+      babyId: true,
+      quantity: true,
+      unitPrice: true,
+    },
+  },
+} satisfies Prisma.ReservationSelect;
+
+type ReservationForCompletion = Prisma.ReservationGetPayload<{
+  select: typeof reservationCompletionSelect;
+}>;
 
 const idSchema = z.string().min(1, "ID wajib");
 
@@ -58,22 +77,9 @@ export async function completeReservation(reservationId: string, formData: FormD
     redirect(`/reservation/${parsed.data}?error=invalid-complete`);
   }
 
-  const existing = await db.reservation.findFirst({
+  const existing: ReservationForCompletion | null = await db.reservation.findFirst({
     where: { id: parsed.data },
-    select: {
-      id: true,
-      status: true,
-      completedAt: true,
-      babyId: true,
-      midwifeId: true,
-      items: {
-        select: {
-          babyId: true,
-          quantity: true,
-          unitPrice: true,
-        } as any,
-      },
-    },
+    select: reservationCompletionSelect,
   });
 
   if (!existing) {
@@ -88,7 +94,7 @@ export async function completeReservation(reservationId: string, formData: FormD
       ? validated.data.babyId.trim()
       : undefined;
   const hasItemBaby = existing.items.some(
-    (item: any) => typeof item.babyId === "string" && item.babyId.length > 0,
+    (item) => typeof item.babyId === "string" && item.babyId.length > 0,
   );
   const resolvedBabyId = inputBabyId ?? existing.babyId ?? undefined;
   const shouldRequireBaby = !resolvedBabyId && !hasItemBaby;
@@ -99,7 +105,7 @@ export async function completeReservation(reservationId: string, formData: FormD
 
   if (shouldComplete) {
     const subtotalPrice = existing.items.reduce(
-      (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
+      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
       0,
     );
 

@@ -3,7 +3,7 @@ import { jsPDF } from "jspdf";
 import { z } from "zod";
 
 import { auth } from "~/server/auth";
-import { db } from "~/server/db";
+import { db, type Prisma } from "~/server/db";
 import {
   formatCurrency,
   getPeriodEndDate,
@@ -312,6 +312,31 @@ type PdfTransactionRow = {
   total: string;
 };
 
+const reservationTransactionSelect = {
+  startAt: true,
+  status: true,
+  serviceType: true,
+  subtotalPrice: true,
+  discountPercent: true,
+  discountAmount: true,
+  totalPrice: true,
+  customer: { select: { motherName: true } },
+  baby: { select: { id: true, name: true } },
+  midwife: { select: { name: true, email: true } },
+  items: {
+    select: {
+      quantity: true,
+      unitPrice: true,
+      treatment: { select: { name: true } },
+      baby: { select: { id: true, name: true } },
+    },
+  },
+} satisfies Prisma.ReservationSelect;
+
+type ReservationTransactionRow = Prisma.ReservationGetPayload<{
+  select: typeof reservationTransactionSelect;
+}>;
+
 type PdfPayloadBase = {
   periodLabel: string;
   createdAtLabel: string;
@@ -371,36 +396,17 @@ function buildPdfSubtitle(payload: PdfPayload): string {
 
 async function fetchPdfTransactions(
   where: { gte: Date; lt: Date },
-  statusFilter?: string,
+  statusFilter?: "COMPLETED",
 ): Promise<PdfTransactionRow[]> {
-  const reservations = (await db.reservation.findMany({
+  const reservations: ReservationTransactionRow[] = await db.reservation.findMany({
     where: {
       startAt: { gte: where.gte, lt: where.lt },
-      ...(statusFilter ? { status: statusFilter as never } : {}),
+      ...(statusFilter ? { status: statusFilter } : {}),
     },
-    select: {
-      startAt: true,
-      status: true,
-      serviceType: true,
-      subtotalPrice: true,
-      discountPercent: true,
-      discountAmount: true,
-      totalPrice: true,
-      customer: { select: { motherName: true } },
-      baby: { select: { id: true, name: true } },
-      midwife: { select: { name: true, email: true } },
-      items: {
-        select: {
-          quantity: true,
-          unitPrice: true,
-          treatment: { select: { name: true } },
-          baby: { select: { id: true, name: true } },
-        } as any,
-      },
-    },
+    select: reservationTransactionSelect,
     orderBy: { startAt: "desc" },
     take: 200,
-  } as any)) as any[];
+  });
 
   return reservations.map((r) => ({
     date: formatDateLabel(r.startAt),
@@ -426,8 +432,8 @@ async function fetchPdfTransactions(
       }
       if (map.size === 0) return "-";
       if (map.size === 1) {
-        const only = map.values().next().value as string[];
-        return only.join(", ");
+        const only = map.values().next().value;
+        return only ? only.join(", ") : "-";
       }
       return Array.from(map.entries())
         .map(([babyName, items]) => `${babyName}: ${items.join(", ")}`)
@@ -436,7 +442,7 @@ async function fetchPdfTransactions(
     status: r.status,
     total: (() => {
       const itemSubtotal = r.items.reduce(
-        (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
         0,
       );
       const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;
@@ -451,36 +457,17 @@ async function fetchPdfTransactions(
 
 async function fetchCsvTransactionRows(
   where: { gte: Date; lt: Date },
-  statusFilter?: string,
+  statusFilter?: "COMPLETED",
 ): Promise<CsvRow[]> {
-  const reservations = (await db.reservation.findMany({
+  const reservations: ReservationTransactionRow[] = await db.reservation.findMany({
     where: {
       startAt: { gte: where.gte, lt: where.lt },
-      ...(statusFilter ? { status: statusFilter as never } : {}),
+      ...(statusFilter ? { status: statusFilter } : {}),
     },
-    select: {
-      startAt: true,
-      status: true,
-      serviceType: true,
-      subtotalPrice: true,
-      discountPercent: true,
-      discountAmount: true,
-      totalPrice: true,
-      customer: { select: { motherName: true } },
-      baby: { select: { id: true, name: true } },
-      midwife: { select: { name: true, email: true } },
-      items: {
-        select: {
-          quantity: true,
-          unitPrice: true,
-          treatment: { select: { name: true } },
-          baby: { select: { id: true, name: true } },
-        } as any,
-      },
-    },
+    select: reservationTransactionSelect,
     orderBy: { startAt: "desc" },
     take: 200,
-  } as any)) as any[];
+  });
 
   return reservations.map((r) => ({
     section: "detail",
@@ -507,8 +494,8 @@ async function fetchCsvTransactionRows(
       }
       if (map.size === 0) return "-";
       if (map.size === 1) {
-        const only = map.values().next().value as string[];
-        return only.join(", ");
+        const only = map.values().next().value;
+        return only ? only.join(", ") : "-";
       }
       return Array.from(map.entries())
         .map(([babyName, items]) => `${babyName}: ${items.join(", ")}`)
@@ -517,7 +504,7 @@ async function fetchCsvTransactionRows(
     status: r.status,
     total: (() => {
       const itemSubtotal = r.items.reduce(
-        (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
         0,
       );
       const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;

@@ -1,4 +1,4 @@
-import { db } from "~/server/db";
+import { db, type Prisma, type ReservationStatus } from "~/server/db";
 
 export type TransactionDetail = {
   id: string;
@@ -20,7 +20,9 @@ export async function fetchTransactionDetails(
     treatmentId?: string;
   },
 ): Promise<TransactionDetail[]> {
-  const statusFilter = extraWhere?.status ? { status: extraWhere.status as never } : {};
+  const statusFilter = extraWhere?.status
+    ? { status: extraWhere.status as ReservationStatus }
+    : {};
   const midwifeFilter = extraWhere?.midwifeId
     ? { midwifeId: extraWhere.midwifeId }
     : {};
@@ -42,44 +44,50 @@ export async function fetchTransactionDetails(
     if (reservationIds.length === 0) return [];
   }
 
-  const reservations = (await db.reservation.findMany(({
+  const reservationTransactionSelect = {
+    id: true,
+    startAt: true,
+    status: true,
+    serviceType: true,
+    subtotalPrice: true,
+    discountPercent: true,
+    discountAmount: true,
+    totalPrice: true,
+    customer: { select: { motherName: true } },
+    baby: { select: { id: true, name: true } },
+    midwife: { select: { name: true, email: true } },
+    items: {
+      select: {
+        quantity: true,
+        unitPrice: true,
+        treatment: { select: { name: true } },
+        baby: { select: { id: true, name: true } },
+      },
+    },
+  } satisfies Prisma.ReservationSelect;
+
+  type ReservationTransactionRow = Prisma.ReservationGetPayload<{
+    select: typeof reservationTransactionSelect;
+  }>;
+
+  const reservations: ReservationTransactionRow[] = await db.reservation.findMany({
     where: {
       startAt: { gte: where.gte, lt: where.lt },
       ...statusFilter,
       ...midwifeFilter,
       ...(reservationIds ? { id: { in: reservationIds } } : {}),
     },
-    select: {
-      id: true,
-      startAt: true,
-      status: true,
-      serviceType: true,
-      subtotalPrice: true,
-      discountPercent: true,
-      discountAmount: true,
-      totalPrice: true,
-      customer: { select: { motherName: true } },
-      baby: { select: { id: true, name: true } },
-      midwife: { select: { name: true, email: true } },
-      items: {
-        select: {
-          quantity: true,
-          unitPrice: true,
-          treatment: { select: { name: true } },
-          baby: { select: { id: true, name: true } },
-        } as any,
-      },
-    },
+    select: reservationTransactionSelect,
     orderBy: { startAt: "desc" },
     take: 200,
-  } as any))) as any[];
+  });
 
-  return reservations.map((r: any) => ({
+  return reservations.map((r) => ({
     id: r.id,
     customerName: r.customer.motherName,
     babyName: (() => {
       const map = new Map<string, string>();
-      for (const item of r.items as any[]) {
+      for (const item of r.items) {
         if (item.baby) map.set(item.baby.id, item.baby.name);
       }
       if (r.baby) map.set(r.baby.id, r.baby.name);
@@ -92,7 +100,7 @@ export async function fetchTransactionDetails(
     serviceType: r.serviceType,
     treatments: (() => {
       const map = new Map<string, string[]>();
-      for (const item of r.items as any[]) {
+      for (const item of r.items) {
         const key = item.baby?.name ?? "-";
         const list = map.get(key) ?? [];
         list.push(`${item.treatment?.name ?? "-"} x${item.quantity}`);
@@ -100,8 +108,8 @@ export async function fetchTransactionDetails(
       }
       if (map.size === 0) return "-";
       if (map.size === 1) {
-        const only = map.values().next().value as string[];
-        return only.join(", ");
+        const only = map.values().next().value;
+        return only ? only.join(", ") : "-";
       }
       return Array.from(map.entries())
         .map(([babyName, items]) => `${babyName}: ${items.join(", ")}`)
@@ -109,7 +117,7 @@ export async function fetchTransactionDetails(
     })(),
     totalPrice: (() => {
       const itemSubtotal = r.items.reduce(
-        (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
+        (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
         0,
       );
       const subtotal = r.subtotalPrice?.toNumber() ?? itemSubtotal;

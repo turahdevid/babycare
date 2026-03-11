@@ -8,6 +8,22 @@ import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
 import { FilterForm } from "../_components/filter-form";
 
+const reservationListInclude = {
+  customer: true,
+  baby: true,
+  midwife: true,
+  items: {
+    include: {
+      treatment: true,
+      baby: true,
+    },
+  },
+} satisfies Prisma.ReservationInclude;
+
+type ReservationListRow = Prisma.ReservationGetPayload<{
+  include: typeof reservationListInclude;
+}>;
+
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
@@ -65,19 +81,9 @@ export default async function ReservationListPage(props: {
     whereClause.startAt = { gte: targetDate, lt: nextDay };
   }
 
-  const reservations = await db.reservation.findMany({
+  const reservations: ReservationListRow[] = await db.reservation.findMany({
     where: whereClause,
-    include: {
-      customer: true,
-      baby: true,
-      midwife: true,
-      items: {
-        include: {
-          treatment: true,
-          baby: true,
-        } as any,
-      },
-    },
+    include: reservationListInclude,
     orderBy: { startAt: "desc" },
     take: 50,
   });
@@ -128,12 +134,12 @@ export default async function ReservationListPage(props: {
         <div className="grid gap-4">
           {reservations.map((reservation) => {
             const treatmentNames = reservation.items
-              .map((item: any) => item.treatment?.name ?? "")
+              .map((item) => item.treatment?.name ?? "")
               .join(", ");
 
             const babyNames = (() => {
               const map = new Map<string, string>();
-              for (const item of reservation.items as any[]) {
+              for (const item of reservation.items) {
                 if (item.baby) map.set(item.baby.id, item.baby.name);
               }
               if (reservation.baby) map.set(reservation.baby.id, reservation.baby.name);

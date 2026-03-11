@@ -2,9 +2,24 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
-import { db } from "~/server/db";
+import { db, type Prisma } from "~/server/db";
 import { GlassCard } from "../_components/glass-card";
 import { StatusPill } from "../_components/status-pill";
+
+const dashboardReservationInclude = {
+  customer: true,
+  baby: true,
+  items: {
+    include: {
+      treatment: true,
+      baby: true,
+    },
+  },
+} satisfies Prisma.ReservationInclude;
+
+type DashboardReservationRow = Prisma.ReservationGetPayload<{
+  include: typeof dashboardReservationInclude;
+}>;
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -133,21 +148,12 @@ export default async function DashboardPage() {
   const [todayReservations, todayCount] = await Promise.all([
     db.reservation.findMany({
       where: whereClause,
-      include: {
-        customer: true,
-        baby: true,
-        items: {
-          include: {
-            treatment: true,
-            baby: true,
-          } as any,
-        },
-      },
+      include: dashboardReservationInclude,
       orderBy: { startAt: "asc" },
       take: 5,
     }),
     db.reservation.count({ where: whereClause }),
-  ]);
+  ]) as [DashboardReservationRow[], number];
 
   const nextReservation = todayReservations[0];
   const nextSlot = nextReservation ? formatTime(nextReservation.startAt) : "-";
@@ -200,7 +206,7 @@ export default async function DashboardPage() {
               ) : (
                 todayReservations.map((reservation) => {
                   const treatmentNames = reservation.items
-                    .map((item: any) => item.treatment?.name ?? "")
+                    .map((item) => item.treatment?.name ?? "")
                     .join(", ");
                   return (
                     <Link

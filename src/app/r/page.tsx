@@ -3,15 +3,6 @@ import { GlassCard } from "../(admin)/_components/glass-card";
 
 import { PublicReservationForm } from "./_components/public-reservation-form";
 
-type TreatmentItem = {
-  id: string;
-  name: string;
-  category: string;
-  description: string | null;
-  durationMinutes: number;
-  basePrice: number;
-};
-
 export default async function PublicReservationPage() {
 
   const treatments = await db.treatment.findMany({

@@ -2,9 +2,31 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
-import { db } from "~/server/db";
+import { db, type Prisma } from "~/server/db";
 import { GlassCard } from "~/app/(admin)/_components/glass-card";
 import { PrintReceiptButton } from "./_components/print-receipt-button";
+
+const reservationReceiptInclude = {
+  customer: true,
+  baby: true,
+  midwife: true,
+  items: {
+    include: {
+      treatment: true,
+      baby: true,
+    },
+  },
+  auditLogs: {
+    where: { action: "COMPLETE" },
+    include: { actor: true },
+    orderBy: { createdAt: "desc" },
+    take: 1,
+  },
+} satisfies Prisma.ReservationInclude;
+
+type ReservationReceipt = Prisma.ReservationGetPayload<{
+  include: typeof reservationReceiptInclude;
+}>;
 
 function formatDateTime(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -44,46 +66,32 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
 
   const reservation = await db.reservation.findUnique({
     where: { id: params.id },
-    include: {
-      customer: true,
-      baby: true,
-      midwife: true,
-      items: {
-        include: {
-          treatment: true,
-          baby: true,
-        } as any,
-      },
-      auditLogs: {
-        where: { action: "COMPLETE" },
-        include: { actor: true },
-        orderBy: { createdAt: "desc" },
-        take: 1,
-      },
-    },
+    include: reservationReceiptInclude,
   });
 
   if (!reservation) {
     notFound();
   }
 
+  const resolvedReservation = reservation as ReservationReceipt;
+
   const isMidwife = session.user.role === "MIDWIFE";
-  const isOwnReservation = reservation.midwifeId === session.user.id;
+  const isOwnReservation = resolvedReservation.midwifeId === session.user.id;
   if (isMidwife && !isOwnReservation) {
     redirect("/dashboard");
   }
 
-  const totalPrice = reservation.items.reduce(
-    (sum: number, item: any) => sum + item.unitPrice.toNumber() * item.quantity,
+  const totalPrice = resolvedReservation.items.reduce(
+    (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
     0,
   );
 
-  const storedSubtotal = reservation.subtotalPrice?.toNumber();
-  const storedDiscountAmount = reservation.discountAmount?.toNumber();
-  const storedTotal = reservation.totalPrice?.toNumber();
+  const storedSubtotal = resolvedReservation.subtotalPrice?.toNumber();
+  const storedDiscountAmount = resolvedReservation.discountAmount?.toNumber();
+  const storedTotal = resolvedReservation.totalPrice?.toNumber();
 
   const subtotalPrice = storedSubtotal ?? totalPrice;
-  const discountPercent = reservation.discountPercent;
+  const discountPercent = resolvedReservation.discountPercent;
   const discountAmount =
     storedDiscountAmount ??
     (typeof discountPercent === "number" && discountPercent > 0
@@ -94,22 +102,28 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
     discountAmount > 0;
   const finalTotal = storedTotal ?? Math.max(subtotalPrice - discountAmount, 0);
 
-  const cashier = reservation.auditLogs[0]?.actor;
+  const cashier = resolvedReservation.auditLogs[0]?.actor;
   const cashierText = cashier?.name ?? cashier?.email ?? "-";
 
   const reservationBabies = (() => {
     const map = new Map<string, ReservationBaby>();
 
-    for (const item of reservation.items as any[]) {
-      const baby = (item?.baby ?? null) as ReservationBaby | null;
-      if (baby?.id) {
-        map.set(baby.id, baby);
+    for (const item of resolvedReservation.items) {
+      if (item.baby) {
+        map.set(item.baby.id, {
+          id: item.baby.id,
+          name: item.baby.name,
+          birthDate: item.baby.birthDate,
+        });
       }
     }
 
-    const primaryBaby = (reservation.baby ?? null) as unknown as ReservationBaby | null;
-    if (primaryBaby?.id) {
-      map.set(primaryBaby.id, primaryBaby);
+    if (resolvedReservation.baby) {
+      map.set(resolvedReservation.baby.id, {
+        id: resolvedReservation.baby.id,
+        name: resolvedReservation.baby.name,
+        birthDate: resolvedReservation.baby.birthDate,
+      });
     }
 
     return Array.from(map.values());
@@ -133,7 +147,7 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
       <div className="flex items-center justify-between gap-4 receipt-actions">
         <Link
           className="text-sm text-slate-700/80 transition hover:text-slate-900"
-          href={`/reservation/${reservation.id}`}
+          href={`/reservation/${resolvedReservation.id}`}
         >
           ← Kembali
         </Link>
@@ -144,7 +158,9 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
         <GlassCard className="receipt-shell">
           <div className="text-center">
             <h2 className="text-base font-semibold text-slate-900">Struk Pembayaran</h2>
-            <p className="mt-1 text-xs text-slate-700/80">#{reservation.id.slice(0, 8)}</p>
+            <p className="mt-1 text-xs text-slate-700/80">
+              #{resolvedReservation.id.slice(0, 8)}
+            </p>
           </div>
 
           <div className="mt-5 space-y-3 text-sm">
@@ -173,9 +189,7 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
               <span className="text-slate-700/80">Anak</span>
               <span className="text-right font-medium text-slate-900">
                 {reservationBabies.length > 0
-                  ? reservationBabies
-                      .map((baby: { name: string }) => baby.name)
-                      .join(", ")
+                  ? reservationBabies.map((baby) => baby.name).join(", ")
                   : "-"}
               </span>
             </div>
@@ -183,7 +197,7 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
             <div className="flex items-start justify-between gap-4">
               <span className="text-slate-700/80">Bidan</span>
               <span className="text-right font-medium text-slate-900">
-                {reservation.midwife?.name ?? reservation.midwife?.email ?? "-"}
+                {resolvedReservation.midwife?.name ?? resolvedReservation.midwife?.email ?? "-"}
               </span>
             </div>
 
@@ -198,9 +212,9 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
 
             <div className="mt-3 space-y-2">
               {hasMultipleBabies
-                ? reservationBabies.map((baby: { id: string; name: string }) => {
-                    const items = reservation.items.filter(
-                      (item: any) => item.babyId === baby.id,
+                ? reservationBabies.map((baby) => {
+                    const items = resolvedReservation.items.filter(
+                      (item) => item.babyId === baby.id,
                     );
                     if (items.length === 0) return null;
 
@@ -208,7 +222,7 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
                       <div key={baby.id} className="pt-2">
                         <p className="text-xs font-semibold text-slate-900">{baby.name}</p>
                         <div className="mt-2 space-y-2">
-                          {items.map((item: any) => (
+                          {items.map((item) => (
                             <div
                               key={item.id}
                               className="flex items-start justify-between gap-4 text-sm"
@@ -230,7 +244,7 @@ export default async function ReservationReceiptPage(props: { params: Params }) 
                       </div>
                     );
                   })
-                : reservation.items.map((item: any) => (
+                : resolvedReservation.items.map((item) => (
                     <div
                       key={item.id}
                       className="flex items-start justify-between gap-4 text-sm"

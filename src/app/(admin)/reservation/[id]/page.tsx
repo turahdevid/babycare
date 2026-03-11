@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
-import { db } from "~/server/db";
+import { db, type Prisma } from "~/server/db";
 import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
@@ -12,6 +12,38 @@ import {
   DiscountPreviewProvider,
 } from "./_components/discount-preview-controller";
 import { completeReservation } from "../_actions";
+
+const reservationDetailInclude = {
+  customer: {
+    include: {
+      babies: {
+        where: { deletedAt: null },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  },
+  baby: true,
+  midwife: true,
+  items: {
+    include: {
+      treatment: true,
+      baby: true,
+    },
+  },
+  auditLogs: {
+    include: {
+      actor: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 10,
+  },
+} satisfies Prisma.ReservationInclude;
+
+type ReservationDetail = Prisma.ReservationGetPayload<{
+  include: typeof reservationDetailInclude;
+}>;
 
 type ReservationItem = {
   id: string;
@@ -77,33 +109,7 @@ export default async function ReservationDetailPage(props: {
   const [reservation, midwives] = await Promise.all([
     db.reservation.findUnique({
       where: { id: params.id },
-      include: {
-        customer: {
-          include: {
-            babies: {
-              where: { deletedAt: null },
-              orderBy: { createdAt: "desc" },
-            },
-          },
-        },
-        baby: true,
-        midwife: true,
-        items: {
-          include: {
-            treatment: true,
-            baby: true,
-          },
-        } as any,
-        auditLogs: {
-          include: {
-            actor: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          take: 10,
-        },
-      },
+      include: reservationDetailInclude,
     }),
     db.user.findMany({
       where: { role: "MIDWIFE" },
@@ -116,16 +122,18 @@ export default async function ReservationDetailPage(props: {
     notFound();
   }
 
+  const resolvedReservation = reservation as ReservationDetail;
+
   const isAdmin = session.user.role === "ADMIN";
   const isMidwife = session.user.role === "MIDWIFE";
-  const isOwnReservation = reservation.midwifeId === session.user.id;
+  const isOwnReservation = resolvedReservation.midwifeId === session.user.id;
 
   if (isMidwife && !isOwnReservation) {
     redirect("/dashboard");
   }
 
-  const items = reservation.items as unknown as ReservationItem[];
-  const auditLogs = reservation.auditLogs as unknown as ReservationAuditLogEntry[];
+  const items = resolvedReservation.items as unknown as ReservationItem[];
+  const auditLogs = resolvedReservation.auditLogs as unknown as ReservationAuditLogEntry[];
 
   const totalPrice = items.reduce(
     (sum: number, item: ReservationItem) =>
@@ -135,25 +143,33 @@ export default async function ReservationDetailPage(props: {
 
   const reservationBabies = (() => {
     const map = new Map<string, ReservationBaby>();
-    for (const item of reservation.items as any[]) {
-      if (item?.baby) {
-        map.set(item.baby.id, item.baby as ReservationBaby);
+    for (const item of resolvedReservation.items) {
+      if (item.baby) {
+        map.set(item.baby.id, {
+          id: item.baby.id,
+          name: item.baby.name,
+          birthDate: item.baby.birthDate,
+        });
       }
     }
-    if ((reservation as any).baby) {
-      map.set((reservation as any).baby.id, (reservation as any).baby as ReservationBaby);
+    if (resolvedReservation.baby) {
+      map.set(resolvedReservation.baby.id, {
+        id: resolvedReservation.baby.id,
+        name: resolvedReservation.baby.name,
+        birthDate: resolvedReservation.baby.birthDate,
+      });
     }
     return Array.from(map.values());
   })();
 
   const hasMultipleBabies = reservationBabies.length > 1;
 
-  const storedSubtotal = reservation.subtotalPrice?.toNumber();
+  const storedSubtotal = resolvedReservation.subtotalPrice?.toNumber();
   const subtotalPrice = storedSubtotal ?? totalPrice;
-  const discountPercent = reservation.discountPercent;
+  const discountPercent = resolvedReservation.discountPercent;
 
   const canComplete = isAdmin || (isMidwife && isOwnReservation);
-  const canPrintReceipt = Boolean(reservation.completedAt);
+  const canPrintReceipt = Boolean(resolvedReservation.completedAt);
 
   return (
     <DiscountPreviewProvider
@@ -176,13 +192,13 @@ export default async function ReservationDetailPage(props: {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">
-                Reservasi #{reservation.id.slice(0, 8)}
+                Reservasi #{resolvedReservation.id.slice(0, 8)}
               </h2>
               <p className="mt-1 text-sm text-slate-700/80">
-                Dibuat {formatDate(reservation.createdAt)}
+                Dibuat {formatDate(resolvedReservation.createdAt)}
               </p>
             </div>
-            <StatusPill status={reservation.status} />
+            <StatusPill status={resolvedReservation.status} />
           </div>
         </GlassCard>
 
@@ -195,20 +211,20 @@ export default async function ReservationDetailPage(props: {
             <div>
               <span className="font-medium text-slate-700">Nama Bunda:</span>
               <p className="mt-1 text-slate-900">
-                {reservation.customer.motherName}
+                {resolvedReservation.customer.motherName}
               </p>
             </div>
             <div>
               <span className="font-medium text-slate-700">No. WhatsApp:</span>
               <p className="mt-1 text-slate-900">
-                {reservation.customer.motherPhone}
+                {resolvedReservation.customer.motherPhone}
               </p>
             </div>
-            {reservation.customer.motherEmail ? (
+            {resolvedReservation.customer.motherEmail ? (
               <div>
                 <span className="font-medium text-slate-700">Email:</span>
                 <p className="mt-1 text-slate-900">
-                  {reservation.customer.motherEmail}
+                  {resolvedReservation.customer.motherEmail}
                 </p>
               </div>
             ) : null}

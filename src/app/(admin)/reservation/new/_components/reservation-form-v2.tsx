@@ -576,7 +576,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                   const baby = selectedCustomer?.babies.find((b) => b.id === babyId);
                   const babyName = baby?.name ?? "-";
                   const selections = selectedTreatmentsByBaby[babyId] ?? [];
-                  const selectedCategory = activeCategoryByBaby[babyId] || categories[0] || "";
+                  const selectedCategory = activeCategoryByBaby[babyId] ?? categories[0] ?? "";
                   const grouped = treatments.filter(
                     (t) => String(t.category) === selectedCategory,
                   );

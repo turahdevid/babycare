@@ -403,7 +403,7 @@ export async function POST(request: Request) {
             message: "Reservasi dibuat",
           },
         },
-      } as any,
+      },
     });
 
     return NextResponse.json({ reservationId: reservation.id });
