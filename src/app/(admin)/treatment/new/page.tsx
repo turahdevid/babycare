@@ -91,6 +91,8 @@ export default async function NewTreatmentPage(props: {
                 >
                   <option value="BABY">Baby</option>
                   <option value="KIDS">Kids</option>
+                  <option value="IBU">Ibu</option>
+                  <option value="SPESIAL">Spesial</option>
                 </select>
               </div>
             </div>

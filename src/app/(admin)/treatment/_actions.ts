@@ -9,7 +9,7 @@ import { db } from "~/server/db";
 
 const treatmentSchema = z.object({
   name: z.string().min(1, "Nama treatment wajib diisi"),
-  category: z.enum(["BABY", "KIDS"]),
+  category: z.enum(["BABY", "KIDS", "IBU", "SPESIAL"]),
   description: z.string().optional(),
   durationMinutes: z.coerce
     .number()
