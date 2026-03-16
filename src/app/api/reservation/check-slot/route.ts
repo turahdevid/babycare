@@ -19,7 +19,11 @@ export async function POST(request: Request) {
     
     if (!slot) {
       return NextResponse.json(
-        { available: false, message: "Waktu tidak valid. Pilih antara 09:00-17:00" },
+        {
+          available: false,
+          message:
+            "Waktu tidak valid. Pilih slot: 09:00, 10:30, 12:00, 13:30, 15:00, 16:00, 17:00",
+        },
         { status: 400 },
       );
     }

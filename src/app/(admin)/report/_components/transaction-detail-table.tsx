@@ -10,6 +10,7 @@ type TransactionRow = {
   startAt: Date;
   status: string;
   serviceType: string;
+  paymentMethod: string | null;
   treatments: string;
   totalPrice: number;
 };
@@ -28,57 +29,119 @@ export function TransactionDetailTable({ rows }: Props) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-white/60 text-xs text-slate-600">
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Tanggal</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Customer</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Bayi</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Bidan</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Layanan</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Treatment</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium">Status</th>
-            <th className="whitespace-nowrap px-3 py-3 font-medium text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id} className="border-b border-white/50">
-              <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
-                {formatDateTime(row.startAt)}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2.5 font-medium text-slate-900">
+    <>
+      <div className="grid gap-3 lg:hidden">
+        {rows.map((row) => (
+          <div
+            key={row.id}
+            className="rounded-2xl border border-white/55 bg-white/25 px-4 py-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-xs text-slate-700/80">{formatDateTime(row.startAt)}</p>
                 <Link
-                  className="hover:underline"
+                  className="mt-1 block truncate text-sm font-semibold text-slate-900 hover:underline"
                   href={`/reservation/${row.id}`}
+                  title={row.customerName}
                 >
                   {row.customerName}
                 </Link>
-              </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
-                {row.babyName ?? "-"}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
-                {row.midwifeName ?? "-"}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
-                {row.serviceType}
-              </td>
-              <td className="max-w-[200px] truncate px-3 py-2.5 text-slate-700">
-                {row.treatments}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2.5">
-                <StatusBadge status={row.status} />
-              </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-right font-medium text-slate-900">
-                {formatCurrency(row.totalPrice)}
-              </td>
+                <p className="mt-1 text-xs text-slate-700/80">
+                  {row.babyName ?? "-"} • {row.midwifeName ?? "-"}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-slate-900">
+                  {formatCurrency(row.totalPrice)}
+                </p>
+                <div className="mt-1 flex justify-end">
+                  <StatusBadge status={row.status} />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 grid gap-1 text-xs text-slate-700/80">
+              <p>
+                <span className="font-medium text-slate-900">Layanan:</span> {row.serviceType}
+              </p>
+              <p>
+                <span className="font-medium text-slate-900">Pembayaran:</span>{" "}
+                {formatPaymentMethod(row.paymentMethod)}
+              </p>
+              <p className="break-words">
+                <span className="font-medium text-slate-900">Treatment:</span> {row.treatments}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto lg:block">
+        <table className="min-w-[1100px] w-full table-fixed text-left text-xs">
+          <thead>
+            <tr className="border-b border-white/60 text-xs text-slate-600">
+              <th className="w-[140px] whitespace-nowrap px-3 py-3 font-medium">Tanggal</th>
+              <th className="w-[160px] whitespace-nowrap px-3 py-3 font-medium">Customer</th>
+              <th className="w-[140px] whitespace-nowrap px-3 py-3 font-medium">Bayi</th>
+              <th className="w-[140px] whitespace-nowrap px-3 py-3 font-medium">Bidan</th>
+              <th className="w-[110px] whitespace-nowrap px-3 py-3 font-medium">Layanan</th>
+              <th className="w-[120px] whitespace-nowrap px-3 py-3 font-medium">Pembayaran</th>
+              <th className="w-[320px] whitespace-nowrap px-3 py-3 font-medium">Treatment</th>
+              <th className="w-[120px] whitespace-nowrap px-3 py-3 font-medium">Status</th>
+              <th className="w-[130px] whitespace-nowrap px-3 py-3 font-medium text-right">Total</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.id} className="border-b border-white/50">
+                <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
+                  {formatDateTime(row.startAt)}
+                </td>
+                <td className="px-3 py-2.5 font-medium text-slate-900">
+                  <Link
+                    className="block truncate hover:underline"
+                    href={`/reservation/${row.id}`}
+                    title={row.customerName}
+                  >
+                    {row.customerName}
+                  </Link>
+                </td>
+                <td className="px-3 py-2.5 text-slate-700">
+                  <span className="block truncate" title={row.babyName ?? "-"}>
+                    {row.babyName ?? "-"}
+                  </span>
+                </td>
+                <td className="px-3 py-2.5 text-slate-700">
+                  <span
+                    className="block truncate"
+                    title={row.midwifeName ?? "-"}
+                  >
+                    {row.midwifeName ?? "-"}
+                  </span>
+                </td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
+                  {row.serviceType}
+                </td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-slate-700">
+                  {formatPaymentMethod(row.paymentMethod)}
+                </td>
+                <td className="px-3 py-2.5 text-slate-700">
+                  <span className="block whitespace-normal break-words" title={row.treatments}>
+                    {row.treatments}
+                  </span>
+                </td>
+                <td className="whitespace-nowrap px-3 py-2.5">
+                  <StatusBadge status={row.status} />
+                </td>
+                <td className="whitespace-nowrap px-3 py-2.5 text-right font-medium text-slate-900">
+                  {formatCurrency(row.totalPrice)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
@@ -98,4 +161,10 @@ function StatusBadge({ status }: { status: string }) {
       {status}
     </span>
   );
+}
+
+function formatPaymentMethod(method: string | null): string {
+  if (method === "CASH") return "Cash";
+  if (method === "TRANSFER") return "Transfer";
+  return "-";
 }

@@ -419,7 +419,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\win10\\Music\\asdasd\\babycare\\generated\\prisma",
+      "value": "C:\\Users\\DELL\\Documents\\project\\babycare\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -433,7 +433,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\win10\\Music\\asdasd\\babycare\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\DELL\\Documents\\project\\babycare\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -447,6 +447,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

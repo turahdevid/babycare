@@ -15,6 +15,9 @@ const createPublicReservationSchema = z.object({
   motherName: z.string().min(1),
   motherPhone: z.string().min(1),
   motherEmail: z.string().email().optional(),
+  address: z.string().optional(),
+  babyId: z.string().optional(),
+  babyName: z.string().optional(),
   date: z.string().min(1),
   time: z.string().min(1),
   serviceType: z.enum(["OUTLET", "HOMECARE"]),
@@ -28,11 +31,17 @@ export async function POST(request: Request) {
 
     const motherEmailValue = formData.get("motherEmail");
     const notesValue = formData.get("notes");
+    const addressValue = formData.get("address");
+    const babyIdValue = formData.get("babyId");
+    const babyNameValue = formData.get("babyName");
 
     const validated = createPublicReservationSchema.parse({
       motherName: formData.get("motherName"),
       motherPhone: formData.get("motherPhone"),
       motherEmail: typeof motherEmailValue === "string" ? motherEmailValue : undefined,
+      address: typeof addressValue === "string" ? addressValue : undefined,
+      babyId: typeof babyIdValue === "string" ? babyIdValue : undefined,
+      babyName: typeof babyNameValue === "string" ? babyNameValue : undefined,
       date: formData.get("date"),
       time: formData.get("time"),
       serviceType: formData.get("serviceType"),
@@ -50,8 +59,8 @@ export async function POST(request: Request) {
         {
           error:
             validated.serviceType === "HOMECARE"
-              ? "Waktu tidak valid. Homecare hanya tersedia jam 10:00 dan 15:00"
-              : "Waktu tidak valid. Pilih antara 09:00-17:00",
+              ? "Waktu tidak valid. Pilih slot: 09:00, 10:30, 12:00, 13:30, 15:00, 16:00, 17:00"
+              : "Waktu tidak valid. Pilih slot: 09:00, 10:30, 12:00, 13:30, 15:00, 16:00, 17:00",
         },
         { status: 400 },
       );
@@ -126,27 +135,85 @@ export async function POST(request: Request) {
 
     const motherPhone = validated.motherPhone.trim();
 
+    const babyNameTrimmed =
+      typeof validated.babyName === "string" ? validated.babyName.trim() : "";
+    const babyIdTrimmed = typeof validated.babyId === "string" ? validated.babyId.trim() : "";
+
     const customer = await db.customer.findFirst({
       where: { motherPhone, deletedAt: null },
-      select: { id: true },
+      select: { id: true, motherName: true, motherEmail: true, address: true },
     });
+
+    const nextMotherName = validated.motherName.trim();
+    const nextMotherEmail = validated.motherEmail ?? null;
+    const nextAddress = typeof validated.address === "string" ? validated.address.trim() : "";
 
     const customerId = customer
       ? customer.id
       : (
           await db.customer.create({
             data: {
-              motherName: validated.motherName.trim(),
+              motherName: nextMotherName,
               motherPhone,
-              motherEmail: validated.motherEmail ?? null,
+              motherEmail: nextMotherEmail,
+              address: nextAddress.length > 0 ? nextAddress : null,
             },
             select: { id: true },
           })
         ).id;
 
+    if (customer) {
+      const shouldUpdateName =
+        nextMotherName.length > 0 && customer.motherName.trim() !== nextMotherName;
+
+      const shouldUpdateEmail =
+        typeof validated.motherEmail === "string" &&
+        validated.motherEmail.trim().length > 0 &&
+        customer.motherEmail !== nextMotherEmail;
+
+      const shouldUpdateAddress =
+        nextAddress.length > 0 &&
+        (typeof customer.address !== "string" || customer.address.trim().length === 0);
+
+      if (shouldUpdateName || shouldUpdateEmail || shouldUpdateAddress) {
+        await db.customer.update({
+          where: { id: customer.id },
+          data: {
+            motherName: shouldUpdateName ? nextMotherName : undefined,
+            motherEmail: shouldUpdateEmail ? nextMotherEmail : undefined,
+            address: shouldUpdateAddress ? nextAddress : undefined,
+          },
+        });
+      }
+    }
+
+    const resolvedBabyId = await (async () => {
+      if (babyIdTrimmed.length > 0) {
+        const existingBaby = await db.baby.findFirst({
+          where: { id: babyIdTrimmed, customerId, deletedAt: null },
+          select: { id: true },
+        });
+        return existingBaby?.id ?? null;
+      }
+
+      if (babyNameTrimmed.length > 0) {
+        const createdBaby = await db.baby.create({
+          data: {
+            customerId,
+            name: babyNameTrimmed,
+          },
+          select: { id: true },
+        });
+        return createdBaby.id;
+      }
+
+      return null;
+    })();
+
     const reservation = await db.reservation.create({
       data: {
         customerId,
+        babyId: resolvedBabyId,
         startAt: startDateTime,
         endAt: endDateTime,
         status: "PENDING",
@@ -161,6 +228,7 @@ export async function POST(request: Request) {
               quantity: item.quantity,
               unitPrice: treatment!.basePrice,
               durationMinutes: treatment!.durationMinutes,
+              babyId: resolvedBabyId,
             };
           }),
         },

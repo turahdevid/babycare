@@ -244,8 +244,8 @@ export async function POST(request: Request) {
         {
           error:
             validated.serviceType === "HOMECARE"
-              ? "Waktu tidak valid. Homecare hanya tersedia jam 10:00 dan 15:00"
-              : "Waktu tidak valid. Pilih antara 09:00-17:00",
+              ? "Waktu tidak valid. Pilih slot: 09:00, 10:30, 12:00, 13:30, 15:00, 16:00, 17:00"
+              : "Waktu tidak valid. Pilih slot: 09:00, 10:30, 12:00, 13:30, 15:00, 16:00, 17:00",
         },
         { status: 400 },
       );

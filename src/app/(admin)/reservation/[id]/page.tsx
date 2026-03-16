@@ -11,7 +11,7 @@ import {
   DiscountPriceSummary,
   DiscountPreviewProvider,
 } from "./_components/discount-preview-controller";
-import { completeReservation } from "../_actions";
+import { cancelReservation, completeReservation } from "../_actions";
 
 const reservationDetailInclude = {
   customer: {
@@ -102,6 +102,19 @@ export default async function ReservationDetailPage(props: {
   const session = await auth();
   const params = await props.params;
 
+  const success =
+    typeof (props as { searchParams?: Record<string, string | string[] | undefined> })
+      .searchParams?.success === "string"
+      ? (props as { searchParams?: Record<string, string | string[] | undefined> }).searchParams
+          ?.success
+      : undefined;
+  const errorParam =
+    typeof (props as { searchParams?: Record<string, string | string[] | undefined> })
+      .searchParams?.error === "string"
+      ? (props as { searchParams?: Record<string, string | string[] | undefined> }).searchParams
+          ?.error
+      : undefined;
+
   if (!session?.user) {
     redirect("/");
   }
@@ -177,6 +190,22 @@ export default async function ReservationDetailPage(props: {
       subtotal={subtotalPrice}
     >
       <section className="grid gap-6">
+        {success === "cancelled" ? (
+          <GlassCard>
+            <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-3 text-sm text-emerald-800">
+              Reservasi berhasil dibatalkan.
+            </div>
+          </GlassCard>
+        ) : null}
+
+        {errorParam === "cannot-cancel" ? (
+          <GlassCard>
+            <div className="rounded-xl border border-rose-200/60 bg-rose-50/50 px-4 py-3 text-sm text-rose-700">
+              Reservasi yang sudah selesai tidak bisa dibatalkan.
+            </div>
+          </GlassCard>
+        ) : null}
+
         <div className="flex items-center justify-between gap-4">
           <Link
             className="text-sm text-slate-700/80 transition hover:text-slate-900"
@@ -582,12 +611,14 @@ export default async function ReservationDetailPage(props: {
             >
               Assign Bidan
             </button>
-            <button
-              className="rounded-2xl border border-rose-200/60 bg-rose-50/50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50/70"
-              type="button"
-            >
-              Cancel
-            </button>
+            <form action={cancelReservation.bind(null, reservation.id)}>
+              <button
+                className="rounded-2xl border border-rose-200/60 bg-rose-50/50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50/70"
+                type="submit"
+              >
+                Cancel
+              </button>
+            </form>
           </div>
           <p className="mt-3 text-xs text-slate-700/80">
             Fitur update status akan segera ditambahkan

@@ -37,6 +37,63 @@ async function requireStaff() {
   return session;
 }
 
+export async function cancelReservation(reservationId: string) {
+  const session = await requireStaff();
+
+  const parsed = idSchema.safeParse(reservationId);
+  if (!parsed.success) {
+    redirect("/reservation?error=invalid");
+  }
+
+  const existing = await db.reservation.findFirst({
+    where: { id: parsed.data },
+    select: {
+      id: true,
+      status: true,
+      completedAt: true,
+    },
+  });
+
+  if (!existing) {
+    redirect("/reservation?error=not-found");
+  }
+
+  if (existing.status === "CANCELLED") {
+    redirect(`/reservation/${existing.id}?success=cancelled`);
+  }
+
+  if (existing.status === "COMPLETED" || existing.completedAt) {
+    redirect(`/reservation/${existing.id}?error=cannot-cancel`);
+  }
+
+  const now = new Date();
+  await db.$transaction([
+    db.reservation.update({
+      where: { id: existing.id },
+      data: {
+        status: "CANCELLED",
+        cancelledAt: now,
+      },
+    }),
+    db.reservationAuditLog.create({
+      data: {
+        reservationId: existing.id,
+        action: "CANCEL",
+        fromStatus: existing.status,
+        toStatus: "CANCELLED",
+        actorId: session.user.id,
+        message: "Reservasi dibatalkan",
+      },
+    }),
+  ]);
+
+  revalidatePath("/reservation");
+  revalidatePath("/reservation/list");
+  revalidatePath("/reservation/completed");
+  revalidatePath(`/reservation/${existing.id}`);
+  redirect(`/reservation/${existing.id}?success=cancelled`);
+}
+
 export async function completeReservation(reservationId: string, formData: FormData) {
   const session = await requireStaff();
 
@@ -103,23 +160,20 @@ export async function completeReservation(reservationId: string, formData: FormD
     redirect(`/reservation/${parsed.data}?error=invalid-complete`);
   }
 
+  const subtotalPrice = existing.items.reduce(
+    (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
+    0,
+  );
+
+  const discountPercent =
+    typeof validated.data.discountPercent === "number" && validated.data.discountPercent > 0
+      ? validated.data.discountPercent
+      : undefined;
+  const discountAmountRaw = discountPercent ? (subtotalPrice * discountPercent) / 100 : 0;
+  const discountAmount = Math.round(discountAmountRaw * 100) / 100;
+  const totalPrice = Math.round((subtotalPrice - discountAmount) * 100) / 100;
+
   if (shouldComplete) {
-    const subtotalPrice = existing.items.reduce(
-      (sum, item) => sum + item.unitPrice.toNumber() * item.quantity,
-      0,
-    );
-
-    const discountPercent =
-      typeof validated.data.discountPercent === "number" &&
-      validated.data.discountPercent > 0
-        ? validated.data.discountPercent
-        : undefined;
-    const discountAmountRaw = discountPercent
-      ? (subtotalPrice * discountPercent) / 100
-      : 0;
-    const discountAmount = Math.round(discountAmountRaw * 100) / 100;
-    const totalPrice = Math.round((subtotalPrice - discountAmount) * 100) / 100;
-
     await db.$transaction([
       db.reservation.update({
         where: { id: existing.id },
@@ -146,6 +200,19 @@ export async function completeReservation(reservationId: string, formData: FormD
         },
       }),
     ]);
+  } else {
+    await db.reservation.update({
+      where: { id: existing.id },
+      data: {
+        babyId: resolvedBabyId ?? null,
+        midwifeId: validated.data.midwifeId,
+        paymentMethod: validated.data.paymentMethod ?? null,
+        subtotalPrice,
+        discountPercent: discountPercent ?? null,
+        discountAmount: discountPercent ? discountAmount : null,
+        totalPrice,
+      },
+    });
   }
 
   revalidatePath("/reservation");

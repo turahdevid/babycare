@@ -37,6 +37,14 @@ type AvailableSlot = {
   label: string;
 };
 
+type CustomerLookup = {
+  id: string;
+  motherName: string;
+  motherEmail: string | null;
+  address: string | null;
+  babies: Array<{ id: string; name: string }>;
+};
+
 const availableSlotsResponseSchema = z.object({
   slots: z.array(
     z.object({
@@ -67,6 +75,9 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
   const motherNameId = useId();
   const motherPhoneId = useId();
   const motherEmailId = useId();
+  const addressId = useId();
+  const babyIdId = useId();
+  const babyNameId = useId();
   const dateId = useId();
   const timeId = useId();
   const serviceTypeId = useId();
@@ -79,12 +90,18 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
   const [motherName, setMotherName] = useState<string>("");
   const [motherPhone, setMotherPhone] = useState<string>(defaultPhone ?? "");
   const [motherEmail, setMotherEmail] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
   const [serviceType, setServiceType] = useState<"OUTLET" | "HOMECARE">(
     "OUTLET",
   );
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+
+  const [lookupCustomer, setLookupCustomer] = useState<CustomerLookup | null>(null);
+  const [isLookingUpCustomer, setIsLookingUpCustomer] = useState<boolean>(false);
+  const [selectedBabyId, setSelectedBabyId] = useState<string>("");
+  const [babyName, setBabyName] = useState<string>("");
 
   const [selectedTreatments, setSelectedTreatments] = useState<
     SelectedTreatment[]
@@ -101,6 +118,70 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
   useEffect(() => {
     setMotherPhone(defaultPhone ?? "");
   }, [defaultPhone]);
+
+  const handleLookupCustomer = useCallback(async () => {
+    const phone = motherPhone.trim();
+    setIsLookingUpCustomer(true);
+    setLookupCustomer(null);
+
+    if (phone.length === 0) {
+      setIsLookingUpCustomer(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/public/customer/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ motherPhone: phone }),
+      });
+
+      if (!response.ok) {
+        setIsLookingUpCustomer(false);
+        return;
+      }
+
+      const json: unknown = await response.json();
+      const parsed = z
+        .object({
+          customer: z
+            .object({
+              id: z.string().min(1),
+              motherName: z.string().min(1),
+              motherEmail: z.string().nullable(),
+              address: z.string().nullable(),
+              babies: z.array(z.object({ id: z.string().min(1), name: z.string().min(1) })),
+            })
+            .nullable(),
+        })
+        .safeParse(json);
+
+      if (!parsed.success) {
+        setIsLookingUpCustomer(false);
+        return;
+      }
+
+      if (!parsed.data.customer) {
+        setIsLookingUpCustomer(false);
+        return;
+      }
+
+      const customer = parsed.data.customer;
+      setLookupCustomer(customer);
+      setMotherName(customer.motherName);
+      setMotherEmail(customer.motherEmail ?? "");
+      setAddress(customer.address ?? "");
+
+      if (customer.babies.length > 0) {
+        setSelectedBabyId(customer.babies[0]?.id ?? "");
+        setBabyName("");
+      } else {
+        setSelectedBabyId("new");
+      }
+    } finally {
+      setIsLookingUpCustomer(false);
+    }
+  }, [motherPhone]);
 
   const totalDuration = useMemo(() => {
     return selectedTreatments.reduce((sum, item) => {
@@ -213,6 +294,15 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
         if (motherEmail.trim().length > 0) {
           formData.set("motherEmail", motherEmail.trim());
         }
+        if (address.trim().length > 0) {
+          formData.set("address", address.trim());
+        }
+        const shouldSendBabyId = lookupCustomer && selectedBabyId.length > 0 && selectedBabyId !== "new";
+        if (shouldSendBabyId) {
+          formData.set("babyId", selectedBabyId);
+        } else if (babyName.trim().length > 0) {
+          formData.set("babyName", babyName.trim());
+        }
         formData.set("serviceType", serviceType);
         formData.set("date", date);
         formData.set("time", time);
@@ -252,13 +342,17 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
       }
     },
     [
+      address,
+      babyName,
       date,
       isSubmitting,
+      lookupCustomer,
       motherEmail,
       motherName,
       motherPhone,
       notes,
       selectedTreatments,
+      selectedBabyId,
       serviceType,
       time,
     ],
@@ -269,7 +363,8 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
     motherName.trim().length === 0 ||
     motherPhone.trim().length === 0 ||
     date.length === 0 ||
-    time.length === 0;
+    time.length === 0 ||
+    ((lookupCustomer ? selectedBabyId === "new" : true) && babyName.trim().length === 0);
 
   return (
     <form onSubmit={onSubmit}>
@@ -322,17 +417,37 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
               >
                 Nomor WhatsApp <span className="text-rose-600">*</span>
               </label>
-              <input
-                className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                id={motherPhoneId}
-                inputMode="tel"
-                name="motherPhone"
-                onChange={(e) => setMotherPhone(e.target.value)}
-                placeholder="Contoh: 08xxxxxxxxxx"
-                required
-                type="tel"
-                value={motherPhone}
-              />
+              <div className="mt-1.5 flex gap-2">
+                <input
+                  className="w-full flex-1 rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  id={motherPhoneId}
+                  inputMode="tel"
+                  name="motherPhone"
+                  onChange={(e) => {
+                    setMotherPhone(e.target.value);
+                    setLookupCustomer(null);
+                    setSelectedBabyId("");
+                    setBabyName("");
+                  }}
+                  placeholder="Contoh: 08xxxxxxxxxx"
+                  required
+                  type="tel"
+                  value={motherPhone}
+                />
+                <button
+                  className="rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70 disabled:opacity-50"
+                  disabled={isLookingUpCustomer || motherPhone.trim().length === 0}
+                  onClick={() => void handleLookupCustomer()}
+                  type="button"
+                >
+                  {isLookingUpCustomer ? "Mengecek..." : "Cek"}
+                </button>
+              </div>
+              {lookupCustomer ? (
+                <p className="mt-2 text-xs text-emerald-700">
+                  Data ditemukan: {lookupCustomer.motherName}
+                </p>
+              ) : null}
             </div>
 
             <div className="md:col-span-2">
@@ -353,12 +468,114 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
                 value={motherEmail}
               />
             </div>
+
+            {!lookupCustomer ? (
+              <div className="md:col-span-2">
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor={addressId}
+                >
+                  Alamat
+                </label>
+                <textarea
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  id={addressId}
+                  name="address"
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Alamat lengkap"
+                  rows={3}
+                  value={address}
+                />
+              </div>
+            ) : null}
           </div>
         </GlassCard>
 
         <GlassCard>
           <h2 className="text-base font-semibold text-slate-900">
-            2. Jadwal
+            2. Data Anak
+          </h2>
+
+          {lookupCustomer && lookupCustomer.babies.length > 0 ? (
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  className="block text-sm font-medium text-slate-700"
+                  htmlFor={babyIdId}
+                >
+                  Pilih Anak <span className="text-rose-600">*</span>
+                </label>
+                <select
+                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  id={babyIdId}
+                  name="babyId"
+                  onChange={(e) => {
+                    setSelectedBabyId(e.target.value);
+                    if (e.target.value !== "new") {
+                      setBabyName("");
+                    }
+                  }}
+                  required
+                  value={selectedBabyId}
+                >
+                  {lookupCustomer.babies.map((baby) => (
+                    <option key={baby.id} value={baby.id}>
+                      {baby.name}
+                    </option>
+                  ))}
+                  <option value="new">+ Tambah Anak Baru</option>
+                </select>
+              </div>
+
+              {selectedBabyId === "new" ? (
+                <div>
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor={babyNameId}
+                  >
+                    Nama Anak <span className="text-rose-600">*</span>
+                  </label>
+                  <input
+                    className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                    id={babyNameId}
+                    name="babyName"
+                    onChange={(e) => setBabyName(e.target.value)}
+                    placeholder="Nama anak"
+                    required
+                    type="text"
+                    value={babyName}
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="mt-4">
+              <label
+                className="block text-sm font-medium text-slate-700"
+                htmlFor={babyNameId}
+              >
+                Nama Anak <span className="text-rose-600">*</span>
+              </label>
+              <input
+                className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                id={babyNameId}
+                name="babyName"
+                onChange={(e) => setBabyName(e.target.value)}
+                placeholder="Nama anak"
+                required
+                type="text"
+                value={babyName}
+              />
+              <p className="mt-2 text-xs text-slate-700/70">
+                Isi nama anak untuk reservasi ini.
+              </p>
+            </div>
+          )}
+        </GlassCard>
+
+        <GlassCard>
+          <h2 className="text-base font-semibold text-slate-900">
+            3. Jadwal
           </h2>
 
           <div className="mt-4 grid gap-4 md:grid-cols-3">
@@ -445,7 +662,7 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
 
         <GlassCard>
           <h2 className="text-base font-semibold text-slate-900">
-            3. Pilih Treatment
+            4. Pilih Treatment
           </h2>
 
           {(["BABY", "KIDS"] as const).map((cat) => {
@@ -537,7 +754,7 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
 
         <GlassCard>
           <h2 className="text-base font-semibold text-slate-900">
-            4. Catatan (Opsional)
+            5. Catatan (Opsional)
           </h2>
           <textarea
             className="mt-4 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"

@@ -1,13 +1,21 @@
 export const TIME_SLOTS = [
-  { start: "09:00", end: "11:00", label: "09:00 - 11:00" },
-  { start: "11:00", end: "13:00", label: "11:00 - 13:00" },
-  { start: "13:00", end: "15:00", label: "13:00 - 15:00" },
-  { start: "15:00", end: "17:00", label: "15:00 - 17:00" },
+  { start: "09:00", end: "10:30", label: "09.00" },
+  { start: "10:30", end: "12:00", label: "10.30" },
+  { start: "12:00", end: "13:30", label: "12.00" },
+  { start: "13:30", end: "15:00", label: "13.30" },
+  { start: "15:00", end: "16:00", label: "15.00" },
+  { start: "16:00", end: "17:00", label: "16.00" },
+  { start: "17:00", end: "18:00", label: "17.00" },
 ] as const;
 
 export const HOMECARE_TIME_SLOTS = [
-  { start: "10:00", end: "12:00", label: "10:00 (Homecare)" },
-  { start: "15:00", end: "17:00", label: "15:00 (Homecare)" },
+  { start: "09:00", end: "10:30", label: "09.00 (Homecare)" },
+  { start: "10:30", end: "12:00", label: "10.30 (Homecare)" },
+  { start: "12:00", end: "13:30", label: "12.00 (Homecare)" },
+  { start: "13:30", end: "15:00", label: "13.30 (Homecare)" },
+  { start: "15:00", end: "16:00", label: "15.00 (Homecare)" },
+  { start: "16:00", end: "17:00", label: "16.00 (Homecare)" },
+  { start: "17:00", end: "18:00", label: "17.00 (Homecare)" },
 ] as const;
 
 export const SLOT_CAPACITY = {
@@ -15,15 +23,17 @@ export const SLOT_CAPACITY = {
   HOMECARE: 2,
 } as const;
 
+function toMinutes(time: string): number {
+  const normalized = time.slice(0, 5);
+  const [hoursRaw, minutesRaw] = normalized.split(":");
+  const hours = Number(hoursRaw ?? "0");
+  const minutes = Number(minutesRaw ?? "0");
+  return hours * 60 + minutes;
+}
+
 export function getSlotForTime(time: string): typeof TIME_SLOTS[number] | null {
-  const hour = parseInt(time.split(":")[0] ?? "0");
-  
-  if (hour >= 9 && hour < 11) return TIME_SLOTS[0];
-  if (hour >= 11 && hour < 13) return TIME_SLOTS[1];
-  if (hour >= 13 && hour < 15) return TIME_SLOTS[2];
-  if (hour >= 15 && hour < 17) return TIME_SLOTS[3];
-  
-  return null;
+  const normalized = time.slice(0, 5);
+  return TIME_SLOTS.find((s) => s.start === normalized) ?? null;
 }
 
 export function getHomecareSlotForTime(time: string): typeof HOMECARE_TIME_SLOTS[number] | null {
@@ -32,9 +42,9 @@ export function getHomecareSlotForTime(time: string): typeof HOMECARE_TIME_SLOTS
 }
 
 export function isTimeInSlot(time: string, slot: typeof TIME_SLOTS[number]): boolean {
-  const hour = parseInt(time.split(":")[0] ?? "0");
-  const slotStartHour = parseInt(slot.start.split(":")[0] ?? "0");
-  const slotEndHour = parseInt(slot.end.split(":")[0] ?? "0");
-  
-  return hour >= slotStartHour && hour < slotEndHour;
+  const value = toMinutes(time);
+  const slotStart = toMinutes(slot.start);
+  const slotEnd = toMinutes(slot.end);
+
+  return value >= slotStart && value < slotEnd;
 }
