@@ -7,6 +7,8 @@ import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../_components/glass-card";
 import { CustomerSearch } from "./_components/customer-search";
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = {
   q?: string;
   page?: string;

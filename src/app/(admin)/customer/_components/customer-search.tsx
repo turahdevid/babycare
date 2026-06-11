@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
@@ -15,12 +15,14 @@ export function CustomerSearch({ placeholder, initialQuery }: Props) {
 
   const [value, setValue] = useState<string>(initialQuery ?? "");
 
-  // Stable base URL without transient params
-  const base = useMemo(() => new URLSearchParams(searchParams?.toString()), [searchParams]);
-
   useEffect(() => {
+    const currentQ = searchParams?.get("q") ?? "";
+    if (value.trim() === currentQ.trim()) {
+      return;
+    }
+
     const handle = setTimeout(() => {
-      const params = new URLSearchParams(base.toString());
+      const params = new URLSearchParams(searchParams?.toString());
       if (value.trim().length > 0) {
         params.set("q", value.trim());
       } else {
@@ -33,7 +35,7 @@ export function CustomerSearch({ placeholder, initialQuery }: Props) {
     }, 350);
 
     return () => clearTimeout(handle);
-  }, [base, pathname, router, value]);
+  }, [value, searchParams, pathname, router]);
 
   return (
     <input
