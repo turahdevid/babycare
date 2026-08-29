@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useId } from "react";
+import { createPortal } from "react-dom";
 
 export type SearchableSelectOption = {
   value: string;
@@ -78,6 +79,40 @@ export function SearchableSelect({
     };
   }, [isOpen]);
 
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  }>({ top: 0, left: 0, width: 0 });
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const updatePosition = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      updatePosition();
+      window.addEventListener("resize", updatePosition);
+      window.addEventListener("scroll", updatePosition, true);
+    }
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isOpen]);
+
   // Focus input when opened (handles mobile/tablet focus)
   useEffect(() => {
     if (isOpen) {
@@ -111,6 +146,111 @@ export function SearchableSelect({
     setIsOpen(false);
   };
 
+  const dropdownMenu = (
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col justify-end bg-slate-900/40 backdrop-blur-xs sm:bg-transparent sm:backdrop-blur-none"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setIsOpen(false);
+        }
+      }}
+    >
+      <div
+        className="w-full rounded-t-3xl border border-slate-200/90 bg-white p-4 shadow-2xl sm:absolute sm:rounded-2xl sm:p-2 sm:shadow-xl"
+        style={{
+          ...(typeof window !== "undefined" && window.innerWidth >= 640
+            ? {
+                top: `${dropdownPosition.top + 6}px`,
+                left: `${dropdownPosition.left}px`,
+                width: `${dropdownPosition.width}px`,
+                position: "absolute",
+              }
+            : {}),
+        }}
+      >
+        {/* Search Box Input - proper input element to trigger touch tablet/phone virtual keyboard */}
+        <div className="sticky top-0 z-10 pb-2">
+          <div className="relative">
+            <input
+              ref={searchInputRef}
+              autoComplete="off"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+              inputMode="text"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+              type="text"
+              value={searchQuery}
+            />
+            {searchQuery ? (
+              <button
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-xs text-slate-400 hover:text-slate-600"
+                onClick={() => setSearchQuery("")}
+                type="button"
+              >
+                ✕
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Options List with Scrolling */}
+        <div
+          className="max-h-60 overflow-y-auto overscroll-contain py-1 text-sm text-slate-700 sm:max-h-52"
+          role="listbox"
+          tabIndex={-1}
+        >
+          {/* Default empty option / reset option if not required */}
+          {!required && (
+            <div
+              className={`cursor-pointer rounded-xl px-3 py-2.5 transition ${
+                selectedValue === ""
+                  ? "bg-sky-50 font-medium text-sky-700"
+                  : "hover:bg-slate-100/70"
+              }`}
+              onClick={() => handleSelect("")}
+              role="option"
+              aria-selected={selectedValue === ""}
+            >
+              <div className="truncate">{placeholder}</div>
+            </div>
+          )}
+
+          {filteredOptions.length === 0 ? (
+            <div className="px-3 py-6 text-center text-xs text-slate-500">
+              {emptyMessage}
+            </div>
+          ) : (
+            filteredOptions.map((option) => {
+              const isSelected = option.value === selectedValue;
+              return (
+                <div
+                  key={option.value}
+                  className={`cursor-pointer rounded-xl px-3 py-2.5 transition ${
+                    isSelected
+                      ? "bg-sky-50 font-medium text-sky-700"
+                      : "hover:bg-slate-100/70"
+                  }`}
+                  onClick={() => handleSelect(option.value)}
+                  role="option"
+                  aria-selected={isSelected}
+                >
+                  <div className="truncate text-slate-900 font-medium">
+                    {option.label}
+                  </div>
+                  {option.sublabel ? (
+                    <div className="truncate text-xs text-slate-500">
+                      {option.sublabel}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className={`relative ${className}`} ref={containerRef}>
       {/* Hidden input for form submission compatibility */}
@@ -132,7 +272,10 @@ export function SearchableSelect({
           selectedOption ? "text-slate-900" : "text-slate-500"
         }`}
         disabled={disabled}
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => {
+          updatePosition();
+          setIsOpen((prev) => !prev);
+        }}
         type="button"
       >
         <span className="block truncate">
@@ -156,90 +299,8 @@ export function SearchableSelect({
         </svg>
       </button>
 
-      {/* Dropdown Menu */}
-      {isOpen ? (
-        <div className="absolute z-50 mt-1.5 max-h-80 w-full overflow-hidden rounded-2xl border border-white/80 bg-white/95 p-2 shadow-xl backdrop-blur-2xl">
-          {/* Search Box Input - proper input element to trigger touch tablet/phone virtual keyboard */}
-          <div className="sticky top-0 z-10 pb-2">
-            <div className="relative">
-              <input
-                ref={searchInputRef}
-                autoComplete="off"
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
-                inputMode="text"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={searchPlaceholder}
-                type="text"
-                value={searchQuery}
-              />
-              {searchQuery ? (
-                <button
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
-                  onClick={() => setSearchQuery("")}
-                  type="button"
-                >
-                  ✕
-                </button>
-              ) : null}
-            </div>
-          </div>
-
-          {/* Options List with Scrolling */}
-          <div
-            className="max-h-56 overflow-y-auto overscroll-contain py-1 text-sm text-slate-700"
-            role="listbox"
-            tabIndex={-1}
-          >
-            {/* Default empty option / reset option if not required */}
-            {!required && (
-              <div
-                className={`cursor-pointer rounded-xl px-3 py-2 transition ${
-                  selectedValue === ""
-                    ? "bg-sky-50 font-medium text-sky-700"
-                    : "hover:bg-slate-100/70"
-                }`}
-                onClick={() => handleSelect("")}
-                role="option"
-                aria-selected={selectedValue === ""}
-              >
-                <div className="truncate">{placeholder}</div>
-              </div>
-            )}
-
-            {filteredOptions.length === 0 ? (
-              <div className="px-3 py-3 text-center text-xs text-slate-500">
-                {emptyMessage}
-              </div>
-            ) : (
-              filteredOptions.map((option) => {
-                const isSelected = option.value === selectedValue;
-                return (
-                  <div
-                    key={option.value}
-                    className={`cursor-pointer rounded-xl px-3 py-2 transition ${
-                      isSelected
-                        ? "bg-sky-50 font-medium text-sky-700"
-                        : "hover:bg-slate-100/70"
-                    }`}
-                    onClick={() => handleSelect(option.value)}
-                    role="option"
-                    aria-selected={isSelected}
-                  >
-                    <div className="truncate text-slate-900">
-                      {option.label}
-                    </div>
-                    {option.sublabel ? (
-                      <div className="truncate text-xs text-slate-500">
-                        {option.sublabel}
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      ) : null}
+      {/* Dropdown Menu Portal */}
+      {isOpen && isMounted ? createPortal(dropdownMenu, document.body) : null}
     </div>
   );
 }
