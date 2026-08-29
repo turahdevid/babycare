@@ -279,22 +279,28 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
         body: formData,
       });
 
+      const rawText = await response.text();
+      let parsedJson: unknown = null;
+      try {
+        parsedJson = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        parsedJson = null;
+      }
+
       if (!response.ok) {
-        const errorJson: unknown = await response.json();
-        const parsedError = createReservationErrorSchema.safeParse(errorJson);
+        const parsedError = createReservationErrorSchema.safeParse(parsedJson);
 
         throw new Error(
-          parsedError.success
-            ? (parsedError.data.error ?? "Gagal membuat reservasi")
-            : "Gagal membuat reservasi",
+          parsedError.success && parsedError.data.error
+            ? parsedError.data.error
+            : `Gagal membuat reservasi (Status: ${response.status})`,
         );
       }
 
-      const json: unknown = await response.json();
-      const parsed = createReservationResponseSchema.safeParse(json);
+      const parsed = createReservationResponseSchema.safeParse(parsedJson);
 
       if (!parsed.success) {
-        throw new Error("Gagal membuat reservasi");
+        throw new Error("Gagal membuat reservasi. Respon tidak valid.");
       }
 
       router.push(`/reservation/${parsed.data.reservationId}`);

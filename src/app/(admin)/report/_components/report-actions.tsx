@@ -17,21 +17,21 @@ export function ReportActions({
     <div className="flex items-center gap-2 print:hidden">
       {pdfHref ? (
         <a
-          className="inline-flex items-center gap-2 rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70"
+          className="inline-flex items-center gap-1.5 rounded-2xl border border-sky-200/60 bg-sky-50/50 px-3 py-2 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70 sm:gap-2 sm:px-4"
           href={pdfHref}
         >
-          <PdfIcon className="h-4 w-4" />
-          {pdfLabel ?? "PDF"}
+          <PdfIcon className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">{pdfLabel ?? "PDF"}</span>
         </a>
       ) : null}
 
       {csvHref ? (
         <a
-          className="inline-flex items-center gap-2 rounded-2xl border border-white/60 bg-white/35 px-4 py-2 text-sm font-medium text-slate-800 transition hover:bg-white/45"
+          className="inline-flex items-center gap-1.5 rounded-2xl border border-white/60 bg-white/35 px-3 py-2 text-sm font-medium text-slate-800 transition hover:bg-white/45 sm:gap-2 sm:px-4"
           href={csvHref}
         >
-          <SheetIcon className="h-4 w-4" />
-          {csvLabel ?? "Excel (CSV)"}
+          <SheetIcon className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">{csvLabel ?? "Excel"}</span>
         </a>
       ) : null}
     </div>

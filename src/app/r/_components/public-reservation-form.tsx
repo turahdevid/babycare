@@ -316,22 +316,28 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
           body: formData,
         });
 
+        const rawText = await response.text();
+        let parsedJson: unknown = null;
+        try {
+          parsedJson = rawText ? JSON.parse(rawText) : null;
+        } catch {
+          parsedJson = null;
+        }
+
         if (!response.ok) {
-          const errorJson: unknown = await response.json();
-          const parsedError = createReservationErrorSchema.safeParse(errorJson);
+          const parsedError = createReservationErrorSchema.safeParse(parsedJson);
 
           throw new Error(
-            parsedError.success
-              ? (parsedError.data.error ?? "Gagal membuat reservasi")
-              : "Gagal membuat reservasi",
+            parsedError.success && parsedError.data.error
+              ? parsedError.data.error
+              : `Gagal membuat reservasi (Status: ${response.status})`,
           );
         }
 
-        const json: unknown = await response.json();
-        const parsed = createReservationResponseSchema.safeParse(json);
+        const parsed = createReservationResponseSchema.safeParse(parsedJson);
 
         if (!parsed.success) {
-          throw new Error("Gagal membuat reservasi");
+          throw new Error("Gagal membuat reservasi. Respon tidak valid.");
         }
 
         setSuccessReservationId(parsed.data.reservationId);
@@ -422,6 +428,7 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
                   className="w-full flex-1 rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                   id={motherPhoneId}
                   inputMode="tel"
+                  minLength={9}
                   name="motherPhone"
                   onChange={(e) => {
                     setMotherPhone(e.target.value);
@@ -429,8 +436,10 @@ export function PublicReservationForm({ treatments, defaultPhone }: Props) {
                     setSelectedBabyId("");
                     setBabyName("");
                   }}
-                  placeholder="Contoh: 08xxxxxxxxxx"
+                  pattern="^(\+?62|08|0)[0-9]{8,13}$"
+                  placeholder="Contoh: 081234567890"
                   required
+                  title="Nomor WhatsApp harus valid (contoh: 081234567890)"
                   type="tel"
                   value={motherPhone}
                 />

@@ -47,6 +47,7 @@ export default async function ReportTodayPage() {
           status: "COMPLETED",
         },
         select: {
+          paymentMethod: true,
           subtotalPrice: true,
           discountPercent: true,
           discountAmount: true,
@@ -58,6 +59,13 @@ export default async function ReportTodayPage() {
 
   const completedCount = completedReservations.length;
 
+  let cashRevenue = 0;
+  let cashCount = 0;
+  let transferRevenue = 0;
+  let transferCount = 0;
+  let unknownPaymentRevenue = 0;
+  let unknownPaymentCount = 0;
+
   const revenue = completedTotals.reduce((sum, reservation) => {
     const itemSubtotal = reservation.items.reduce(
       (subSum, item) => subSum + item.unitPrice.toNumber() * item.quantity,
@@ -68,7 +76,20 @@ export default async function ReportTodayPage() {
       reservation.discountAmount?.toNumber() ??
       (reservation.discountPercent ? (subtotal * reservation.discountPercent) / 100 : 0);
     const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
-    return sum + Math.max(total, 0);
+    const safeTotal = Math.max(total, 0);
+
+    if (reservation.paymentMethod === "CASH") {
+      cashRevenue += safeTotal;
+      cashCount += 1;
+    } else if (reservation.paymentMethod === "TRANSFER") {
+      transferRevenue += safeTotal;
+      transferCount += 1;
+    } else {
+      unknownPaymentRevenue += safeTotal;
+      unknownPaymentCount += 1;
+    }
+
+    return sum + safeTotal;
   }, 0);
 
   const transactions = await fetchTransactionDetails({ gte: start, lt: end });
@@ -131,18 +152,64 @@ export default async function ReportTodayPage() {
           </div>
         </GlassCard>
 
-        <GlassCard>
-          <h3 className="text-base font-semibold text-slate-900">Omzet</h3>
-          <div className="mt-4">
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-slate-700/80">Total omzet</span>
-              <span className="text-2xl font-semibold text-slate-900">
-                {formatCurrency(revenue)}
-              </span>
-            </div>
-            <p className="mt-2 text-xs text-slate-700/80">
-              Omzet dihitung dari reservasi dengan status COMPLETED.
+        <GlassCard className="w-full min-w-0">
+          <h3 className="text-base font-semibold text-slate-900">Omzet Hari Ini</h3>
+          <div className="mt-3">
+            <span className="block text-xs font-bold uppercase tracking-wider text-slate-500">
+              Total Omzet
+            </span>
+            <p className="mt-1 break-words text-xl font-bold text-slate-900 sm:text-2xl">
+              {formatCurrency(revenue)}
             </p>
+            <p className="mt-1 text-xs text-slate-600">
+              Dihitung dari {completedCount} reservasi COMPLETED
+            </p>
+          </div>
+
+          <div className="mt-4 grid w-full min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <div className="min-w-0 rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-3 shadow-xs">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                  Cash / Tunai
+                </span>
+                <span className="shrink-0 rounded-md bg-emerald-200/80 px-1.5 py-0.5 text-xs font-bold text-emerald-900">
+                  {cashCount} tx
+                </span>
+              </div>
+              <p className="mt-1 break-words text-base font-bold text-emerald-700 sm:text-lg">
+                {formatCurrency(cashRevenue)}
+              </p>
+            </div>
+
+            <div className="min-w-0 rounded-2xl border border-sky-200/80 bg-sky-50/50 p-3 shadow-xs">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-sky-800">
+                  Transfer Bank
+                </span>
+                <span className="shrink-0 rounded-md bg-sky-200/80 px-1.5 py-0.5 text-xs font-bold text-sky-900">
+                  {transferCount} tx
+                </span>
+              </div>
+              <p className="mt-1 break-words text-base font-bold text-sky-700 sm:text-lg">
+                {formatCurrency(transferRevenue)}
+              </p>
+            </div>
+
+            {unknownPaymentCount > 0 ? (
+              <div className="min-w-0 rounded-2xl border border-amber-200/80 bg-amber-50/50 p-3 shadow-xs sm:col-span-2">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
+                    Belum Ditentukan
+                  </span>
+                  <span className="shrink-0 rounded-md bg-amber-200/80 px-1.5 py-0.5 text-xs font-bold text-amber-900">
+                    {unknownPaymentCount} tx
+                  </span>
+                </div>
+                <p className="mt-1 break-words text-base font-bold text-amber-700 sm:text-lg">
+                  {formatCurrency(unknownPaymentRevenue)}
+                </p>
+              </div>
+            ) : null}
           </div>
         </GlassCard>
       </div>

@@ -9,14 +9,14 @@ const newCustomerSchema = z.object({
   motherName: z.string().min(1),
   motherPhone: z.string().min(1),
   address: z.string().min(1),
-  motherEmail: z.string().email().optional(),
+  motherEmail: z.string().email().optional().or(z.literal("")),
   notes: z.string().optional(),
   baby: z
     .object({
       name: z.string().min(1),
-      gender: z.enum(["MALE", "FEMALE"]).optional(),
+      gender: z.enum(["MALE", "FEMALE"]).optional().or(z.literal("")),
       birthPlace: z.string().optional(),
-      birthDate: z.string().min(1).optional(),
+      birthDate: z.string().min(1).optional().or(z.literal("")),
       allergy: z.string().optional(),
       ageAtTreatment: z.string().optional(),
       notes: z.string().optional(),
@@ -206,11 +206,16 @@ export async function POST(request: Request) {
             ? newCustomerData.baby.birthDate
             : null;
 
+        const genderValue =
+          newCustomerData.baby.gender === "MALE" || newCustomerData.baby.gender === "FEMALE"
+            ? newCustomerData.baby.gender
+            : null;
+
         const createdBaby = await db.baby.create({
           data: {
             customerId,
             name: newCustomerData.baby.name,
-            gender: newCustomerData.baby.gender ?? null,
+            gender: genderValue,
             birthPlace: newCustomerData.baby.birthPlace ?? null,
             birthDate: birthDateValue ? new Date(birthDateValue) : null,
             allergy: newCustomerData.baby.allergy ?? null,

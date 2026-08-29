@@ -91,13 +91,120 @@ async function main() {
     }
   }
 
+  // Seed sample customer, baby, and reservations with CASH and TRANSFER
+  let sampleCustomer = await db.customer.findFirst({
+    where: { motherPhone: "081234567890" },
+  });
+
+  if (!sampleCustomer) {
+    sampleCustomer = await db.customer.create({
+      data: {
+        motherName: "Ibu Amanda",
+        motherPhone: "081234567890",
+        motherEmail: "amanda@example.com",
+        address: "Jl. Melati No. 12, Jakarta",
+      },
+    });
+  }
+
+  let sampleBaby = await db.baby.findFirst({
+    where: { customerId: sampleCustomer.id, name: "Baby Kenzo" },
+  });
+
+  if (!sampleBaby) {
+    sampleBaby = await db.baby.create({
+      data: {
+        customerId: sampleCustomer.id,
+        name: "Baby Kenzo",
+        gender: "MALE",
+        birthPlace: "Jakarta",
+        birthDate: new Date(now.getFullYear(), now.getMonth() - 6, 10),
+      },
+    });
+  }
+
+  const allTreatments = await db.treatment.findMany({ take: 4 });
+
+  if (allTreatments.length >= 2) {
+    const existingRes1 = await db.reservation.findFirst({
+      where: { id: "sample-res-cash" },
+    });
+
+    if (!existingRes1) {
+      const t1 = allTreatments[0]!;
+      const t1Price = t1.basePrice.toNumber();
+      await db.reservation.create({
+        data: {
+          id: "sample-res-cash",
+          customerId: sampleCustomer.id,
+          babyId: sampleBaby.id,
+          midwifeId: midwife.id,
+          startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0),
+          endAt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0),
+          status: "COMPLETED",
+          serviceType: "OUTLET",
+          paymentMethod: "CASH",
+          subtotalPrice: t1Price,
+          totalPrice: t1Price,
+          items: {
+            create: [
+              {
+                treatmentId: t1.id,
+                babyId: sampleBaby.id,
+                quantity: 1,
+                unitPrice: t1.basePrice,
+                durationMinutes: t1.durationMinutes,
+              },
+            ],
+          },
+        },
+      });
+    }
+
+    const existingRes2 = await db.reservation.findFirst({
+      where: { id: "sample-res-transfer" },
+    });
+
+    if (!existingRes2) {
+      const t2 = allTreatments[1]!;
+      const t2Price = t2.basePrice.toNumber();
+      await db.reservation.create({
+        data: {
+          id: "sample-res-transfer",
+          customerId: sampleCustomer.id,
+          babyId: sampleBaby.id,
+          midwifeId: midwife.id,
+          startAt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 0),
+          endAt: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0),
+          status: "COMPLETED",
+          serviceType: "OUTLET",
+          paymentMethod: "TRANSFER",
+          subtotalPrice: t2Price,
+          totalPrice: t2Price,
+          items: {
+            create: [
+              {
+                treatmentId: t2.id,
+                babyId: sampleBaby.id,
+                quantity: 1,
+                unitPrice: t2.basePrice,
+                durationMinutes: t2.durationMinutes,
+              },
+            ],
+          },
+        },
+      });
+    }
+  }
+
   process.stdout.write(
     `Seed completed.\n- Admin: ${admin.email ?? ""}\n- Midwife: ${midwife.email ?? ""}\n- Treatments created: ${treatmentCount}\n`,
   );
 }
 
 main()
-  .catch(() => {
+  .catch((err) => {
+    console.error("Seed error details:", err);
     process.stderr.write("Seed failed\n");
     process.exit(1);
   })

@@ -372,6 +372,12 @@ type PdfPayload =
   | (PdfPayloadBase & {
       type: "revenue";
       revenue: number;
+      cashRevenue: number;
+      cashCount: number;
+      transferRevenue: number;
+      transferCount: number;
+      unknownPaymentRevenue: number;
+      unknownPaymentCount: number;
       rows: Array<{ name: string; revenue: number }>;
     })
   | (PdfPayloadBase & {
@@ -727,6 +733,7 @@ async function buildPdfPayload(args: {
         status: "COMPLETED",
       },
       select: {
+        paymentMethod: true,
         subtotalPrice: true,
         discountPercent: true,
         discountAmount: true,
@@ -744,6 +751,12 @@ async function buildPdfPayload(args: {
 
     const byTreatment = new Map<string, number>();
     let revenue = 0;
+    let cashRevenue = 0;
+    let cashCount = 0;
+    let transferRevenue = 0;
+    let transferCount = 0;
+    let unknownPaymentRevenue = 0;
+    let unknownPaymentCount = 0;
 
     for (const reservation of reservations) {
       const itemSubtotal = reservation.items.reduce(
@@ -759,6 +772,17 @@ async function buildPdfPayload(args: {
       const total = reservation.totalPrice?.toNumber() ?? subtotal - discountAmount;
       const safeTotal = Math.max(total, 0);
       revenue += safeTotal;
+
+      if (reservation.paymentMethod === "CASH") {
+        cashRevenue += safeTotal;
+        cashCount += 1;
+      } else if (reservation.paymentMethod === "TRANSFER") {
+        transferRevenue += safeTotal;
+        transferCount += 1;
+      } else {
+        unknownPaymentRevenue += safeTotal;
+        unknownPaymentCount += 1;
+      }
 
       const ratio = subtotal > 0 ? safeTotal / subtotal : 0;
       for (const item of reservation.items) {
@@ -785,6 +809,12 @@ async function buildPdfPayload(args: {
       periodLabel,
       createdAtLabel,
       revenue,
+      cashRevenue,
+      cashCount,
+      transferRevenue,
+      transferCount,
+      unknownPaymentRevenue,
+      unknownPaymentCount,
       rows,
       transactions,
     };
@@ -987,10 +1017,15 @@ function renderPdfFromPayload(
       payload.rows.map((r) => [r.name, r.quantity]),
     );
   } else if (payload.type === "revenue") {
-    drawPdfSectionTitle(doc, cursor, "Ringkasan");
+    drawPdfSectionTitle(doc, cursor, "Ringkasan Omzet");
     drawPdfKeyValueGrid(doc, cursor, [
       { label: "Total omzet", value: formatCurrencyNumber(payload.revenue) },
-      { label: "", value: "" },
+      { label: "Cash", value: `${formatCurrencyNumber(payload.cashRevenue)} (${payload.cashCount} transaksi)` },
+      { label: "Transfer", value: `${formatCurrencyNumber(payload.transferRevenue)} (${payload.transferCount} transaksi)` },
+      {
+        label: payload.unknownPaymentCount > 0 ? "Belum ditentukan" : "",
+        value: payload.unknownPaymentCount > 0 ? `${formatCurrencyNumber(payload.unknownPaymentRevenue)} (${payload.unknownPaymentCount} transaksi)` : "",
+      },
     ]);
 
     drawPdfSectionTitle(doc, cursor, "Top treatment");
@@ -1316,6 +1351,7 @@ export async function GET(request: Request) {
           status: "COMPLETED",
         },
         select: {
+          paymentMethod: true,
           subtotalPrice: true,
           discountPercent: true,
           discountAmount: true,
@@ -1333,6 +1369,12 @@ export async function GET(request: Request) {
 
       const byTreatment = new Map<string, number>();
       let revenue = 0;
+      let cashRevenue = 0;
+      let cashCount = 0;
+      let transferRevenue = 0;
+      let transferCount = 0;
+      let unknownPaymentRevenue = 0;
+      let unknownPaymentCount = 0;
 
       for (const reservation of reservations) {
         const itemSubtotal = reservation.items.reduce(
@@ -1349,6 +1391,17 @@ export async function GET(request: Request) {
         const safeTotal = Math.max(total, 0);
         revenue += safeTotal;
 
+        if (reservation.paymentMethod === "CASH") {
+          cashRevenue += safeTotal;
+          cashCount += 1;
+        } else if (reservation.paymentMethod === "TRANSFER") {
+          transferRevenue += safeTotal;
+          transferCount += 1;
+        } else {
+          unknownPaymentRevenue += safeTotal;
+          unknownPaymentCount += 1;
+        }
+
         const ratio = subtotal > 0 ? safeTotal / subtotal : 0;
         for (const item of reservation.items) {
           const current = byTreatment.get(item.treatment.name) ?? 0;
@@ -1360,7 +1413,16 @@ export async function GET(request: Request) {
       }
 
       const rows: CsvRow[] = [
-        { period, total_omzet: revenue },
+        {
+          period,
+          total_omzet: revenue,
+          cash_omzet: cashRevenue,
+          cash_transaksi: cashCount,
+          transfer_omzet: transferRevenue,
+          transfer_transaksi: transferCount,
+          belum_ditentukan_omzet: unknownPaymentRevenue,
+          belum_ditentukan_transaksi: unknownPaymentCount,
+        },
         ...Array.from(byTreatment.entries())
           .map(([name, total]) => ({ period, treatment: name, omzet: total }))
           .sort((a, b) => {

@@ -82,9 +82,13 @@ export default async function NewCustomerPage() {
               <input
                 className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-600/60 focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
                 id="motherPhone"
+                inputMode="tel"
+                minLength={9}
                 name="motherPhone"
-                placeholder="08xxxxxxxxxx"
+                pattern="^(\+?62|08|0)[0-9]{8,13}$"
+                placeholder="Contoh: 081234567890"
                 required
+                title="Nomor WhatsApp harus valid (contoh: 081234567890)"
                 type="tel"
               />
             </div>

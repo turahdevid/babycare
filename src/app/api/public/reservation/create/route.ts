@@ -12,17 +12,17 @@ const treatmentsSchema = z.array(
 );
 
 const createPublicReservationSchema = z.object({
-  motherName: z.string().min(1),
-  motherPhone: z.string().min(1),
-  motherEmail: z.string().email().optional(),
+  motherName: z.string().min(1, "Nama ibu wajib diisi"),
+  motherPhone: z.string().min(1, "Nomor WhatsApp wajib diisi"),
+  motherEmail: z.string().email("Format email tidak valid").optional().or(z.literal("")),
   address: z.string().optional(),
   babyId: z.string().optional(),
   babyName: z.string().optional(),
-  date: z.string().min(1),
-  time: z.string().min(1),
+  date: z.string().min(1, "Tanggal wajib diisi"),
+  time: z.string().min(1, "Jam wajib diisi"),
   serviceType: z.enum(["OUTLET", "HOMECARE"]),
   notes: z.string().optional(),
-  treatments: z.string().min(1),
+  treatments: z.string().min(1, "Treatment wajib dipilih"),
 });
 
 export async function POST(request: Request) {

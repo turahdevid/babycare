@@ -30,7 +30,7 @@ export function TransactionDetailTable({ rows }: Props) {
 
   return (
     <>
-      <div className="grid gap-3 lg:hidden">
+      <div className="grid gap-3 xl:hidden">
         {rows.map((row) => (
           <div
             key={row.id}
@@ -76,7 +76,7 @@ export function TransactionDetailTable({ rows }: Props) {
         ))}
       </div>
 
-      <div className="hidden overflow-x-auto lg:block">
+      <div className="hidden overflow-x-auto xl:block">
         <table className="min-w-[1100px] w-full table-fixed text-left text-xs">
           <thead>
             <tr className="border-b border-white/60 text-xs text-slate-600">

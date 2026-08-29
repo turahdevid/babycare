@@ -418,7 +418,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\win10\\Music\\turahcode\\babycare\\generated\\prisma",
+      "value": "C:\\Users\\win10\\Pictures\\babycare\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -432,12 +432,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\win10\\Music\\turahcode\\babycare\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\win10\\Pictures\\babycare\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.19.2",
