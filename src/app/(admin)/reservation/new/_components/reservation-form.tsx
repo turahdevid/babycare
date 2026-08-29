@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import type { Customer, Baby, Treatment, User } from "~/server/db";
 
 import { GlassCard } from "../../../_components/glass-card";
+import { SearchableSelect } from "../../../_components/searchable-select";
 
 type Props = {
   customers: (Customer & { babies: Baby[] })[];
@@ -32,6 +33,22 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
   const [error, setError] = useState("");
 
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
+
+  const customerOptions = useMemo(() => {
+    return customers.map((c) => ({
+      value: c.id,
+      label: `${c.motherName} - ${c.motherPhone}`,
+      sublabel: c.address ?? undefined,
+    }));
+  }, [customers]);
+
+  const midwifeOptions = useMemo(() => {
+    return midwives.map((m) => ({
+      value: m.id,
+      label: m.name ?? m.email ?? "Bidan",
+      sublabel: m.name && m.email ? m.email : undefined,
+    }));
+  }, [midwives]);
 
   const handleAddTreatment = (treatmentId: string) => {
     const existing = selectedTreatments.find((t) => t.treatmentId === treatmentId);
@@ -131,21 +148,19 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
               >
                 Customer <span className="text-rose-600">*</span>
               </label>
-              <select
-                className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                id="customerId"
-                name="customerId"
-                onChange={(e) => setSelectedCustomerId(e.target.value)}
-                required
-                value={selectedCustomerId}
-              >
-                <option value="">Pilih customer</option>
-                {customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.motherName} - {customer.motherPhone}
-                  </option>
-                ))}
-              </select>
+              <div className="mt-1.5">
+                <SearchableSelect
+                  emptyMessage="Customer tidak ditemukan"
+                  id="customerId"
+                  name="customerId"
+                  onChange={(val) => setSelectedCustomerId(val)}
+                  options={customerOptions}
+                  placeholder="Pilih customer"
+                  required
+                  searchPlaceholder="Cari nama ibu, no HP, alamat..."
+                  value={selectedCustomerId}
+                />
+              </div>
             </div>
 
             {selectedCustomer && selectedCustomer.babies.length > 0 ? (
@@ -217,18 +232,16 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
               >
                 Assign Bidan (Opsional)
               </label>
-              <select
-                className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                id="midwifeId"
-                name="midwifeId"
-              >
-                <option value="">Belum di-assign</option>
-                {midwives.map((midwife) => (
-                  <option key={midwife.id} value={midwife.id}>
-                    {midwife.name ?? midwife.email}
-                  </option>
-                ))}
-              </select>
+              <div className="mt-1.5">
+                <SearchableSelect
+                  emptyMessage="Bidan tidak ditemukan"
+                  id="midwifeId"
+                  name="midwifeId"
+                  options={midwifeOptions}
+                  placeholder="Belum di-assign"
+                  searchPlaceholder="Cari nama bidan..."
+                />
+              </div>
             </div>
           </div>
 

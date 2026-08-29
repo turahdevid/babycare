@@ -7,6 +7,7 @@ import { z } from "zod";
 import type { Customer, Baby, User } from "~/server/db";
 
 import { GlassCard } from "../../../_components/glass-card";
+import { SearchableSelect } from "../../../_components/searchable-select";
 import { NewCustomerModal, type NewCustomerPayload } from "./new-customer-modal";
 import { SLOT_CAPACITY } from "~/lib/time-slots";
 
@@ -128,6 +129,33 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
           (babyId) => selectedTreatmentsByBaby[babyId] ?? [],
         )
       : selectedTreatments;
+
+  const customerOptions = useMemo(() => {
+    const list = [];
+    if (newCustomerData) {
+      list.push({
+        value: "new",
+        label: `${newCustomerData.motherName} - ${newCustomerData.motherPhone} (Baru)`,
+        sublabel: newCustomerData.address ?? undefined,
+      });
+    }
+    for (const c of customers) {
+      list.push({
+        value: c.id,
+        label: `${c.motherName} - ${c.motherPhone}`,
+        sublabel: c.address ?? undefined,
+      });
+    }
+    return list;
+  }, [customers, newCustomerData]);
+
+  const midwifeOptions = useMemo(() => {
+    return midwives.map((m) => ({
+      value: m.id,
+      label: m.name ?? m.email ?? "Bidan",
+      sublabel: m.name && m.email ? m.email : undefined,
+    }));
+  }, [midwives]);
 
   const handleNewCustomerClick = () => {
     setShowNewCustomerModal(true);
@@ -353,35 +381,26 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                   Customer <span className="text-rose-600">*</span>
                 </label>
                 <div className="mt-1.5 flex gap-2">
-                  <select
-                    className="flex-1 rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
+                  <SearchableSelect
+                    className="flex-1 min-w-0"
+                    emptyMessage="Customer tidak ditemukan"
                     id="customerId"
                     name="customerId"
-                    onChange={(e) => {
-                      const next = e.target.value;
+                    onChange={(next) => {
                       setSelectedCustomerId(next);
                       setSelectedBabyIds([]);
                       setSelectedTreatments([]);
                       setSelectedTreatmentsByBaby({});
                       setNewCustomerData((prev) => (next === "new" ? prev : null));
                     }}
+                    options={customerOptions}
+                    placeholder="Pilih customer"
                     required={!newCustomerData}
+                    searchPlaceholder="Cari nama ibu, no HP, alamat..."
                     value={selectedCustomerId}
-                  >
-                    <option value="">Pilih customer</option>
-                    {newCustomerData ? (
-                      <option value="new">
-                        {newCustomerData.motherName} - {newCustomerData.motherPhone} (Baru)
-                      </option>
-                    ) : null}
-                    {customers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.motherName} - {customer.motherPhone}
-                      </option>
-                    ))}
-                  </select>
+                  />
                   <button
-                    className="rounded-2xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-2.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50/70"
+                    className="shrink-0 rounded-2xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-2.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50/70"
                     onClick={handleNewCustomerClick}
                     type="button"
                   >
@@ -548,18 +567,16 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                 >
                   Assign Bidan (Opsional)
                 </label>
-                <select
-                  className="mt-1.5 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus-visible:border-white/80 focus-visible:ring-2 focus-visible:ring-violet-200/60"
-                  id="midwifeId"
-                  name="midwifeId"
-                >
-                  <option value="">Belum di-assign</option>
-                  {midwives.map((midwife) => (
-                    <option key={midwife.id} value={midwife.id}>
-                      {midwife.name ?? midwife.email}
-                    </option>
-                  ))}
-                </select>
+                <div className="mt-1.5">
+                  <SearchableSelect
+                    emptyMessage="Bidan tidak ditemukan"
+                    id="midwifeId"
+                    name="midwifeId"
+                    options={midwifeOptions}
+                    placeholder="Belum di-assign"
+                    searchPlaceholder="Cari nama bidan..."
+                  />
+                </div>
               </div>
             </div>
 
