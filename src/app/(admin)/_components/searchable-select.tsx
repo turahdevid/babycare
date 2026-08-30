@@ -7,6 +7,7 @@ export type SearchableSelectOption = {
   value: string;
   label: string;
   sublabel?: string;
+  searchText?: string;
 };
 
 type Props = {
@@ -20,6 +21,7 @@ type Props = {
   emptyMessage?: string;
   required?: boolean;
   disabled?: boolean;
+  searchBy?: "label" | "all";
   onChange?: (value: string) => void;
   className?: string;
 };
@@ -35,6 +37,7 @@ export function SearchableSelect({
   emptyMessage = "Tidak ada hasil ditemukan",
   required = false,
   disabled = false,
+  searchBy = "all",
   onChange,
   className = "",
 }: Props) {
@@ -50,6 +53,7 @@ export function SearchableSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -58,12 +62,15 @@ export function SearchableSelect({
     }
   }, [isControlled, value]);
 
-  // Close dropdown on click outside
+  // Close dropdown on click/touch outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node;
       if (
         containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        !containerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
       ) {
         setIsOpen(false);
       }
@@ -129,7 +136,16 @@ export function SearchableSelect({
 
   const filteredOptions = options.filter((opt) => {
     if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
+    const q = searchQuery.toLowerCase().trim();
+
+    if (opt.searchText !== undefined) {
+      return opt.searchText.toLowerCase().includes(q);
+    }
+
+    if (searchBy === "label") {
+      return opt.label.toLowerCase().includes(q);
+    }
+
     const matchesLabel = opt.label.toLowerCase().includes(q);
     const matchesSublabel = opt.sublabel?.toLowerCase().includes(q) ?? false;
     const matchesValue = opt.value.toLowerCase().includes(q);
@@ -148,7 +164,7 @@ export function SearchableSelect({
 
   const dropdownMenu = (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col justify-end bg-slate-900/40 backdrop-blur-xs sm:bg-transparent sm:backdrop-blur-none"
+      className="fixed inset-0 z-[9999] flex flex-col justify-end bg-slate-900/40 backdrop-blur-xs sm:pointer-events-none sm:bg-transparent sm:backdrop-blur-none"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           setIsOpen(false);
@@ -156,7 +172,8 @@ export function SearchableSelect({
       }}
     >
       <div
-        className="w-full rounded-t-3xl border border-slate-200/90 bg-white p-4 shadow-2xl sm:absolute sm:rounded-2xl sm:p-2 sm:shadow-xl"
+        ref={dropdownRef}
+        className="w-full rounded-t-3xl border border-slate-200/90 bg-white p-4 shadow-2xl sm:pointer-events-auto sm:absolute sm:rounded-2xl sm:p-2 sm:shadow-xl"
         style={{
           ...(typeof window !== "undefined" && window.innerWidth >= 640
             ? {
@@ -168,7 +185,7 @@ export function SearchableSelect({
             : {}),
         }}
       >
-        {/* Search Box Input - proper input element to trigger touch tablet/phone virtual keyboard */}
+        {/* Search Box Input */}
         <div className="sticky top-0 z-10 pb-2">
           <div className="relative">
             <input
@@ -193,9 +210,9 @@ export function SearchableSelect({
           </div>
         </div>
 
-        {/* Options List with Scrolling */}
+        {/* Options List with Touch Scrolling Support */}
         <div
-          className="max-h-60 overflow-y-auto overscroll-contain py-1 text-sm text-slate-700 sm:max-h-52"
+          className="max-h-60 overflow-y-auto overscroll-contain py-1 text-sm text-slate-700 sm:max-h-52 [-webkit-overflow-scrolling:touch] touch-pan-y"
           role="listbox"
           tabIndex={-1}
         >

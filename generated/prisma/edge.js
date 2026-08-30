@@ -418,7 +418,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\win10\\Pictures\\babycare\\generated\\prisma",
+      "value": "C:\\Users\\DELL\\Documents\\client\\babycare\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -432,7 +432,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\win10\\Pictures\\babycare\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\DELL\\Documents\\client\\babycare\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

@@ -39,6 +39,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
       value: c.id,
       label: `${c.motherName} - ${c.motherPhone}`,
       sublabel: c.address ?? undefined,
+      searchText: c.motherName,
     }));
   }, [customers]);
 

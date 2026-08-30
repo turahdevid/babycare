@@ -137,6 +137,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
         value: "new",
         label: `${newCustomerData.motherName} - ${newCustomerData.motherPhone} (Baru)`,
         sublabel: newCustomerData.address ?? undefined,
+        searchText: newCustomerData.motherName,
       });
     }
     for (const c of customers) {
@@ -144,6 +145,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
         value: c.id,
         label: `${c.motherName} - ${c.motherPhone}`,
         sublabel: c.address ?? undefined,
+        searchText: c.motherName,
       });
     }
     return list;
@@ -396,7 +398,7 @@ export function ReservationForm({ customers, treatments, midwives }: Props) {
                     options={customerOptions}
                     placeholder="Pilih customer"
                     required={!newCustomerData}
-                    searchPlaceholder="Cari nama ibu, no HP, alamat..."
+                    searchPlaceholder="Cari nama ibu..."
                     value={selectedCustomerId}
                   />
                   <button
