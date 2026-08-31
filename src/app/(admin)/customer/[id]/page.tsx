@@ -6,6 +6,7 @@ import { db } from "~/server/db";
 import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
+import { SubmitButton } from "~/app/_components/submit-button";
 import { addBaby } from "../_actions";
 import { BabyAgeAutofill } from "./_components/baby-age-autofill";
 
@@ -291,12 +292,12 @@ export default async function CustomerDetailPage(props: { params: Params }) {
               </div>
 
               <div className="mt-4">
-                <button
+                <SubmitButton
                   className="w-full rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70"
-                  type="submit"
+                  loadingText="Menyimpan Baby..."
                 >
                   Simpan Baby
-                </button>
+                </SubmitButton>
               </div>
             </form>
           </div>

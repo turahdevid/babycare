@@ -361,14 +361,16 @@ export async function POST(request: Request) {
     const reservationPrimaryBabyId =
       resolvedBabyId ?? (resolvedBabyIds.length > 0 ? resolvedBabyIds[0] : null);
 
+    const selectedMidwifeId =
+      validated.midwifeId && validated.midwifeId.length > 0
+        ? validated.midwifeId
+        : null;
+
     const reservation = await db.reservation.create({
       data: {
         customerId,
         babyId: reservationPrimaryBabyId,
-        midwifeId:
-          validated.midwifeId && validated.midwifeId.length > 0
-            ? validated.midwifeId
-            : null,
+        midwifeId: selectedMidwifeId,
         startAt: startDateTime,
         endAt: endDateTime,
         status: "PENDING",

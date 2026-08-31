@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { GlassCard } from "../_components/glass-card";
+import { SubmitButton } from "~/app/_components/submit-button";
 import { archiveTreatment, toggleTreatmentActive } from "./_actions";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -248,21 +249,21 @@ export default async function TreatmentPage(props: PageProps) {
                             </svg>
                           </Link>
                           <form action={toggleAction}>
-                            <button
+                            <SubmitButton
                               aria-label={
                                 treatment.isActive
                                   ? "Nonaktifkan treatment"
                                   : "Aktifkan treatment"
-                              }
-                              title={
-                                treatment.isActive ? "Nonaktifkan" : "Aktifkan"
                               }
                               className={
                                 treatment.isActive
                                   ? "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-amber-200/60 bg-amber-50/50 text-amber-800 transition hover:bg-amber-50/70"
                                   : "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-200/60 bg-emerald-50/50 text-emerald-800 transition hover:bg-emerald-50/70"
                               }
-                              type="submit"
+                              loadingText=""
+                              title={
+                                treatment.isActive ? "Nonaktifkan" : "Aktifkan"
+                              }
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -275,14 +276,14 @@ export default async function TreatmentPage(props: PageProps) {
                                 <path d="M12 2v8" />
                                 <path d="M5.5 6.5a7.5 7.5 0 1 0 13 0" />
                               </svg>
-                            </button>
+                            </SubmitButton>
                           </form>
                           <form action={archiveAction}>
-                            <button
+                            <SubmitButton
                               aria-label="Arsipkan treatment"
-                              title="Arsipkan"
                               className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200/60 bg-rose-50/50 text-rose-700 transition hover:bg-rose-50/70"
-                              type="submit"
+                              loadingText=""
+                              title="Arsipkan"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -298,7 +299,7 @@ export default async function TreatmentPage(props: PageProps) {
                                 <path d="M10 11v6" />
                                 <path d="M14 11v6" />
                               </svg>
-                            </button>
+                            </SubmitButton>
                           </form>
                         </div>
                       </td>

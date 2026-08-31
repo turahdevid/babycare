@@ -4,6 +4,7 @@ import { z } from "zod";
 import { auth } from "~/server/auth";
 import { hashPassword, verifyPassword } from "~/server/auth/password";
 import { db } from "~/server/db";
+import { SubmitButton } from "~/app/_components/submit-button";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -168,15 +169,12 @@ export default async function ChangePasswordPage({
               />
             </div>
 
-            <button
+            <SubmitButton
               className="group relative w-full overflow-hidden rounded-2xl bg-[linear-gradient(120deg,#7DD3FC,#E0F2FE,#38BDF8)] bg-size-[200%_200%] px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_14px_40px_rgba(14,165,233,0.2)] transition hover:bg-position-[100%_0%] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-              type="submit"
+              loadingText="Menyimpan password..."
             >
-              <span className="relative z-10">Simpan password</span>
-              <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <span className="absolute -left-1/2 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-white/35 blur-xl" />
-              </span>
-            </button>
+              Simpan password
+            </SubmitButton>
           </form>
       </div>
     </section>

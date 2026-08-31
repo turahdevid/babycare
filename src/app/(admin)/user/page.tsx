@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { GlassCard } from "../_components/glass-card";
+import { SubmitButton } from "~/app/_components/submit-button";
 import { deleteUser } from "./_actions";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -182,11 +183,11 @@ export default async function UserManagementPage(props: {
                       </Link>
 
                       <form action={deleteAction}>
-                        <button
+                        <SubmitButton
                           aria-label="Hapus pegawai"
-                          title="Hapus"
                           className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-200/60 bg-rose-50/50 text-rose-700 transition hover:bg-rose-50/70"
-                          type="submit"
+                          loadingText=""
+                          title="Hapus"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +203,7 @@ export default async function UserManagementPage(props: {
                             <path d="M10 11v6" />
                             <path d="M14 11v6" />
                           </svg>
-                        </button>
+                        </SubmitButton>
                       </form>
                     </div>
                   </div>

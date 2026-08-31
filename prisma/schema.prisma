@@ -223,7 +223,6 @@ model Reservation {
     @@index([customerId, startAt])
     @@index([babyId, startAt])
     @@index([serviceType, startAt])
-    @@unique([midwifeId, startAt])
 }
 
 model ReservationTreatment {

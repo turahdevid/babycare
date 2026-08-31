@@ -6,6 +6,7 @@ import { db, type Prisma } from "~/server/db";
 import { calculateAge } from "~/lib/calculate-age";
 import { GlassCard } from "../../_components/glass-card";
 import { StatusPill } from "../../_components/status-pill";
+import { SubmitButton } from "~/app/_components/submit-button";
 import {
   DiscountPercentInput,
   DiscountPriceSummary,
@@ -95,25 +96,20 @@ function formatCurrency(amount: number) {
 }
 
 type Params = Promise<{ id: string }>;
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function ReservationDetailPage(props: {
   params: Params;
+  searchParams?: SearchParams;
 }) {
   const session = await auth();
   const params = await props.params;
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
 
   const success =
-    typeof (props as { searchParams?: Record<string, string | string[] | undefined> })
-      .searchParams?.success === "string"
-      ? (props as { searchParams?: Record<string, string | string[] | undefined> }).searchParams
-          ?.success
-      : undefined;
+    typeof searchParams?.success === "string" ? searchParams.success : undefined;
   const errorParam =
-    typeof (props as { searchParams?: Record<string, string | string[] | undefined> })
-      .searchParams?.error === "string"
-      ? (props as { searchParams?: Record<string, string | string[] | undefined> }).searchParams
-          ?.error
-      : undefined;
+    typeof searchParams?.error === "string" ? searchParams.error : undefined;
 
   if (!session?.user) {
     redirect("/");
@@ -202,6 +198,22 @@ export default async function ReservationDetailPage(props: {
           <GlassCard>
             <div className="rounded-xl border border-rose-200/60 bg-rose-50/50 px-4 py-3 text-sm text-rose-700">
               Reservasi yang sudah selesai tidak bisa dibatalkan.
+            </div>
+          </GlassCard>
+        ) : null}
+
+        {errorParam === "midwife-busy" ? (
+          <GlassCard>
+            <div className="rounded-xl border border-rose-200/60 bg-rose-50/50 px-4 py-3 text-sm text-rose-700">
+              Bidan yang dipilih sudah memiliki jadwal reservasi lain pada jam tersebut. Silakan pilih bidan lain.
+            </div>
+          </GlassCard>
+        ) : null}
+
+        {errorParam === "invalid-complete" ? (
+          <GlassCard>
+            <div className="rounded-xl border border-rose-200/60 bg-rose-50/50 px-4 py-3 text-sm text-rose-700">
+              Data penyelesaian reservasi tidak lengkap atau tidak valid.
             </div>
           </GlassCard>
         ) : null}
@@ -583,13 +595,13 @@ export default async function ReservationDetailPage(props: {
                 <p className="mt-1 text-xs text-slate-600/80">Range diskon 0% - 100%</p>
               </div>
 
-              <button
+              <SubmitButton
                 className="rounded-2xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50/70 disabled:opacity-50"
                 disabled={reservation.customer.babies.length === 0}
-                type="submit"
+                loadingText="Menyelesaikan..."
               >
                 Lengkapi &amp; Selesaikan
-              </button>
+              </SubmitButton>
             </form>
           ) : null}
         </GlassCard>
@@ -612,12 +624,12 @@ export default async function ReservationDetailPage(props: {
               Assign Bidan
             </button>
             <form action={cancelReservation.bind(null, reservation.id)}>
-              <button
+              <SubmitButton
                 className="rounded-2xl border border-rose-200/60 bg-rose-50/50 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50/70"
-                type="submit"
+                loadingText="Membatalkan..."
               >
                 Cancel
-              </button>
+              </SubmitButton>
             </form>
           </div>
           <p className="mt-3 text-xs text-slate-700/80">

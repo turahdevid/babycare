@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { GlassCard } from "../../../_components/glass-card";
+import { SubmitButton } from "~/app/_components/submit-button";
 import { updateCustomer } from "../../_actions";
 
 type Params = Promise<{ id: string }>;
@@ -172,12 +173,12 @@ export default async function EditCustomerPage(props: { params: Params }): Promi
           </div>
 
           <div className="mt-6 flex gap-3">
-            <button
+            <SubmitButton
               className="flex-1 rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70"
-              type="submit"
+              loadingText="Menyimpan..."
             >
               Simpan Perubahan
-            </button>
+            </SubmitButton>
             <Link
               className="rounded-2xl border border-slate-200/60 bg-slate-50/50 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50/70"
               href={`/customer/${customer.id}`}

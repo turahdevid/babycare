@@ -5,12 +5,13 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { auth } from "~/server/auth";
-import { db, type Prisma } from "~/server/db";
+import { db, Prisma } from "~/server/db";
 
 const reservationCompletionSelect = {
   id: true,
   status: true,
   completedAt: true,
+  startAt: true,
   babyId: true,
   midwifeId: true,
   items: {
@@ -173,9 +174,36 @@ export async function completeReservation(reservationId: string, formData: FormD
   const discountAmount = Math.round(discountAmountRaw * 100) / 100;
   const totalPrice = Math.round((subtotalPrice - discountAmount) * 100) / 100;
 
-  if (shouldComplete) {
-    await db.$transaction([
-      db.reservation.update({
+  try {
+    if (shouldComplete) {
+      await db.$transaction([
+        db.reservation.update({
+          where: { id: existing.id },
+          data: {
+            babyId: resolvedBabyId ?? null,
+            midwifeId: validated.data.midwifeId,
+            paymentMethod: validated.data.paymentMethod ?? null,
+            subtotalPrice,
+            discountPercent: discountPercent ?? null,
+            discountAmount: discountPercent ? discountAmount : null,
+            totalPrice,
+            status: "COMPLETED",
+            completedAt: now,
+          },
+        }),
+        db.reservationAuditLog.create({
+          data: {
+            reservationId: existing.id,
+            action: "COMPLETE",
+            fromStatus: existing.status,
+            toStatus: "COMPLETED",
+            actorId: session.user.id,
+            message: "Reservasi diselesaikan",
+          },
+        }),
+      ]);
+    } else {
+      await db.reservation.update({
         where: { id: existing.id },
         data: {
           babyId: resolvedBabyId ?? null,
@@ -185,34 +213,17 @@ export async function completeReservation(reservationId: string, formData: FormD
           discountPercent: discountPercent ?? null,
           discountAmount: discountPercent ? discountAmount : null,
           totalPrice,
-          status: "COMPLETED",
-          completedAt: now,
         },
-      }),
-      db.reservationAuditLog.create({
-        data: {
-          reservationId: existing.id,
-          action: "COMPLETE",
-          fromStatus: existing.status,
-          toStatus: "COMPLETED",
-          actorId: session.user.id,
-          message: "Reservasi diselesaikan",
-        },
-      }),
-    ]);
-  } else {
-    await db.reservation.update({
-      where: { id: existing.id },
-      data: {
-        babyId: resolvedBabyId ?? null,
-        midwifeId: validated.data.midwifeId,
-        paymentMethod: validated.data.paymentMethod ?? null,
-        subtotalPrice,
-        discountPercent: discountPercent ?? null,
-        discountAmount: discountPercent ? discountAmount : null,
-        totalPrice,
-      },
-    });
+      });
+    }
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      redirect(`/reservation/${parsed.data}?error=midwife-busy`);
+    }
+    throw error;
   }
 
   revalidatePath("/reservation");

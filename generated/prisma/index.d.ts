@@ -14498,7 +14498,6 @@ export namespace Prisma {
 
   export type ReservationWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    midwifeId_startAt?: ReservationMidwifeIdStartAtCompoundUniqueInput
     AND?: ReservationWhereInput | ReservationWhereInput[]
     OR?: ReservationWhereInput[]
     NOT?: ReservationWhereInput | ReservationWhereInput[]
@@ -14526,7 +14525,7 @@ export namespace Prisma {
     items?: ReservationTreatmentListRelationFilter
     auditLogs?: ReservationAuditLogListRelationFilter
     notifications?: NotificationListRelationFilter
-  }, "id" | "midwifeId_startAt">
+  }, "id">
 
   export type ReservationOrderByWithAggregationInput = {
     id?: SortOrder
@@ -16563,11 +16562,6 @@ export namespace Prisma {
     fields: ReservationOrderByRelevanceFieldEnum | ReservationOrderByRelevanceFieldEnum[]
     sort: SortOrder
     search: string
-  }
-
-  export type ReservationMidwifeIdStartAtCompoundUniqueInput = {
-    midwifeId: string
-    startAt: Date | string
   }
 
   export type ReservationCountOrderByAggregateInput = {

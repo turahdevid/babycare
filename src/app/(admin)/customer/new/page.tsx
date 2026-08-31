@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { GlassCard } from "../../_components/glass-card";
+import { SubmitButton } from "~/app/_components/submit-button";
 import { createCustomer } from "../_actions";
 
 export default async function NewCustomerPage() {
@@ -267,12 +268,12 @@ export default async function NewCustomerPage() {
           </div>
 
           <div className="mt-6 flex gap-3">
-            <button
+            <SubmitButton
               className="flex-1 rounded-2xl border border-sky-200/60 bg-sky-50/50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-50/70"
-              type="submit"
+              loadingText="Menyimpan..."
             >
               Simpan Customer
-            </button>
+            </SubmitButton>
             <Link
               className="rounded-2xl border border-slate-200/60 bg-slate-50/50 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50/70"
               href="/customer"
